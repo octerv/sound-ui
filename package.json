@@ -1,20 +1,40 @@
 {
-  "name": "sui",
+  "name": "sound-ui",
   "version": "0.0.1",
   "description": "Sound UI Components with React.",
   "main": "build/index.js",
   "files": [
+    "package.json",
+    "README.md",
+    "LICENSE",
+    "types",
     "build"
   ],
   "scripts": {
     "build": "tsc",
     "test": "jest",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "preview": "npx ladle serve"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "UI",
+    "React",
+    "Sound",
+    "Audio",
+    "Waves"
+  ],
+  "author": "Octerv",
   "license": "MIT",
+  "peerDependencies": {
+    "@types/react": "^18.0.26",
+    "@types/react-dom": "^18.0.10",
+    "@types/styled-components": "^5.1.26",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "styled-components": "^5.3.6"
+  },
   "devDependencies": {
+    "@ladle/react": "^2.4.5",
     "@types/jest": "^29.2.5",
     "@types/node": "^18.11.18",
     "jest": "^29.3.1",

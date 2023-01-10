@@ -1,3 +1,1 @@
-export const hello = (): void => {
-  console.log("hello world");
-};
+export { Waves, WavesProps } from "./Waves";
