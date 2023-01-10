@@ -24,6 +24,11 @@
     "Waves"
   ],
   "author": "Octerv",
+  "homepage": "https://github.com/octerv/sound-ui",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/octerv/sound-ui.git"
+  },
   "license": "MIT",
   "peerDependencies": {
     "@types/react": "^18.0.26",

@@ -1,4 +1,4 @@
-# SUI
+# Sound UI
 
 Sound UI Components with React.
 
@@ -73,4 +73,4 @@ export const Default = () => {
 npm run preview
 ```
 
-![View1](images/view1.png)
+![View1](https://user-images.githubusercontent.com/103025781/211580349-fc17c7eb-d4e2-42e2-a78b-b0ed19369657.png)
