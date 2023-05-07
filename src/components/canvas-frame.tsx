@@ -1,6 +1,10 @@
 import React from "react";
 import { useRef } from "react";
-import { useFrameCanvasSetup, useFrameCanvasUpdate } from "../Waves.effects";
+import {
+  useFrameCanvasSetup,
+  useFrameCanvasStereoUpdate,
+  useFrameCanvasUpdate,
+} from "../Waves.effects";
 import { Content } from "./styled";
 
 interface Props {
@@ -9,6 +13,7 @@ interface Props {
   audioBuffer: AudioBuffer | null;
   width: number;
   height: number;
+  stereo: boolean | undefined;
 }
 
 const CanvasFrame = ({
@@ -17,9 +22,15 @@ const CanvasFrame = ({
   audioBuffer,
   width,
   height,
+  stereo,
 }: Props) => {
   useFrameCanvasSetup(canvasRef);
-  useFrameCanvasUpdate(canvasRef, constants, audioBuffer);
+  if (stereo) {
+    useFrameCanvasStereoUpdate(canvasRef, constants, audioBuffer);
+  } else {
+    useFrameCanvasUpdate(canvasRef, constants, audioBuffer);
+  }
+
   return <Content width={width} height={height} ref={canvasRef} />;
 };
 

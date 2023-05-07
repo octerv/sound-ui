@@ -2,7 +2,7 @@ import React, { startTransition } from "react";
 import { useEffect } from "react";
 import { useWavesCanvasSetup } from "../Waves.effects";
 import { Content } from "./styled";
-import { drawWaves } from "../Waves.functions";
+import { drawWaveStereo, drawWaves } from "../Waves.functions";
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // Interface
@@ -17,6 +17,7 @@ interface Props {
   samplingLevel: number | undefined;
   normalize: boolean;
   drawing: boolean;
+  stereo: boolean | undefined;
   setDrew: (drew: boolean) => void;
   setDrawing: (drawing: boolean) => void;
   setScaling: (scaling: boolean) => void;
@@ -35,6 +36,7 @@ const CanvasWaves = ({
   samplingLevel,
   normalize,
   drawing,
+  stereo,
   setDrew,
   setDrawing,
   setScaling,
@@ -56,14 +58,25 @@ const CanvasWaves = ({
     if (!canvasRef || !canvasRef.current) return;
     // draw waves
     startTransition(() => {
-      drawWaves(
-        audioBuffer,
-        canvasRef,
-        constants,
-        normalize,
-        width,
-        samplingLevel || 0.001
-      );
+      if (stereo) {
+        drawWaveStereo(
+          audioBuffer,
+          canvasRef,
+          constants,
+          normalize,
+          width,
+          samplingLevel || 0.001
+        );
+      } else {
+        drawWaves(
+          audioBuffer,
+          canvasRef,
+          constants,
+          normalize,
+          width,
+          samplingLevel || 0.001
+        );
+      }
       console.info("[success] drew");
       setScaling(false);
       setDrawing(false);

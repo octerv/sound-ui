@@ -145,7 +145,8 @@ const useMouseCanvasSetup = (
 const useCoverCanvasSetup = (
   canvasRef: RefObject<HTMLCanvasElement> | null,
   constants: { [key: string]: any },
-  audioBuffer: AudioBuffer | null
+  audioBuffer: AudioBuffer | null,
+  stereo: boolean | undefined
 ) => {
   useEffect(() => {
     if (!audioBuffer) return;
@@ -163,6 +164,8 @@ const useCoverCanvasSetup = (
     );
     canvasCtx.closePath();
     canvasCtx.fill();
+
+    if (stereo) return;
 
     const graphHeight =
       (canvasHeight -
@@ -229,6 +232,50 @@ const useFrameCanvasUpdate = (
       canvasCtx.closePath();
       canvasCtx.stroke();
     }
+  }, [audioBuffer]);
+};
+
+const useFrameCanvasStereoUpdate = (
+  canvasRef: RefObject<HTMLCanvasElement> | null,
+  constants: { [key: string]: any },
+  audioBuffer: AudioBuffer | null
+) => {
+  useEffect(() => {
+    if (!audioBuffer) return;
+    if (!canvasRef || !canvasRef.current) return;
+
+    const { canvasCtx, canvasWidth, canvasHeight } =
+      getCanvasContext(canvasRef);
+    const graphWidth = canvasWidth - constants.CANVAS_PADDING * 2;
+    const graphHeight =
+      canvasHeight - constants.CANVAS_PADDING - constants.VERTICAL_SCALE_HEIGHT;
+    console.debug(
+      `canvas: ${canvasWidth}x${canvasHeight}, graph: ${graphWidth}x${graphHeight}`
+    );
+
+    const centerHeight = constants.CANVAS_PADDING + graphHeight / 2;
+
+    // draw frame
+    canvasCtx.strokeStyle = "#347991";
+    canvasCtx.lineWidth = 1;
+    canvasCtx.beginPath();
+    canvasCtx.rect(
+      constants.CANVAS_PADDING,
+      constants.CANVAS_PADDING,
+      graphWidth,
+      graphHeight
+    );
+    canvasCtx.closePath();
+    canvasCtx.stroke();
+
+    // draw grid (horizontal)
+    canvasCtx.strokeStyle = "#2F4147";
+    canvasCtx.lineWidth = 0.2;
+    canvasCtx.beginPath();
+    canvasCtx.moveTo(constants.CANVAS_PADDING, centerHeight);
+    canvasCtx.lineTo(constants.CANVAS_PADDING + graphWidth, centerHeight);
+    canvasCtx.closePath();
+    canvasCtx.stroke();
   }, [audioBuffer]);
 };
 
@@ -467,6 +514,7 @@ export {
   useMouseCanvasSetup,
   useCoverCanvasSetup,
   useFrameCanvasUpdate,
+  useFrameCanvasStereoUpdate,
   useCanvasClear,
   useScaleEffect,
   useCursorEffect,

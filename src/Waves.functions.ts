@@ -9,6 +9,13 @@ import { RefObject } from "react";
 // duration >= 10:00 && duration < 30:00 ... each 3:00 = sampleRate * 180
 // duration >= 1:00 && duration < 10:00 ... each 1:00 = sampleRate * 60
 // duration < 1:00 ... each 0:05 = sampleRate * 5
+/**
+ * スケールを変更する
+ * @param audioBuffer
+ * @param position
+ * @param scale
+ * @returns
+ */
 function _scaling(
   audioBuffer: AudioBuffer,
   position: number = 0, // second
@@ -71,6 +78,11 @@ function _scaling(
   return { buffer, scales, adjust };
 }
 
+/**
+ * 時刻を文字列として取得する
+ * @param second
+ * @returns
+ */
 function _getTimeStr(second: number): string {
   const hour = Math.floor(second / (60 * 60));
   const min = Math.floor((second % (60 * 60)) / 60);
@@ -82,6 +94,11 @@ function _getTimeStr(second: number): string {
       )}`;
 }
 
+/**
+ * 最大値を取得する
+ * @param audioBuffer
+ * @returns
+ */
 function _getMax(audioBuffer: AudioBuffer): { [index: number]: number } {
   // 最大値の取得
   let max: { [index: number]: number } = {};
@@ -101,6 +118,12 @@ function _getMax(audioBuffer: AudioBuffer): { [index: number]: number } {
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // export functions
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+/**
+ * 配列を指定された個数で分割する
+ * @param array
+ * @param number
+ * @returns
+ */
 const sliceByNumber = (array: number[], number: number) => {
   const length = Math.ceil(array.length / number);
   return new Array(length)
@@ -108,6 +131,14 @@ const sliceByNumber = (array: number[], number: number) => {
     .map((_, i) => array.slice(i * number, (i + 1) * number));
 };
 
+/**
+ * カーソル位置の時刻を取得する
+ * @param canvasWavesWidth
+ * @param adjustWidth
+ * @param duration
+ * @param x
+ * @returns
+ */
 const getCursorSecond = (
   canvasWavesWidth: number,
   adjustWidth: number,
@@ -118,6 +149,11 @@ const getCursorSecond = (
   return ((x - adjustWidth) * duration) / (canvasWavesWidth - adjustWidth * 2);
 };
 
+/**
+ * Canvasのコンテキストを取得する
+ * @param ref
+ * @returns
+ */
 const getCanvasContext = (
   ref: RefObject<HTMLCanvasElement>
 ): {
@@ -132,6 +168,16 @@ const getCanvasContext = (
   return { canvasCtx, canvasWidth, canvasHeight };
 };
 
+/**
+ * 波形を描画する
+ * @param audioBuffer
+ * @param canvasRef
+ * @param constants
+ * @param normalize
+ * @param canvasWavesWidth
+ * @param samplingLevel
+ * @returns
+ */
 const drawWaves = (
   audioBuffer: AudioBuffer | null,
   canvasRef: RefObject<HTMLCanvasElement> | null,
@@ -238,6 +284,134 @@ const drawWaves = (
   }
 };
 
+/**
+ * 波形を描画する（ステレオ）
+ * @param audioBuffer
+ * @param canvasRef
+ * @param constants
+ * @param normalize
+ * @param canvasWavesWidth
+ * @param samplingLevel
+ * @returns
+ */
+const drawWaveStereo = (
+  audioBuffer: AudioBuffer | null,
+  canvasRef: RefObject<HTMLCanvasElement> | null,
+  constants: { [key: string]: any },
+  normalize: boolean,
+  canvasWavesWidth: number,
+  samplingLevel: number
+) => {
+  if (!audioBuffer) return;
+  if (!canvasRef || !canvasRef.current) return;
+  console.info("[info] drawing: waves");
+
+  // canvasのサイズを変更してスケールを表現
+  const { buffer, scales } = _scaling(audioBuffer);
+
+  // どれくらいの詳細度で描画するか（以下は1/10秒）
+  const stepInterval = buffer.sampleRate * samplingLevel;
+  console.debug(`sampling level: ${samplingLevel}, interval: ${stepInterval}`);
+
+  // canvasの取得
+  const canvasWidth = canvasWavesWidth;
+  const { canvasCtx, canvasHeight } = getCanvasContext(canvasRef);
+  console.debug(`canvasWidth: ${canvasWidth}, canvasHeight: ${canvasHeight}`);
+
+  // graph frame size
+  const graphWidth = canvasWidth - constants.CANVAS_PADDING * 2;
+  const graphHeight =
+    canvasHeight -
+    constants.CANVAS_PADDING * 2 -
+    constants.VERTICAL_SCALE_HEIGHT;
+  console.debug(`graphWidth: ${graphWidth}, graphHeight: ${graphHeight}`);
+
+  // step size
+  const stepWidth =
+    (graphWidth - constants.GRAPH_PADDING * 2) /
+    (buffer.getChannelData(0).length / stepInterval);
+  const stepHeight = graphHeight - constants.GRAPH_PADDING * 2;
+
+  // clear previous waves
+  canvasCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+  // prepare normalize
+  const max = _getMax(audioBuffer);
+
+  // bufferからステレオそれぞれのデータを取り出す
+  const channelDataLeft = buffer.getChannelData(0);
+  const channelDataRight = buffer.getChannelData(1);
+  const numberOfSamples = buffer.length;
+
+  // 左右のチャンネルのデータを加算し、平均を取ることでモノラル波形を作成する
+  const waveformData = new Float32Array(numberOfSamples);
+  for (let i = 0; i < numberOfSamples; i++) {
+    waveformData[i] = (channelDataLeft[i] + channelDataRight[i]) / 2;
+  }
+
+  const centerHeight = constants.CANVAS_PADDING + graphHeight / 2;
+
+  let prePos = {
+    x: constants.CANVAS_PADDING + constants.GRAPH_PADDING,
+    y: centerHeight,
+  };
+
+  for (let j = 0; j < waveformData.length; j = j + stepInterval) {
+    const amp = waveformData[j] * (stepHeight / 2);
+
+    const curPos = {
+      x:
+        constants.CANVAS_PADDING +
+        constants.GRAPH_PADDING +
+        stepWidth * (j / stepInterval),
+      y: centerHeight - amp,
+    };
+
+    // draw horizontal scale
+    if (j in scales) {
+      // console.debug(`draw scale [${j}:${scales[j]}]`);
+      const y = constants.CANVAS_PADDING;
+      canvasCtx.strokeStyle = "#2F4147";
+      canvasCtx.lineWidth = 0.2;
+      canvasCtx.beginPath();
+      canvasCtx.moveTo(curPos.x, y);
+      canvasCtx.lineTo(curPos.x, y + graphHeight);
+      canvasCtx.closePath();
+      canvasCtx.stroke();
+      // 目盛り文字を描画
+      const scaleY = canvasHeight - constants.VERTICAL_SCALE_HEIGHT + 8;
+      canvasCtx.font = "10px serif";
+      canvasCtx.fillText(_getTimeStr(scales[j]), curPos.x, scaleY);
+    }
+
+    if (j === 0) {
+      // 先頭は値を入れておくのみにする（0位置の設定のため）
+      prePos = curPos;
+      continue;
+    }
+
+    // 波形の描画
+    canvasCtx.strokeStyle = "#48A7C7";
+    canvasCtx.lineWidth = 0.5;
+    canvasCtx.beginPath();
+    canvasCtx.moveTo(prePos.x, prePos.y);
+    canvasCtx.lineTo(curPos.x, curPos.y);
+    canvasCtx.stroke();
+    prePos = curPos;
+  }
+};
+
+/**
+ * 範囲選択された部分を描画する
+ * @param canvasDecorationRef
+ * @param constants
+ * @param canvasWavesWidth
+ * @param ranges
+ * @param position
+ * @param selecting
+ * @param scale
+ * @returns
+ */
 const drawSelectedRanges = (
   canvasDecorationRef: RefObject<HTMLCanvasElement> | null,
   constants: { [key: string]: any },
@@ -312,5 +486,6 @@ export {
   sliceByNumber,
   getCanvasContext,
   drawWaves,
+  drawWaveStereo,
   drawSelectedRanges,
 };

@@ -8,6 +8,7 @@ interface Props {
   audioBuffer: AudioBuffer | null;
   width: number;
   height: number;
+  stereo: boolean | undefined;
 }
 
 const CanvasCover = ({
@@ -16,8 +17,9 @@ const CanvasCover = ({
   audioBuffer,
   width,
   height,
+  stereo,
 }: Props) => {
-  useCoverCanvasSetup(canvasRef, constants, audioBuffer);
+  useCoverCanvasSetup(canvasRef, constants, audioBuffer, stereo);
   return <Content width={width} height={height} ref={canvasRef} />;
 };
 

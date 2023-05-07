@@ -66,6 +66,7 @@ export const Default = () => {
 - samplingLevel(optional:number): detail of waves (max:0.001, othre:0.01 0.1 1)
 - normalize(optional:boolean): set true to normalize waves
 - selectable(optional:boolean): set true to select range on waves
+- stereo(optional:boolean): set true, mixing two stereo waveforms into a single waveform
 
 ## Preview
 

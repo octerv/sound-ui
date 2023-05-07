@@ -116,6 +116,7 @@ export const Waves = (props: WavesProps) => {
         audioBuffer={audioBuffer}
         width={props.width}
         height={props.height}
+        stereo={props.stereo}
       />
       <CanvasWaves
         canvasRef={canvasWavesRef}
@@ -127,6 +128,7 @@ export const Waves = (props: WavesProps) => {
         samplingLevel={props.samplingLevel}
         normalize={normalize}
         drawing={drawing}
+        stereo={props.stereo}
         setDrew={setDrew}
         setDrawing={setDrawing}
         setScaling={setScaling}
@@ -149,6 +151,7 @@ export const Waves = (props: WavesProps) => {
         audioBuffer={audioBuffer}
         width={props.width}
         height={props.height}
+        stereo={props.stereo}
       />
       <CanvasMouse
         canvasRef={canvasMouseRef}
