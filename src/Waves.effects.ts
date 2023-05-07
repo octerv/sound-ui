@@ -102,7 +102,9 @@ const useAudioBuffer = (dataUrl: string, context: AudioContext | null) => {
   return buffer;
 };
 
-const setupFrameCanvas = (canvasRef: RefObject<HTMLCanvasElement> | null) => {
+const useSetupFrameCanvas = (
+  canvasRef: RefObject<HTMLCanvasElement> | null
+) => {
   useEffect(() => {
     if (!canvasRef || !canvasRef.current) return;
     const { canvasCtx, canvasWidth, canvasHeight } =
@@ -118,7 +120,9 @@ const setupFrameCanvas = (canvasRef: RefObject<HTMLCanvasElement> | null) => {
   }, [canvasRef]);
 };
 
-const setupWavesCanvas = (canvasRef: RefObject<HTMLCanvasElement> | null) => {
+const useSetupWavesCanvas = (
+  canvasRef: RefObject<HTMLCanvasElement> | null
+) => {
   useEffect(() => {
     if (!canvasRef || !canvasRef.current) return;
     const { canvasCtx } = getCanvasContext(canvasRef);
@@ -127,7 +131,9 @@ const setupWavesCanvas = (canvasRef: RefObject<HTMLCanvasElement> | null) => {
   }, [canvasRef]);
 };
 
-const setupMouseCanvas = (canvasRef: RefObject<HTMLCanvasElement> | null) => {
+const useSetupMouseCanvas = (
+  canvasRef: RefObject<HTMLCanvasElement> | null
+) => {
   useEffect(() => {
     if (!canvasRef || !canvasRef.current) return;
     const { canvasCtx } = getCanvasContext(canvasRef);
@@ -136,7 +142,7 @@ const setupMouseCanvas = (canvasRef: RefObject<HTMLCanvasElement> | null) => {
   }, [canvasRef]);
 };
 
-const setupCoverCanvas = (
+const useSetupCoverCanvas = (
   canvasRef: RefObject<HTMLCanvasElement> | null,
   constants: { [key: string]: any },
   audioBuffer: AudioBuffer | null
@@ -437,10 +443,10 @@ const effectSelectedRanges = (
 export {
   useAudioContext,
   useAudioBuffer,
-  setupFrameCanvas,
-  setupWavesCanvas,
-  setupMouseCanvas,
-  setupCoverCanvas,
+  useSetupFrameCanvas,
+  useSetupWavesCanvas,
+  useSetupMouseCanvas,
+  useSetupCoverCanvas,
   updateFrameCanvas,
   clearCanvas,
   effectScale,
