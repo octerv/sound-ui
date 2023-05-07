@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { Content } from "./styled";
 import { Position } from "../Waves.types";
-import { useSetupMouseCanvas } from "../Waves.effects";
+import { useCursorEffect, useSetupMouseCanvas } from "../Waves.effects";
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // Interface
@@ -9,13 +9,16 @@ import { useSetupMouseCanvas } from "../Waves.effects";
 interface Props {
   canvasRef: React.RefObject<HTMLCanvasElement>;
   constants: { [key: string]: number };
+  audioBuffer: AudioBuffer | null;
   enable: boolean;
   selectable: boolean | undefined;
   width: number;
   height: number;
   left: number;
+  drew: boolean;
   scale: number;
   scaling: boolean;
+  cursorPosition: Position;
   setSelectingRange: (selecting: boolean) => void;
   setCursorPosition: (position: Position) => void;
   setScale: (scale: number) => void;
@@ -29,20 +32,37 @@ interface Props {
 const CanvasMouse = ({
   canvasRef,
   constants,
+  audioBuffer,
   enable,
   selectable,
   width,
   height,
   left,
+  drew,
   scale,
   scaling,
+  cursorPosition,
   setSelectingRange,
   setCursorPosition,
   setScale,
   setScaling,
   setCanvasWavesLeft,
 }: Props) => {
+  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+  // Effects
+  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   useSetupMouseCanvas(canvasRef);
+
+  useCursorEffect(
+    cursorPosition,
+    constants,
+    audioBuffer,
+    canvasRef,
+    drew,
+    left,
+    width,
+    scale
+  );
 
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Mouse Event Listener

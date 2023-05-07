@@ -2,9 +2,8 @@ import React from "react";
 import { startTransition, useEffect, useRef, useState } from "react";
 import {
   clearCanvas,
-  effectCursor,
   effectScale,
-  effectSelectedRanges,
+  useSelectedRanges,
   useAudioBuffer,
   useAudioContext,
 } from "./Waves.effects";
@@ -45,8 +44,16 @@ export const Waves = (props: WavesProps) => {
   const [normalize, setNormalize] = useState(
     props.normalize ? props.normalize === true : false
   );
-  const [selectedRanges, setSelectedRanges] = useState<number[]>([]);
   const [selectingRange, setSelectingRange] = useState(false);
+  const selectedRanges = useSelectedRanges(
+    selectingRange,
+    cursorPosition,
+    scale,
+    canvasWavesLeft,
+    drew,
+    constants,
+    canvasMouseRef
+  );
 
   clearCanvas(
     props.dataUrl,
@@ -60,7 +67,6 @@ export const Waves = (props: WavesProps) => {
     if (!drawing) return;
     if (!audioBuffer) return;
     if (!canvasWavesRef || !canvasWavesRef.current) return;
-    if (!canvasMouseRef || !canvasMouseRef.current) return;
     // draw waves
     startTransition(() => {
       drawWaves(
@@ -112,29 +118,6 @@ export const Waves = (props: WavesProps) => {
     setCanvasWavesWidth
   );
 
-  effectCursor(
-    cursorPosition,
-    constants,
-    audioBuffer,
-    canvasMouseRef,
-    drew,
-    canvasWavesLeft,
-    canvasWavesWidth,
-    scale
-  );
-
-  effectSelectedRanges(
-    selectingRange,
-    selectedRanges,
-    cursorPosition,
-    scale,
-    canvasWavesLeft,
-    drew,
-    constants,
-    canvasMouseRef,
-    setSelectedRanges
-  );
-
   const areaStyle = {
     width: props.width,
     height: props.height,
@@ -181,13 +164,16 @@ export const Waves = (props: WavesProps) => {
       <CanvasMouse
         canvasRef={canvasMouseRef}
         constants={constants}
+        audioBuffer={audioBuffer}
         enable={drew}
         selectable={props.selectable}
         width={canvasWavesWidth}
         height={props.height}
         left={canvasWavesLeft}
+        drew={drew}
         scale={scale}
         scaling={scaling}
+        cursorPosition={cursorPosition}
         setSelectingRange={setSelectingRange}
         setCursorPosition={setCursorPosition}
         setScale={setScale}

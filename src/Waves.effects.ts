@@ -279,7 +279,18 @@ const effectScale = (
   }, [scale]);
 };
 
-const effectCursor = (
+/**
+ * マウスの動きによる副作用
+ * @param position
+ * @param constants
+ * @param audioBuffer
+ * @param canvasRef
+ * @param drewWaves
+ * @param canvasWavesLeft
+ * @param canvasWavesWidth
+ * @param scale
+ */
+const useCursorEffect = (
   position: { [key: string]: number },
   constants: { [key: string]: any },
   audioBuffer: AudioBuffer | null,
@@ -342,17 +353,28 @@ const effectCursor = (
   }, [position]);
 };
 
-const effectSelectedRanges = (
+/**
+ * マウスで範囲選択された箇所を配列にする
+ * @param selecting
+ * @param position
+ * @param scale
+ * @param canvasWavesLeft
+ * @param drewWaves
+ * @param constants
+ * @param canvasRef
+ * @returns
+ */
+const useSelectedRanges = (
   selecting: boolean,
-  ranges: number[],
   position: { [key: string]: number },
   scale: number,
   canvasWavesLeft: number,
   drewWaves: boolean,
   constants: { [key: string]: any },
-  canvasRef: RefObject<HTMLCanvasElement> | null,
-  setSelectedRanges: (values: number[]) => void
-) => {
+  canvasRef: RefObject<HTMLCanvasElement> | null
+): number[] => {
+  const [selectedRanges, setSelectedRanges] = useState<number[]>([]);
+
   useEffect(() => {
     if (!drewWaves) return;
     if (!canvasRef || !canvasRef.current) return;
@@ -371,7 +393,8 @@ const effectSelectedRanges = (
       position.y < constants.CANVAS_PADDING ||
       position.y > canvasHeight - constants.VERTICAL_SCALE_HEIGHT;
 
-    const rescaleRanges = sliceByNumber(ranges, 2);
+    const cloneRanges = JSON.parse(JSON.stringify(selectedRanges));
+    const rescaleRanges = sliceByNumber(cloneRanges, 2);
     let isInRanges = false;
     for (const check of rescaleRanges) {
       if (check.length === 2) {
@@ -385,23 +408,23 @@ const effectSelectedRanges = (
       // 選択開始
       if (outOfCanvas) return;
       if (isInRanges) return;
-      if (ranges.length % 2 === 0) {
+      if (cloneRanges.length % 2 === 0) {
         // 範囲選択が偶数の場合は開始位置を追加する
-        ranges.push(unscaledPosX);
+        cloneRanges.push(unscaledPosX);
       } else {
-        ranges.pop();
-        ranges.push(unscaledPosX);
+        cloneRanges.pop();
+        cloneRanges.push(unscaledPosX);
       }
     } else {
       // 選択終了
       if (outOfCanvas) {
-        ranges.push(canvasWidth - constants.CANVAS_PADDING);
-      } else if (ranges.slice(-1)[0] === unscaledPosX) {
+        cloneRanges.push(canvasWidth - constants.CANVAS_PADDING);
+      } else if (cloneRanges.slice(-1)[0] === unscaledPosX) {
         // 同じ位置でMouseUpされた場合は選択とみなさない
-        ranges.pop();
-      } else if (ranges.length % 2 !== 0) {
+        cloneRanges.pop();
+      } else if (cloneRanges.length % 2 !== 0) {
         // 範囲選択が奇数の場合には終了位置を追加する
-        const prePos = ranges.pop() || 0;
+        const prePos = cloneRanges.pop() || 0;
         let start = prePos;
         let end = unscaledPosX;
         for (const check of rescaleRanges) {
@@ -415,12 +438,14 @@ const effectSelectedRanges = (
             }
           }
         }
-        ranges.push(start);
-        ranges.push(end);
+        cloneRanges.push(start);
+        cloneRanges.push(end);
       }
     }
-    setSelectedRanges(ranges);
+    setSelectedRanges(cloneRanges);
   }, [selecting]);
+
+  return selectedRanges;
 };
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
@@ -436,6 +461,6 @@ export {
   updateFrameCanvas,
   clearCanvas,
   effectScale,
-  effectCursor,
-  effectSelectedRanges,
+  useCursorEffect,
+  useSelectedRanges,
 };
