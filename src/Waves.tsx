@@ -22,16 +22,26 @@ const constants = {
   VERTICAL_SLIDE_WIDTH: 8,
 };
 
+//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+// Component
+//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 export const Waves = (props: WavesProps) => {
+  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+  // Ref
+  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   const canvasFrameRef = useRef<HTMLCanvasElement>(null);
   const canvasWavesRef = useRef<HTMLCanvasElement>(null);
   const canvasDecorationRef = useRef<HTMLCanvasElement>(null);
   const canvasMouseRef = useRef<HTMLCanvasElement>(null);
   const canvasCoverRef = useRef<HTMLCanvasElement>(null);
-  const [canvasWavesLeft, setCanvasWavesLeft] = useState(0);
-  const [canvasWavesWidth, setCanvasWavesWidth] = useState(props.width);
+
+  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+  // State
+  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   const audioCtx = useAudioContext(props.dataUrl);
   const audioBuffer = useAudioBuffer(props.dataUrl, audioCtx);
+  const [canvasWavesLeft, setCanvasWavesLeft] = useState(0);
+  const [canvasWavesWidth, setCanvasWavesWidth] = useState(props.width);
   const [drawing, setDrawing] = useState(false);
   const [drew, setDrew] = useState(false);
   const [cursorPosition, setCursorPosition] = useState<Position>({
@@ -54,6 +64,9 @@ export const Waves = (props: WavesProps) => {
     canvasMouseRef
   );
 
+  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+  // Effects
+  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   useEffect(() => {
     if (!drew) return;
     if (props.normalize === undefined || props.normalize === null) return;
@@ -87,13 +100,13 @@ export const Waves = (props: WavesProps) => {
     setCanvasWavesWidth
   );
 
+  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+  // Render
+  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   const areaStyle = {
     width: props.width,
     height: props.height,
     overflow: "hidden",
-  };
-  const wavesStyle = {
-    left: canvasWavesLeft,
   };
   return (
     <Area style={areaStyle}>
