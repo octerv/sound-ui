@@ -89,7 +89,7 @@ function _getMax(audioBuffer: AudioBuffer): { [index: number]: number } {
     const value = audioBuffer.getChannelData(i).reduce((a, b) => {
       const aa: number = a < 0 ? -a : a;
       const bb: number = b < 0 ? -b : b;
-      // console.log(`${a} -> ${aa}, ${b} -> ${bb}`);
+      // console.debug(`${a} -> ${aa}, ${b} -> ${bb}`);
       return Math.max(aa, bb);
       // return Math.max(a, b);
     }, 0);
@@ -142,14 +142,14 @@ const drawWaves = (
 ) => {
   if (!audioBuffer) return;
   if (!canvasRef || !canvasRef.current) return;
-  console.log("[info] drawing: waves");
+  console.info("[info] drawing: waves");
 
   // canvasのサイズを変更してスケールを表現
   const { buffer, scales } = _scaling(audioBuffer);
 
   // どれくらいの詳細度で描画するか（以下は1/10秒）
   const stepInterval = buffer.sampleRate * samplingLevel;
-  console.log(`sampling level: ${samplingLevel}, interval: ${stepInterval}`);
+  console.debug(`sampling level: ${samplingLevel}, interval: ${stepInterval}`);
 
   // canvasの取得
   const canvasWidth = canvasWavesWidth;
@@ -178,7 +178,7 @@ const drawWaves = (
   for (let i = 0; i < buffer.numberOfChannels; i++) {
     let channelData = buffer.getChannelData(i);
     if (normalize && max[i]) {
-      console.log(`max[${i}]: ${max[i]}`);
+      console.debug(`max[${i}]: ${max[i]}`);
       channelData = channelData.map((a: number) => {
         return a / max[i];
       });
@@ -203,7 +203,7 @@ const drawWaves = (
 
       // draw horizontal scale
       if (j in scales) {
-        // console.log(`draw scale [${j}:${scales[j]}]`);
+        // console.debug(`draw scale [${j}:${scales[j]}]`);
         const y = graphHeight * i + constants.CANVAS_PADDING * (i + 1);
         canvasCtx.strokeStyle = "#2F4147";
         canvasCtx.lineWidth = 0.2;

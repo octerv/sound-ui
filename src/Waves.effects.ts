@@ -14,7 +14,7 @@ function _base64ToArrayBuffer(base64: string): ArrayBufferLike | null {
   if (idx <= 0) return null;
 
   // "data:audio/mpeg;base64," を空文字に置換する（削除する）
-  console.log(`[info]: ${base64.substring(0, idx)}`);
+  console.info(`[info]: ${base64.substring(0, idx)}`);
   const target = base64.substring(idx + 1);
   const binary_string = window.atob(target);
   const len = binary_string.length;
@@ -84,18 +84,18 @@ const useAudioBuffer = (dataUrl: string, context: AudioContext | null) => {
     const buf = _base64ToArrayBuffer(dataUrl);
 
     if (!buf) {
-      console.log("[error] load sound data");
+      console.error("[error] load sound data");
       return;
     }
 
     (async () => {
       const buffer = await context.decodeAudioData(buf);
-      console.log(`channel count: ${buffer.numberOfChannels}`);
-      console.log(`sample rate: ${buffer.sampleRate}`);
-      console.log(`duration: ${buffer.duration}`);
+      console.debug(`channel count: ${buffer.numberOfChannels}`);
+      console.debug(`sample rate: ${buffer.sampleRate}`);
+      console.debug(`duration: ${buffer.duration}`);
       source.buffer = buffer;
       setBuffer(buffer);
-      console.log("[success] load sound data");
+      console.info("[success] load sound data");
     })();
   }, [context]);
 
@@ -199,7 +199,7 @@ const updateFrameCanvas = (
         constants.CANVAS_PADDING * 3 -
         constants.VERTICAL_SCALE_HEIGHT) /
       2;
-    console.log(
+    console.debug(
       `canvas: ${canvasWidth}x${canvasHeight}, graph: ${graphWidth}x${graphHeight}`
     );
 

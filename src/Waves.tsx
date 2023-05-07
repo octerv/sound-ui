@@ -1,5 +1,5 @@
 import React from "react";
-import { startTransition, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   useCanvasClear,
   effectScale,
@@ -7,7 +7,6 @@ import {
   useAudioBuffer,
   useAudioContext,
 } from "./Waves.effects";
-import { drawSelectedRanges, drawWaves } from "./Waves.functions";
 import { Area } from "./components/styled";
 import CanvasFrame from "./components/canvas-frame";
 import CanvasWaves from "./components/canvas-waves";
@@ -64,47 +63,17 @@ export const Waves = (props: WavesProps) => {
   );
 
   useEffect(() => {
-    if (!drawing) return;
-    if (!audioBuffer) return;
-    if (!canvasWavesRef || !canvasWavesRef.current) return;
-    // draw waves
-    startTransition(() => {
-      drawWaves(
-        audioBuffer,
-        canvasWavesRef,
-        constants,
-        normalize,
-        canvasWavesWidth,
-        props.samplingLevel || 0.001
-      );
-      drawSelectedRanges(
-        canvasDecorationRef,
-        constants,
-        canvasWavesWidth,
-        selectedRanges,
-        cursorPosition,
-        selectingRange,
-        scale
-      );
-      console.log("[success] drew");
-      setScaling(false);
-      setDrawing(false);
-      setDrew(true);
-    });
-  }, [drawing]);
-
-  useEffect(() => {
     if (!drew) return;
     if (props.normalize === undefined || props.normalize === null) return;
     if (props.normalize === normalize) return;
-    console.log(`[info] normalize: ${props.normalize}`);
+    console.info(`[info] normalize: ${props.normalize}`);
     setNormalize(props.normalize);
     setDrawing(true);
   }, [props.normalize]);
 
   useEffect(() => {
     if (!drew) return;
-    console.log(`[info] rescale: ${scale}`);
+    console.info(`[info] rescale: ${scale}`);
     setDrawing(true);
   }, [canvasWavesWidth]);
 
@@ -137,11 +106,17 @@ export const Waves = (props: WavesProps) => {
       />
       <CanvasWaves
         canvasRef={canvasWavesRef}
+        constants={constants}
         audioBuffer={audioBuffer}
         width={canvasWavesWidth}
         height={props.height}
         left={canvasWavesLeft}
+        samplingLevel={props.samplingLevel}
+        normalize={normalize}
+        drawing={drawing}
+        setDrew={setDrew}
         setDrawing={setDrawing}
+        setScaling={setScaling}
       />
       <CanvasDecoration
         canvasRef={canvasDecorationRef}
@@ -153,6 +128,7 @@ export const Waves = (props: WavesProps) => {
         selectedRanges={selectedRanges}
         selectingRange={selectingRange}
         scale={scale}
+        drawing={drawing}
       />
       <CanvasCover
         canvasRef={canvasCoverRef}

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { startTransition, useEffect } from "react";
 import { Content } from "./styled";
 import { Position } from "../Waves.types";
 import { drawSelectedRanges } from "../Waves.functions";
@@ -16,6 +16,7 @@ interface Props {
   selectedRanges: number[];
   selectingRange: boolean;
   scale: number;
+  drawing: boolean;
 }
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
@@ -31,6 +32,7 @@ const CanvasDecoration = ({
   selectedRanges,
   selectingRange,
   scale,
+  drawing,
 }: Props) => {
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Effects
@@ -47,6 +49,23 @@ const CanvasDecoration = ({
       scale
     );
   }, [cursorPosition]);
+
+  useEffect(() => {
+    if (!drawing) return;
+    if (!canvasRef || !canvasRef.current) return;
+    // draw waves
+    startTransition(() => {
+      drawSelectedRanges(
+        canvasRef,
+        constants,
+        width,
+        selectedRanges,
+        cursorPosition,
+        selectingRange,
+        scale
+      );
+    });
+  }, [drawing]);
 
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Render
