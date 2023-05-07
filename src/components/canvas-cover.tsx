@@ -1,6 +1,6 @@
 import React from "react";
 import { Content } from "./styled";
-import { useSetupCoverCanvas } from "../Waves.effects";
+import { useCoverCanvasSetup } from "../Waves.effects";
 
 interface Props {
   canvasRef: React.RefObject<HTMLCanvasElement>;
@@ -17,7 +17,7 @@ const CanvasCover = ({
   width,
   height,
 }: Props) => {
-  useSetupCoverCanvas(canvasRef, constants, audioBuffer);
+  useCoverCanvasSetup(canvasRef, constants, audioBuffer);
   return <Content width={width} height={height} ref={canvasRef} />;
 };
 

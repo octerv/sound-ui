@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { Content } from "./styled";
 import { Position } from "../Waves.types";
-import { useCursorEffect, useSetupMouseCanvas } from "../Waves.effects";
+import { useCursorEffect, useMouseCanvasSetup } from "../Waves.effects";
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // Interface
@@ -51,7 +51,7 @@ const CanvasMouse = ({
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Effects
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-  useSetupMouseCanvas(canvasRef);
+  useMouseCanvasSetup(canvasRef);
 
   useCursorEffect(
     cursorPosition,

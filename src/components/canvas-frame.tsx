@@ -1,6 +1,6 @@
 import React from "react";
 import { useRef } from "react";
-import { useSetupFrameCanvas, updateFrameCanvas } from "../Waves.effects";
+import { useFrameCanvasSetup, useFrameCanvasUpdate } from "../Waves.effects";
 import { Content } from "./styled";
 
 interface Props {
@@ -18,8 +18,8 @@ const CanvasFrame = ({
   width,
   height,
 }: Props) => {
-  useSetupFrameCanvas(canvasRef);
-  updateFrameCanvas(canvasRef, constants, audioBuffer);
+  useFrameCanvasSetup(canvasRef);
+  useFrameCanvasUpdate(canvasRef, constants, audioBuffer);
   return <Content width={width} height={height} ref={canvasRef} />;
 };
 

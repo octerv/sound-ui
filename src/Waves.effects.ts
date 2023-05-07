@@ -102,7 +102,7 @@ const useAudioBuffer = (dataUrl: string, context: AudioContext | null) => {
   return buffer;
 };
 
-const useSetupFrameCanvas = (
+const useFrameCanvasSetup = (
   canvasRef: RefObject<HTMLCanvasElement> | null
 ) => {
   useEffect(() => {
@@ -120,7 +120,7 @@ const useSetupFrameCanvas = (
   }, [canvasRef]);
 };
 
-const useSetupWavesCanvas = (
+const useWavesCanvasSetup = (
   canvasRef: RefObject<HTMLCanvasElement> | null
 ) => {
   useEffect(() => {
@@ -131,7 +131,7 @@ const useSetupWavesCanvas = (
   }, [canvasRef]);
 };
 
-const useSetupMouseCanvas = (
+const useMouseCanvasSetup = (
   canvasRef: RefObject<HTMLCanvasElement> | null
 ) => {
   useEffect(() => {
@@ -142,7 +142,7 @@ const useSetupMouseCanvas = (
   }, [canvasRef]);
 };
 
-const useSetupCoverCanvas = (
+const useCoverCanvasSetup = (
   canvasRef: RefObject<HTMLCanvasElement> | null,
   constants: { [key: string]: any },
   audioBuffer: AudioBuffer | null
@@ -182,7 +182,7 @@ const useSetupCoverCanvas = (
   }, [audioBuffer]);
 };
 
-const updateFrameCanvas = (
+const useFrameCanvasUpdate = (
   canvasRef: RefObject<HTMLCanvasElement> | null,
   constants: { [key: string]: any },
   audioBuffer: AudioBuffer | null
@@ -258,7 +258,7 @@ const useCanvasClear = (
   }, [dataUrl]);
 };
 
-const effectScale = (
+const useScaleEffect = (
   scale: number,
   position: { [key: string]: number },
   props: { [key: string]: any },
@@ -462,13 +462,13 @@ const useSelectedRanges = (
 export {
   useAudioContext,
   useAudioBuffer,
-  useSetupFrameCanvas,
-  useSetupWavesCanvas,
-  useSetupMouseCanvas,
-  useSetupCoverCanvas,
-  updateFrameCanvas,
+  useFrameCanvasSetup,
+  useWavesCanvasSetup,
+  useMouseCanvasSetup,
+  useCoverCanvasSetup,
+  useFrameCanvasUpdate,
   useCanvasClear,
-  effectScale,
+  useScaleEffect,
   useCursorEffect,
   useSelectedRanges,
 };

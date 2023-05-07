@@ -2,7 +2,7 @@ import React from "react";
 import { useEffect, useRef, useState } from "react";
 import {
   useCanvasClear,
-  effectScale,
+  useScaleEffect,
   useSelectedRanges,
   useAudioBuffer,
   useAudioContext,
@@ -54,14 +54,6 @@ export const Waves = (props: WavesProps) => {
     canvasMouseRef
   );
 
-  useCanvasClear(
-    props.dataUrl,
-    constants,
-    canvasFrameRef,
-    canvasWavesRef,
-    canvasDecorationRef
-  );
-
   useEffect(() => {
     if (!drew) return;
     if (props.normalize === undefined || props.normalize === null) return;
@@ -77,7 +69,15 @@ export const Waves = (props: WavesProps) => {
     setDrawing(true);
   }, [canvasWavesWidth]);
 
-  effectScale(
+  useCanvasClear(
+    props.dataUrl,
+    constants,
+    canvasFrameRef,
+    canvasWavesRef,
+    canvasDecorationRef
+  );
+
+  useScaleEffect(
     scale,
     cursorPosition,
     props,

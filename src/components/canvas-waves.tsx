@@ -1,9 +1,8 @@
-import React, { startTransition, useState } from "react";
+import React, { startTransition } from "react";
 import { useEffect } from "react";
-import { useSetupWavesCanvas } from "../Waves.effects";
+import { useWavesCanvasSetup } from "../Waves.effects";
 import { Content } from "./styled";
-import { normalize } from "path";
-import { drawWaves, drawSelectedRanges } from "../Waves.functions";
+import { drawWaves } from "../Waves.functions";
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // Interface
@@ -43,7 +42,7 @@ const CanvasWaves = ({
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Effects
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-  useSetupWavesCanvas(canvasRef);
+  useWavesCanvasSetup(canvasRef);
 
   useEffect(() => {
     if (!audioBuffer) return;
