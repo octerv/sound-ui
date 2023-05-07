@@ -232,7 +232,15 @@ const updateFrameCanvas = (
   }, [audioBuffer]);
 };
 
-const clearCanvas = (
+/**
+ * Canvasの描画をクリアする
+ * @param dataUrl
+ * @param constants
+ * @param canvasFrameRef
+ * @param canvasWavesRef
+ * @param canvasDecorationRef
+ */
+const useCanvasClear = (
   dataUrl: string,
   constants: { [key: string]: any },
   canvasFrameRef: RefObject<HTMLCanvasElement> | null,
@@ -459,7 +467,7 @@ export {
   useSetupMouseCanvas,
   useSetupCoverCanvas,
   updateFrameCanvas,
-  clearCanvas,
+  useCanvasClear,
   effectScale,
   useCursorEffect,
   useSelectedRanges,

@@ -1,7 +1,7 @@
 import React from "react";
 import { startTransition, useEffect, useRef, useState } from "react";
 import {
-  clearCanvas,
+  useCanvasClear,
   effectScale,
   useSelectedRanges,
   useAudioBuffer,
@@ -55,7 +55,7 @@ export const Waves = (props: WavesProps) => {
     canvasMouseRef
   );
 
-  clearCanvas(
+  useCanvasClear(
     props.dataUrl,
     constants,
     canvasFrameRef,
