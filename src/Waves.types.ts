@@ -11,6 +11,7 @@ type WavesProps = {
   normalize?: boolean;
   selectable?: boolean;
   stereo?: boolean;
+  currentTime?: number; // ミリ秒数位置指定
 };
 
 export { Position, WavesProps };

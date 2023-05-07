@@ -55,6 +55,7 @@ export const Default = () => {
 export const Stereo = () => {
   const [dataUrl, setDataUrl] = useState("");
   const [normalize, setNormalize] = useState(false);
+  const [currentTime, setCurrentTime] = useState(60000);
 
   const selectFile = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.currentTarget.files;
@@ -85,15 +86,18 @@ export const Stereo = () => {
       <button onClick={handleNormalize}>
         Normalize ({normalize ? "ON" : "OFF"})
       </button>
+      <button onClick={() => setCurrentTime(currentTime - 100)}>◀︎</button>
+      <button onClick={() => setCurrentTime(currentTime + 100)}>▶︎</button>
+      {currentTime / 1000}
       <br />
       <Waves
         dataUrl={dataUrl}
         width={800}
         height={200}
-        samplingLevel={0.01}
         normalize={normalize}
         selectable
         stereo
+        currentTime={currentTime}
       />
     </>
   );

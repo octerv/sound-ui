@@ -65,7 +65,7 @@ const CanvasWaves = ({
           constants,
           normalize,
           width,
-          samplingLevel || 0.001
+          samplingLevel || 0.01
         );
       } else {
         drawWaves(
@@ -74,7 +74,7 @@ const CanvasWaves = ({
           constants,
           normalize,
           width,
-          samplingLevel || 0.001
+          samplingLevel || 0.01
         );
       }
       console.info("[success] drew");

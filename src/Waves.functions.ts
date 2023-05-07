@@ -1,4 +1,5 @@
 import { RefObject } from "react";
+import { Position } from "./Waves.types";
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // local functions
@@ -134,7 +135,7 @@ const sliceByNumber = (array: number[], number: number) => {
 /**
  * カーソル位置の時刻を取得する
  * @param canvasWavesWidth
- * @param adjustWidth
+ * @param adjustWidth 余白を指定
  * @param duration
  * @param x
  * @returns
@@ -147,6 +148,32 @@ const getCursorSecond = (
 ) => {
   if (x === 0) return 0;
   return ((x - adjustWidth) * duration) / (canvasWavesWidth - adjustWidth * 2);
+};
+
+/**
+ * 指定時刻の現在位置を取得する
+ * @param constants
+ * @param canvasWavesWidth
+ * @param duration
+ * @param currentTime ミリ秒
+ * @returns
+ */
+const getCurrentTimePosition = (
+  constants: { [key: string]: any },
+  canvasWavesWidth: number,
+  duration: number,
+  currentTime: number
+): Position => {
+  const graphWidth =
+    canvasWavesWidth -
+    constants.CANVAS_PADDING * 2 -
+    constants.GRAPH_PADDING * 2;
+  const x =
+    constants.CANVAS_PADDING +
+    constants.GRAPH_PADDING +
+    Math.floor(graphWidth * (currentTime / (duration * 1000)));
+  const y = constants.CANVAS_PADDING;
+  return { x, y };
 };
 
 /**
@@ -483,6 +510,7 @@ const drawSelectedRanges = (
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 export {
   getCursorSecond,
+  getCurrentTimePosition,
   sliceByNumber,
   getCanvasContext,
   drawWaves,

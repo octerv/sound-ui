@@ -14,6 +14,7 @@ import CanvasDecoration from "./components/canvas-decoration";
 import CanvasCover from "./components/canvas-cover";
 import CanvasMouse from "./components/canvas-mouse";
 import { Position, WavesProps } from "./Waves.types";
+import CanvasTimeline from "./components/canvas-timeline";
 
 const constants = {
   CANVAS_PADDING: 8,
@@ -33,6 +34,7 @@ export const Waves = (props: WavesProps) => {
   const canvasWavesRef = useRef<HTMLCanvasElement>(null);
   const canvasDecorationRef = useRef<HTMLCanvasElement>(null);
   const canvasMouseRef = useRef<HTMLCanvasElement>(null);
+  const canvasTimelineRef = useRef<HTMLCanvasElement>(null);
   const canvasCoverRef = useRef<HTMLCanvasElement>(null);
 
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
@@ -145,6 +147,19 @@ export const Waves = (props: WavesProps) => {
         scale={scale}
         drawing={drawing}
       />
+      {props.currentTime && (
+        <CanvasTimeline
+          canvasRef={canvasTimelineRef}
+          constants={constants}
+          audioBuffer={audioBuffer}
+          width={canvasWavesWidth}
+          height={props.height}
+          left={canvasWavesLeft}
+          scale={scale}
+          stereo={props.stereo}
+          currentTime={props.currentTime}
+        />
+      )}
       <CanvasCover
         canvasRef={canvasCoverRef}
         constants={constants}

@@ -1,7 +1,7 @@
 import { RefObject, useEffect, useState } from "react";
 import {
-  drawSelectedRanges,
   getCanvasContext,
+  getCurrentTimePosition,
   getCursorSecond,
   sliceByNumber,
 } from "./Waves.functions";
@@ -248,7 +248,9 @@ const useFrameCanvasStereoUpdate = (
       getCanvasContext(canvasRef);
     const graphWidth = canvasWidth - constants.CANVAS_PADDING * 2;
     const graphHeight =
-      canvasHeight - constants.CANVAS_PADDING - constants.VERTICAL_SCALE_HEIGHT;
+      canvasHeight -
+      constants.CANVAS_PADDING * 2 -
+      constants.VERTICAL_SCALE_HEIGHT;
     console.debug(
       `canvas: ${canvasWidth}x${canvasHeight}, graph: ${graphWidth}x${graphHeight}`
     );
@@ -503,6 +505,50 @@ const useSelectedRanges = (
   return selectedRanges;
 };
 
+/**
+ * 指定された現在時刻のバーを描画する
+ * @param canvasRef
+ * @param constants
+ * @param audioBuffer
+ * @param canvasWavesWidth
+ * @param currentTime
+ */
+const useCurrentTime = (
+  canvasRef: RefObject<HTMLCanvasElement> | null,
+  constants: { [key: string]: any },
+  audioBuffer: AudioBuffer | null,
+  canvasWavesWidth: number,
+  currentTime: number | undefined
+) => {
+  useEffect(() => {
+    if (!audioBuffer) return;
+    if (!canvasRef || !canvasRef.current) return;
+    if (!currentTime) return;
+    _clearCanvas(canvasRef, constants);
+
+    const { canvasCtx, canvasHeight } = getCanvasContext(canvasRef);
+    const graphHeight =
+      canvasHeight -
+      constants.CANVAS_PADDING * 2 -
+      constants.VERTICAL_SCALE_HEIGHT;
+    const { x, y } = getCurrentTimePosition(
+      constants,
+      canvasWavesWidth,
+      audioBuffer.duration,
+      currentTime
+    );
+
+    // draw
+    canvasCtx.strokeStyle = "red";
+    canvasCtx.lineWidth = 1.0;
+    canvasCtx.beginPath();
+    canvasCtx.moveTo(x, y);
+    canvasCtx.lineTo(x, y + graphHeight);
+    canvasCtx.closePath();
+    canvasCtx.stroke();
+  }, [currentTime]);
+};
+
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // export
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
@@ -519,4 +565,5 @@ export {
   useScaleEffect,
   useCursorEffect,
   useSelectedRanges,
+  useCurrentTime,
 };
