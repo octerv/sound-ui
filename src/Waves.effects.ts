@@ -284,12 +284,9 @@ const effectCursor = (
   constants: { [key: string]: any },
   audioBuffer: AudioBuffer | null,
   canvasRef: RefObject<HTMLCanvasElement> | null,
-  canvasDecorationRef: RefObject<HTMLCanvasElement> | null,
   drewWaves: boolean,
   canvasWavesLeft: number,
   canvasWavesWidth: number,
-  selecting: boolean,
-  ranges: number[],
   scale: number
 ) => {
   useEffect(() => {
@@ -303,17 +300,6 @@ const effectCursor = (
 
     // clear
     canvasCtx.clearRect(0, 0, canvasWidth, canvasHeight);
-
-    // 選択された範囲を描画する
-    drawSelectedRanges(
-      canvasDecorationRef,
-      constants,
-      canvasWavesWidth,
-      ranges,
-      position,
-      selecting,
-      scale
-    );
 
     // グラフの範囲外に出たら消したままにする
     if (

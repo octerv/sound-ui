@@ -117,12 +117,9 @@ export const Waves = (props: WavesProps) => {
     constants,
     audioBuffer,
     canvasMouseRef,
-    canvasDecorationRef,
     drew,
     canvasWavesLeft,
     canvasWavesWidth,
-    selectingRange,
-    selectedRanges,
     scale
   );
 
@@ -165,9 +162,14 @@ export const Waves = (props: WavesProps) => {
       />
       <CanvasDecoration
         canvasRef={canvasDecorationRef}
+        constants={constants}
         width={canvasWavesWidth}
         height={props.height}
         left={canvasWavesLeft}
+        cursorPosition={cursorPosition}
+        selectedRanges={selectedRanges}
+        selectingRange={selectingRange}
+        scale={scale}
       />
       <CanvasCover
         canvasRef={canvasCoverRef}
