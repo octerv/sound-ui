@@ -1,7 +1,8 @@
 import React, { startTransition, useEffect } from "react";
 import { Content } from "./styled";
 import { Position } from "../Waves.types";
-import { drawSelectedRanges } from "../Waves.functions";
+import { drawSelectedRanges, getTimePosition } from "../Waves.functions";
+import { useMaxArea } from "../Waves.effects";
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // Interface
@@ -9,6 +10,7 @@ import { drawSelectedRanges } from "../Waves.functions";
 interface Props {
   canvasRef: React.RefObject<HTMLCanvasElement>;
   constants: { [key: string]: number };
+  audioBuffer: AudioBuffer | null;
   width: number;
   height: number;
   left: number;
@@ -17,6 +19,7 @@ interface Props {
   selectingRange: boolean;
   scale: number;
   drawing: boolean;
+  maxArea: number[];
 }
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
@@ -25,6 +28,7 @@ interface Props {
 const CanvasDecoration = ({
   canvasRef,
   constants,
+  audioBuffer,
   width,
   height,
   left,
@@ -33,6 +37,7 @@ const CanvasDecoration = ({
   selectingRange,
   scale,
   drawing,
+  maxArea,
 }: Props) => {
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Effects
@@ -66,6 +71,8 @@ const CanvasDecoration = ({
       );
     });
   }, [drawing]);
+
+  useMaxArea(canvasRef, constants, audioBuffer, width, maxArea);
 
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Render

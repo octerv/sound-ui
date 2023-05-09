@@ -158,7 +158,7 @@ const getCursorSecond = (
  * @param currentTime ミリ秒
  * @returns
  */
-const getCurrentTimePosition = (
+const getTimePosition = (
   constants: { [key: string]: any },
   canvasWavesWidth: number,
   duration: number,
@@ -505,15 +505,49 @@ const drawSelectedRanges = (
   canvasCtx.fill();
 };
 
+const getMaxArea = (audioBuffer: AudioBuffer, length: number): number[] => {
+  const areaIdx = [0, 0];
+  const sampleRate = audioBuffer.sampleRate;
+  console.log(`sampleRate: ${sampleRate}`);
+  const stepInterval = audioBuffer.sampleRate * 0.1;
+  let maxSum = 0;
+  let sum = 0;
+  // 全てのデータを確認する
+  for (let i = 0; i < audioBuffer.length; i = i + stepInterval) {
+    // 各チャンネル毎に加算する
+    for (let j = 0; j < audioBuffer.numberOfChannels; j++) {
+      sum += Math.abs(audioBuffer.getChannelData(j)[i]);
+      // lengthの秒数を超えている場合は加算範囲をずらす
+      if (i - sampleRate * length > 0) {
+        const beforeIdx = i - sampleRate * length;
+        sum -= Math.abs(audioBuffer.getChannelData(j)[beforeIdx]);
+      }
+    }
+    // 加算結果が最大を超えているかどうか
+    if (maxSum < sum) {
+      maxSum = sum;
+      areaIdx[1] = i;
+      if (i - sampleRate * length > 0) {
+        areaIdx[0] = i - sampleRate * length;
+      }
+    }
+  }
+  return [
+    Math.round((areaIdx[0] / sampleRate) * 1000) / 1000,
+    Math.round((areaIdx[1] / sampleRate) * 1000) / 1000,
+  ];
+};
+
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // export
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 export {
   getCursorSecond,
-  getCurrentTimePosition,
+  getTimePosition,
   sliceByNumber,
   getCanvasContext,
   drawWaves,
   drawWaveStereo,
   drawSelectedRanges,
+  getMaxArea,
 };

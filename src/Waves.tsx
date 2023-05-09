@@ -15,6 +15,7 @@ import CanvasCover from "./components/canvas-cover";
 import CanvasMouse from "./components/canvas-mouse";
 import { Position, WavesProps } from "./Waves.types";
 import CanvasTimeline from "./components/canvas-timeline";
+import { getMaxArea } from "./Waves.functions";
 
 const constants = {
   CANVAS_PADDING: 8,
@@ -65,6 +66,7 @@ export const Waves = (props: WavesProps) => {
     constants,
     canvasMouseRef
   );
+  const [maxArea, setMaxArea] = useState([0, 0]);
 
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Effects
@@ -83,6 +85,14 @@ export const Waves = (props: WavesProps) => {
     console.info(`[info] rescale: ${scale}`);
     setDrawing(true);
   }, [canvasWavesWidth]);
+
+  useEffect(() => {
+    if (!audioBuffer) return;
+    if (!props.maxAreaLength) return;
+    const area = getMaxArea(audioBuffer, props.maxAreaLength);
+    setMaxArea(area);
+    if (props.setMaxArea) props.setMaxArea(area);
+  }, [audioBuffer]);
 
   useCanvasClear(
     props.dataUrl,
@@ -138,6 +148,7 @@ export const Waves = (props: WavesProps) => {
       <CanvasDecoration
         canvasRef={canvasDecorationRef}
         constants={constants}
+        audioBuffer={audioBuffer}
         width={canvasWavesWidth}
         height={props.height}
         left={canvasWavesLeft}
@@ -146,20 +157,19 @@ export const Waves = (props: WavesProps) => {
         selectingRange={selectingRange}
         scale={scale}
         drawing={drawing}
+        maxArea={maxArea}
       />
-      {props.currentTime && (
-        <CanvasTimeline
-          canvasRef={canvasTimelineRef}
-          constants={constants}
-          audioBuffer={audioBuffer}
-          width={canvasWavesWidth}
-          height={props.height}
-          left={canvasWavesLeft}
-          scale={scale}
-          stereo={props.stereo}
-          currentTime={props.currentTime}
-        />
-      )}
+      <CanvasTimeline
+        canvasRef={canvasTimelineRef}
+        constants={constants}
+        audioBuffer={audioBuffer}
+        width={canvasWavesWidth}
+        height={props.height}
+        left={canvasWavesLeft}
+        scale={scale}
+        stereo={props.stereo}
+        currentTime={props.currentTime}
+      />
       <CanvasCover
         canvasRef={canvasCoverRef}
         constants={constants}

@@ -1,7 +1,7 @@
 import { RefObject, useEffect, useState } from "react";
 import {
   getCanvasContext,
-  getCurrentTimePosition,
+  getTimePosition,
   getCursorSecond,
   sliceByNumber,
 } from "./Waves.functions";
@@ -531,7 +531,7 @@ const useCurrentTime = (
       canvasHeight -
       constants.CANVAS_PADDING * 2 -
       constants.VERTICAL_SCALE_HEIGHT;
-    const { x, y } = getCurrentTimePosition(
+    const { x, y } = getTimePosition(
       constants,
       canvasWavesWidth,
       audioBuffer.duration,
@@ -547,6 +547,47 @@ const useCurrentTime = (
     canvasCtx.closePath();
     canvasCtx.stroke();
   }, [currentTime]);
+};
+
+const useMaxArea = (
+  canvasRef: RefObject<HTMLCanvasElement> | null,
+  constants: { [key: string]: any },
+  audioBuffer: AudioBuffer | null,
+  canvasWavesWidth: number,
+  maxArea: number[]
+) => {
+  useEffect(() => {
+    if (!audioBuffer) return;
+    if (!canvasRef || !canvasRef.current) return;
+    if (maxArea[1] === 0) return;
+
+    const { canvasCtx, canvasHeight } = getCanvasContext(canvasRef);
+    const graphHeight =
+      canvasHeight -
+      constants.CANVAS_PADDING * 2 -
+      constants.VERTICAL_SCALE_HEIGHT;
+
+    const { x: x1, y: y1 } = getTimePosition(
+      constants,
+      canvasWavesWidth,
+      audioBuffer?.duration,
+      maxArea[0] * 1000
+    );
+    const { x: x2 } = getTimePosition(
+      constants,
+      canvasWavesWidth,
+      audioBuffer?.duration,
+      maxArea[1] * 1000
+    );
+    console.log(`area x1:${x1},y1:${y1},x2:${x2},y2:${graphHeight}`);
+
+    canvasCtx.fillStyle = "rgba(255,0,0, 0.3)";
+    canvasCtx.beginPath();
+    canvasCtx.rect(1, 1, constants.CANVAS_PADDING - 2, canvasHeight - 2);
+    canvasCtx.rect(x1, y1, x2, graphHeight);
+    canvasCtx.closePath();
+    canvasCtx.fill();
+  }, [maxArea]);
 };
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
@@ -566,4 +607,5 @@ export {
   useCursorEffect,
   useSelectedRanges,
   useCurrentTime,
+  useMaxArea,
 };
