@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useState } from "react";
-import { Waves } from "../src/Waves";
+import Waves from "../src/Waves";
 
 export default {
   title: "Waves",
@@ -126,7 +126,7 @@ export const MaxArea = () => {
   };
 
   const handleMaxArea = (area: number[]) => {
-    console.log(`area: ${area}`);
+    console.debug(`area: ${area}`);
   };
 
   return (

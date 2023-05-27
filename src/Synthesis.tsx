@@ -1,0 +1,119 @@
+import React, { useEffect, useRef, useState } from "react";
+import { SynthesisProps } from "./Synthesis.types";
+import { Area } from "./components/styled";
+import CanvasFrame from "./components/canvas-frame";
+import { createAudioBuffer, synthesisWaves } from "./Synthesis.functions";
+import CanvasWavePeriod from "./components/canvas-wave-period";
+
+const constants = {
+  CANVAS_PADDING: 8,
+  GRAPH_PADDING: 8,
+  VERTICAL_SCALE_HEIGHT: 24,
+  VERTICAL_SLIDE_WIDTH: 8,
+};
+
+//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+// Component
+//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+const Synthesis = (props: SynthesisProps) => {
+  const duration = props.duration || 1;
+  const frequencies = props.frequencies || [440];
+  const height = Math.floor(
+    (props.width - constants.CANVAS_PADDING * 2) / (frequencies.length + 2)
+  );
+  const min = Math.min(...frequencies);
+  const period = 1 / min;
+
+  // Refs
+  const canvasFrameRef = useRef<HTMLCanvasElement>(null);
+
+  // States
+  const [waves, setWaves] = useState<JSX.Element[] | null>(null);
+  const [buffers, setBuffers] = useState<AudioBuffer[]>([]);
+
+  // Effects
+  useEffect(() => {
+    if (!props.audioContext) return;
+
+    const newBuffers = [];
+    const newWaves = [];
+    for (let i = 0; i < frequencies.length; i++) {
+      const top = Math.floor(height * i + constants.CANVAS_PADDING);
+      const buffer = createAudioBuffer(
+        props.audioContext,
+        duration,
+        frequencies[i]
+      );
+      newBuffers.push(buffer);
+      newWaves.push(
+        <CanvasWavePeriod
+          key={i}
+          constants={constants}
+          audioBuffer={buffer}
+          top={top}
+          left={0}
+          width={props.width}
+          height={height}
+          period={period}
+          frequency={frequencies[i]}
+        />
+      );
+    }
+
+    // 合成波の表示
+    const top = Math.floor(
+      height * frequencies.length + constants.CANVAS_PADDING
+    );
+    const synBuffer = synthesisWaves(props.audioContext, newBuffers);
+    newWaves.push(
+      <CanvasWavePeriod
+        key={frequencies.length + 1}
+        constants={constants}
+        audioBuffer={synBuffer}
+        top={top}
+        left={0}
+        width={props.width}
+        height={height * 2}
+        period={period}
+      />
+    );
+
+    setBuffers(newBuffers);
+    setWaves(newWaves);
+  }, [props.audioContext]);
+
+  useEffect(() => {
+    if (!props.audioContext) return;
+    if (props.playing == undefined) return;
+    if (props.playing >= 0) {
+      for (let i = 0; i < buffers.length; i++) {
+        const source = props.audioContext.createBufferSource();
+        source.buffer = buffers[i];
+        source.connect(props.audioContext.destination);
+        source.start();
+      }
+    }
+  }, [props.playing]);
+
+  const areaStyle = {
+    width: props.width,
+    height: props.height,
+    overflow: "hidden",
+  };
+  return (
+    <Area style={areaStyle}>
+      {" "}
+      <CanvasFrame
+        canvasRef={canvasFrameRef}
+        constants={constants}
+        audioBuffer={null}
+        width={props.width}
+        height={props.height}
+        stereo={false}
+      />
+      {waves}
+    </Area>
+  );
+};
+
+export default Synthesis;

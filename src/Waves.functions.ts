@@ -1,5 +1,6 @@
 import { RefObject } from "react";
 import { Position } from "./Waves.types";
+import { getCanvasContext } from "./functions";
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // local functions
@@ -174,25 +175,6 @@ const getTimePosition = (
     Math.floor(graphWidth * (currentTime / (duration * 1000)));
   const y = constants.CANVAS_PADDING;
   return { x, y };
-};
-
-/**
- * Canvasのコンテキストを取得する
- * @param ref
- * @returns
- */
-const getCanvasContext = (
-  ref: RefObject<HTMLCanvasElement>
-): {
-  canvasCtx: CanvasRenderingContext2D;
-  canvasWidth: number;
-  canvasHeight: number;
-} => {
-  const canvasEle: HTMLCanvasElement = ref.current!;
-  const canvasWidth = canvasEle.clientWidth;
-  const canvasHeight = canvasEle.clientHeight;
-  const canvasCtx: CanvasRenderingContext2D = canvasEle.getContext("2d")!;
-  return { canvasCtx, canvasWidth, canvasHeight };
 };
 
 /**
@@ -508,7 +490,7 @@ const drawSelectedRanges = (
 const getMaxArea = (audioBuffer: AudioBuffer, length: number): number[] => {
   const areaIdx = [0, 0];
   const sampleRate = audioBuffer.sampleRate;
-  console.log(`sampleRate: ${sampleRate}`);
+  console.debug(`sampleRate: ${sampleRate}`);
   const stepInterval = audioBuffer.sampleRate * 0.1;
   let maxSum = 0;
   let sum = 0;

@@ -579,7 +579,7 @@ const useMaxArea = (
       audioBuffer?.duration,
       maxArea[1] * 1000
     );
-    console.log(`area x1:${x1},y1:${y1},x2:${x2},y2:${graphHeight}`);
+    console.debug(`area x1:${x1},y1:${y1},x2:${x2},y2:${graphHeight}`);
 
     canvasCtx.fillStyle = "rgba(255,0,0, 0.3)";
     canvasCtx.beginPath();
