@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { SynthesisProps } from "./Synthesis.types";
+import { FrequencyConfig, SynthesisProps } from "./Synthesis.types";
 import { Area } from "./components/styled";
 import CanvasFrame from "./components/canvas-frame";
 import { createAudioBuffer, synthesisWaves } from "./Synthesis.functions";
@@ -17,7 +17,9 @@ const constants = {
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 const Synthesis = (props: SynthesisProps) => {
   const duration = props.duration || 1;
-  const frequencies = props.frequencies || [440];
+  const frequencies = props.frequencies
+    ? props.frequencies.map((item: FrequencyConfig) => item.frequency)
+    : [440];
   const height = Math.floor(
     (props.width - constants.CANVAS_PADDING * 2) / (frequencies.length + 2)
   );
@@ -34,15 +36,18 @@ const Synthesis = (props: SynthesisProps) => {
   // Effects
   useEffect(() => {
     if (!props.audioContext) return;
+    if (!props.frequencies) return;
 
     const newBuffers = [];
     const newWaves = [];
     for (let i = 0; i < frequencies.length; i++) {
+      const config = props.frequencies[i];
       const top = Math.floor(height * i + constants.CANVAS_PADDING);
       const buffer = createAudioBuffer(
         props.audioContext,
         duration,
-        frequencies[i]
+        config.frequency,
+        config.volume
       );
       newBuffers.push(buffer);
       newWaves.push(

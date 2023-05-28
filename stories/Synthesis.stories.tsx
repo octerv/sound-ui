@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Synthesis from "../src/Synthesis";
+import { FrequencyConfig } from "../src/Synthesis.types";
 
 export default {
   title: "Synthesis",
@@ -9,6 +10,13 @@ export default {
 export const Default = () => {
   const [playing, setPlaying] = useState(-1);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
+
+  const frequencyConfigs: FrequencyConfig[] = [
+    { frequency: 500, volume: 1 },
+    { frequency: 1000, volume: 0.5 },
+    { frequency: 1500, volume: 0.3 },
+    { frequency: 2000, volume: 0.1 },
+  ];
 
   const initAudioContext = () => {
     const newAudioContext = new AudioContext();
@@ -28,7 +36,7 @@ export const Default = () => {
         width={800}
         height={800}
         duration={1}
-        frequencies={[500, 1000, 1500, 2000]}
+        frequencies={frequencyConfigs}
         playing={playing}
       />
     </>

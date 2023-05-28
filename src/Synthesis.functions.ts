@@ -10,7 +10,8 @@ import { getMaxValue, normalizeValue } from "./function.wave";
 const createAudioBuffer = (
   audioContext: AudioContext,
   duration: number,
-  frequency: number
+  frequency: number,
+  volume: number
 ): AudioBuffer => {
   // 音声バッファのパラメーター
   const sampleRate = audioContext.sampleRate;
@@ -26,7 +27,7 @@ const createAudioBuffer = (
 
   for (let i = 0; i < numSamples; i++) {
     const t = i / sampleRate; // 時間（秒）の計算
-    const value = Math.sin(2 * Math.PI * frequency * t); // 正弦波の値の計算
+    const value = volume * Math.sin(2 * Math.PI * frequency * t); // 正弦波の値の計算
 
     // -1から1の範囲に正規化して格納
     channelData[i] = value;
