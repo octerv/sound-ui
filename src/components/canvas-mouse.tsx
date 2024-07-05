@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { Content } from "./styled";
-import { Position } from "../Waves.types";
+import { Position } from "sound-ui/types";
 import { useCursorEffect, useMouseCanvasSetup } from "../Waves.effects";
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/

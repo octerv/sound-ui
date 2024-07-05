@@ -3,6 +3,7 @@
   "version": "0.3.1",
   "description": "Sound UI Components with React.",
   "main": "build/index.js",
+  "types": "types/index.d.ts",
   "files": [
     "package.json",
     "README.md",

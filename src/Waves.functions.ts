@@ -1,5 +1,5 @@
 import { RefObject } from "react";
-import { Position } from "./Waves.types";
+import { Position } from "sound-ui/types";
 import { getCanvasContext } from "./functions";
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/

@@ -13,9 +13,9 @@ import CanvasWaves from "./components/canvas-waves";
 import CanvasDecoration from "./components/canvas-decoration";
 import CanvasCover from "./components/canvas-cover";
 import CanvasMouse from "./components/canvas-mouse";
-import { Position, WavesProps } from "./Waves.types";
 import CanvasTimeline from "./components/canvas-timeline";
 import { getMaxArea } from "./Waves.functions";
+import { Position, WavesProps } from "sound-ui/types";
 
 const constants = {
   CANVAS_PADDING: 8,
