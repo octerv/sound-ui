@@ -1,6 +1,6 @@
 import { RefObject } from "react";
 import { getCanvasContext } from "./functions";
-import { CANVAS_PADDING, GRAPH_PADDING } from "./constants";
+import { CANVAS_PADDING, Color, GRAPH_PADDING } from "./constants";
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // Private
@@ -101,7 +101,7 @@ const drawWavePeriod = (
   const centerHeight = CANVAS_PADDING + graphHeight / 2;
 
   // 中心線の描画
-  canvasCtx.strokeStyle = "#2F4147";
+  canvasCtx.strokeStyle = Color.DeepSlate;
   canvasCtx.lineWidth = 1;
   canvasCtx.beginPath();
   canvasCtx.moveTo(CANVAS_PADDING, centerHeight);
@@ -136,7 +136,7 @@ const drawWavePeriod = (
     }
 
     // 波形の描画
-    canvasCtx.strokeStyle = "#48A7C7";
+    canvasCtx.strokeStyle = Color.SkyBlueCyan;
     canvasCtx.lineWidth = 1;
     canvasCtx.beginPath();
     canvasCtx.moveTo(prePos.x, prePos.y);

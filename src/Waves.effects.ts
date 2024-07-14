@@ -7,6 +7,7 @@ import {
 } from "./Waves.functions";
 import {
   CANVAS_PADDING,
+  Color,
   GRAPH_PADDING,
   VERTICAL_SCALE_HEIGHT,
 } from "./constants";
@@ -114,7 +115,7 @@ const useFrameCanvasSetup = (
     canvasCtx.globalAlpha = 0.8;
     canvasCtx.lineWidth = 0.5;
     // 外枠の描画
-    canvasCtx.fillStyle = "#51707A";
+    canvasCtx.fillStyle = Color.DeepSeaBlue;
     canvasCtx.beginPath();
     canvasCtx.rect(0, 0, canvasWidth, canvasHeight);
     canvasCtx.closePath();
@@ -154,7 +155,7 @@ const useCoverCanvasSetup = (
     if (!canvasRef || !canvasRef.current) return;
     const { canvasCtx, canvasWidth, canvasHeight } =
       getCanvasContext(canvasRef);
-    canvasCtx.fillStyle = "#ffffff";
+    canvasCtx.fillStyle = Color.PureWhite;
     canvasCtx.beginPath();
     canvasCtx.rect(1, 1, CANVAS_PADDING - 2, canvasHeight - 2);
     canvasCtx.rect(
@@ -172,7 +173,7 @@ const useCoverCanvasSetup = (
       (canvasHeight - CANVAS_PADDING * 3 - VERTICAL_SCALE_HEIGHT) / 2;
     for (let i = 0; i < audioBuffer.numberOfChannels; i++) {
       // channel text
-      canvasCtx.fillStyle = "#2F4147";
+      canvasCtx.fillStyle = Color.DeepSlate;
       canvasCtx.font = "12px serif";
       canvasCtx.fillText(
         `channel ${i + 1}`,
@@ -205,7 +206,7 @@ const useFrameCanvasUpdate = (
         CANVAS_PADDING * (i * 1) + graphHeight * i + graphHeight / 2;
 
       // draw frame
-      canvasCtx.strokeStyle = "#347991";
+      canvasCtx.strokeStyle = Color.DeepTeal;
       canvasCtx.lineWidth = 1;
       canvasCtx.beginPath();
       canvasCtx.rect(
@@ -218,7 +219,7 @@ const useFrameCanvasUpdate = (
       canvasCtx.stroke();
 
       // draw grid (horizontal)
-      canvasCtx.strokeStyle = "#2F4147";
+      canvasCtx.strokeStyle = Color.DeepSlate;
       canvasCtx.lineWidth = 0.2;
       canvasCtx.beginPath();
       canvasCtx.moveTo(CANVAS_PADDING, centerHeight);
@@ -249,7 +250,7 @@ const useFrameCanvasStereoUpdate = (
     const centerHeight = CANVAS_PADDING + graphHeight / 2;
 
     // draw frame
-    canvasCtx.strokeStyle = "#347991";
+    canvasCtx.strokeStyle = Color.DeepTeal;
     canvasCtx.lineWidth = 1;
     canvasCtx.beginPath();
     canvasCtx.rect(CANVAS_PADDING, CANVAS_PADDING, graphWidth, graphHeight);
@@ -257,7 +258,7 @@ const useFrameCanvasStereoUpdate = (
     canvasCtx.stroke();
 
     // draw grid (horizontal)
-    canvasCtx.strokeStyle = "#2F4147";
+    canvasCtx.strokeStyle = Color.DeepTeal;
     canvasCtx.lineWidth = 0.2;
     canvasCtx.beginPath();
     canvasCtx.moveTo(CANVAS_PADDING, centerHeight);
@@ -362,8 +363,8 @@ const useCursorEffect = (
       return;
 
     // draw
-    canvasCtx.strokeStyle = "#2F4147";
-    canvasCtx.fillStyle = "#2F4147";
+    canvasCtx.strokeStyle = Color.DeepSlate;
+    canvasCtx.fillStyle = Color.DeepSlate;
     canvasCtx.globalAlpha = 0.8;
     canvasCtx.beginPath();
     canvasCtx.moveTo(position.x, CANVAS_PADDING);

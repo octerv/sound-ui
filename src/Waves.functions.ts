@@ -3,6 +3,7 @@ import { Position } from "sound-ui/types";
 import { getCanvasContext } from "./functions";
 import {
   CANVAS_PADDING,
+  Color,
   GRAPH_PADDING,
   VERTICAL_SCALE_HEIGHT,
 } from "./constants";
@@ -252,7 +253,7 @@ const drawWaves = (
       if (j in scales) {
         // console.debug(`draw scale [${j}:${scales[j]}]`);
         const y = graphHeight * i + CANVAS_PADDING * (i + 1);
-        canvasCtx.strokeStyle = "#2F4147";
+        canvasCtx.strokeStyle = Color.DeepSlate;
         canvasCtx.lineWidth = 0.2;
         canvasCtx.beginPath();
         canvasCtx.moveTo(curPos.x, y);
@@ -274,7 +275,7 @@ const drawWaves = (
       }
 
       // 波形の描画
-      canvasCtx.strokeStyle = "#48A7C7";
+      canvasCtx.strokeStyle = Color.SkyBlueCyan;
       canvasCtx.lineWidth = 0.5;
       canvasCtx.beginPath();
       canvasCtx.moveTo(prePos.x, prePos.y);
@@ -364,7 +365,7 @@ const drawWaveStereo = (
     if (j in scales) {
       // console.debug(`draw scale [${j}:${scales[j]}]`);
       const y = CANVAS_PADDING;
-      canvasCtx.strokeStyle = "#2F4147";
+      canvasCtx.strokeStyle = Color.DeepSlate;
       canvasCtx.lineWidth = 0.2;
       canvasCtx.beginPath();
       canvasCtx.moveTo(curPos.x, y);
@@ -384,7 +385,7 @@ const drawWaveStereo = (
     }
 
     // 波形の描画
-    canvasCtx.strokeStyle = "#48A7C7";
+    canvasCtx.strokeStyle = Color.SkyBlueCyan;
     canvasCtx.lineWidth = 0.5;
     canvasCtx.beginPath();
     canvasCtx.moveTo(prePos.x, prePos.y);
@@ -425,7 +426,7 @@ const drawSelectedRanges = (
     return Math.round(r * scale);
   });
   const rescaleRanges = sliceByNumber(scaledRanges, 2);
-  canvasCtx.fillStyle = "#7A5D65";
+  canvasCtx.fillStyle = Color.DustyRose;
   canvasCtx.globalAlpha = 0.3;
   canvasCtx.beginPath();
   for (const range of rescaleRanges) {
