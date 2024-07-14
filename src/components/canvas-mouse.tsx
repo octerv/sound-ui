@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from "react";
 import { Content } from "./styled";
 import { CanvasPropsInterface, Position } from "sound-ui/types";
-import { useCursorEffect, useMouseCanvasSetup } from "../Waves.effects";
 import { VERTICAL_SLIDE_WIDTH } from "../constants";
+import { useMouseCanvasSetup, useCursorEffect } from "../effects.canvas";
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // Interface

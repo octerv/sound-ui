@@ -1,7 +1,7 @@
 import React from "react";
 import { Content } from "./styled";
-import { useCoverCanvasSetup } from "../Waves.effects";
 import { CanvasPropsInterface } from "sound-ui/types";
+import { useCoverCanvasSetup } from "../effects.canvas";
 
 interface Props extends CanvasPropsInterface {
   stereo: boolean | undefined;

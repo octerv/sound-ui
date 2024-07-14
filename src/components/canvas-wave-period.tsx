@@ -1,10 +1,10 @@
 import React, { startTransition, useRef } from "react";
 import { useEffect } from "react";
-import { useWavesCanvasSetup } from "../Waves.effects";
 import { Content } from "./styled";
 import { drawWavePeriod } from "../function.wave";
 import { getCanvasContext } from "../functions";
 import { CanvasPropsInterface } from "sound-ui/types";
+import { useWavesCanvasSetup } from "../effects.canvas";
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // Interface

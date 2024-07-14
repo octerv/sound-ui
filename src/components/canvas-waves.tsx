@@ -1,9 +1,9 @@
 import React, { startTransition } from "react";
 import { useEffect } from "react";
-import { useWavesCanvasSetup } from "../Waves.effects";
 import { Content } from "./styled";
 import { drawWaveStereo, drawWaves } from "../Waves.functions";
 import { CanvasPropsInterface } from "sound-ui/types";
+import { useWavesCanvasSetup } from "../effects.canvas";
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // Interface

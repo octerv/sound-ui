@@ -1,12 +1,5 @@
 import React from "react";
 import { useEffect, useRef, useState } from "react";
-import {
-  useCanvasClear,
-  useScaleEffect,
-  useSelectedRanges,
-  useAudioBuffer,
-  useAudioContext,
-} from "./Waves.effects";
 import { Area } from "./components/styled";
 import CanvasFrame from "./components/canvas-frame";
 import CanvasWaves from "./components/canvas-waves";
@@ -16,6 +9,12 @@ import CanvasMouse from "./components/canvas-mouse";
 import CanvasTimeline from "./components/canvas-timeline";
 import { getMaxArea } from "./Waves.functions";
 import { Position, WavesProps } from "sound-ui/types";
+import { useAudioContext, useAudioBuffer } from "./effects.audio";
+import {
+  useSelectedRanges,
+  useCanvasClear,
+  useScaleEffect,
+} from "./effects.canvas";
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // Component

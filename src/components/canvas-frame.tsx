@@ -1,11 +1,11 @@
 import React from "react";
+import { Content } from "./styled";
+import { CanvasPropsInterface } from "sound-ui/types";
 import {
   useFrameCanvasSetup,
   useFrameCanvasStereoUpdate,
   useFrameCanvasUpdate,
-} from "../Waves.effects";
-import { Content } from "./styled";
-import { CanvasPropsInterface } from "sound-ui/types";
+} from "../effects.canvas";
 
 interface Props extends CanvasPropsInterface {
   stereo: boolean | undefined;
