@@ -4,17 +4,14 @@ import { useWavesCanvasSetup } from "../Waves.effects";
 import { Content } from "./styled";
 import { drawWavePeriod } from "../function.wave";
 import { getCanvasContext } from "../functions";
+import { CanvasPropsInterface } from "sound-ui/types";
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // Interface
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-interface Props {
-  constants: { [key: string]: number };
-  audioBuffer: AudioBuffer | null;
+interface Props extends CanvasPropsInterface {
   top: number;
   left: number;
-  width: number;
-  height: number;
   period: number;
   frequency?: number;
 }
@@ -23,7 +20,6 @@ interface Props {
 // Component
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 const CanvasWavePeriod = ({
-  constants,
   audioBuffer,
   top,
   left,
@@ -50,7 +46,7 @@ const CanvasWavePeriod = ({
     canvasCtx.clearRect(0, 0, canvasWidth, canvasHeight);
     // draw waves
     startTransition(() => {
-      drawWavePeriod(audioBuffer, canvasRef, constants, period, frequency);
+      drawWavePeriod(audioBuffer, canvasRef, period, frequency);
       console.info("[info] success drew");
     });
   }, [canvasRef]);

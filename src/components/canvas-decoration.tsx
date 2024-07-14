@@ -1,18 +1,13 @@
 import React, { startTransition, useEffect } from "react";
 import { Content } from "./styled";
-import { Position } from "sound-ui/types";
+import { CanvasPropsInterface, Position } from "sound-ui/types";
 import { drawSelectedRanges, getTimePosition } from "../Waves.functions";
 import { useMaxArea } from "../Waves.effects";
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // Interface
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-interface Props {
-  canvasRef: React.RefObject<HTMLCanvasElement>;
-  constants: { [key: string]: number };
-  audioBuffer: AudioBuffer | null;
-  width: number;
-  height: number;
+interface Props extends CanvasPropsInterface {
   left: number;
   cursorPosition: Position;
   selectedRanges: number[];
@@ -27,10 +22,9 @@ interface Props {
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 const CanvasDecoration = ({
   canvasRef,
-  constants,
-  audioBuffer,
   width,
   height,
+  audioBuffer,
   left,
   cursorPosition,
   selectedRanges,
@@ -46,7 +40,6 @@ const CanvasDecoration = ({
     // 選択された範囲を描画する
     drawSelectedRanges(
       canvasRef,
-      constants,
       width,
       selectedRanges,
       cursorPosition,
@@ -62,7 +55,6 @@ const CanvasDecoration = ({
     startTransition(() => {
       drawSelectedRanges(
         canvasRef,
-        constants,
         width,
         selectedRanges,
         cursorPosition,
@@ -72,7 +64,7 @@ const CanvasDecoration = ({
     });
   }, [drawing]);
 
-  useMaxArea(canvasRef, constants, audioBuffer, width, maxArea);
+  useMaxArea(canvasRef, audioBuffer, width, maxArea);
 
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Render

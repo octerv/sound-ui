@@ -1,5 +1,6 @@
 import { RefObject } from "react";
 import { getCanvasContext } from "./functions";
+import { CANVAS_PADDING, GRAPH_PADDING } from "./constants";
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // Private
@@ -67,7 +68,6 @@ const normalizeValue = (
 const drawWavePeriod = (
   audioBuffer: AudioBuffer | null,
   canvasRef: RefObject<HTMLCanvasElement> | null,
-  constants: { [key: string]: any },
   period: number,
   frequency?: number
 ) => {
@@ -79,8 +79,8 @@ const drawWavePeriod = (
   const { canvasCtx, canvasWidth, canvasHeight } = getCanvasContext(canvasRef);
 
   // graph frame size
-  const graphWidth = canvasWidth - constants.CANVAS_PADDING * 2;
-  const graphHeight = canvasHeight - constants.CANVAS_PADDING * 2;
+  const graphWidth = canvasWidth - CANVAS_PADDING * 2;
+  const graphHeight = canvasHeight - CANVAS_PADDING * 2;
 
   // 指定秒数で切り出し
   const buffer = _sliceAudioBuffer(audioBuffer, 0, period);
@@ -91,21 +91,21 @@ const drawWavePeriod = (
 
   // step size
   const stepWidth = Math.floor(graphWidth / buffer.length);
-  const stepHeight = Math.floor(graphHeight - constants.GRAPH_PADDING * 2);
+  const stepHeight = Math.floor(graphHeight - GRAPH_PADDING * 2);
   const stepHeightHalf = Math.floor(stepHeight / 2);
   console.debug(
     `stepWidth:${stepWidth}, stepHeight:${stepHeight}, half:${stepHeightHalf}`
   );
 
   let channelData = buffer.getChannelData(0);
-  const centerHeight = constants.CANVAS_PADDING + graphHeight / 2;
+  const centerHeight = CANVAS_PADDING + graphHeight / 2;
 
   // 中心線の描画
   canvasCtx.strokeStyle = "#2F4147";
   canvasCtx.lineWidth = 1;
   canvasCtx.beginPath();
-  canvasCtx.moveTo(constants.CANVAS_PADDING, centerHeight);
-  canvasCtx.lineTo(constants.CANVAS_PADDING + graphWidth, centerHeight);
+  canvasCtx.moveTo(CANVAS_PADDING, centerHeight);
+  canvasCtx.lineTo(CANVAS_PADDING + graphWidth, centerHeight);
   canvasCtx.closePath();
   canvasCtx.stroke();
 
@@ -113,22 +113,19 @@ const drawWavePeriod = (
   canvasCtx.font = "10px serif";
   canvasCtx.fillText(
     frequency ? `${frequency}Hz` : "Synthesis",
-    constants.GRAPH_PADDING,
-    constants.GRAPH_PADDING
+    GRAPH_PADDING,
+    GRAPH_PADDING
   );
 
   let prePos = {
-    x: constants.CANVAS_PADDING + constants.GRAPH_PADDING,
+    x: CANVAS_PADDING + GRAPH_PADDING,
     y: centerHeight,
   };
   for (let i = 0; i < channelData.length; i = i + stepInterval) {
     const amp = channelData[i] * stepHeightHalf;
 
     const curPos = {
-      x:
-        constants.CANVAS_PADDING +
-        constants.GRAPH_PADDING +
-        stepWidth * (i / stepInterval),
+      x: CANVAS_PADDING + GRAPH_PADDING + stepWidth * (i / stepInterval),
       y: centerHeight - amp,
     };
 

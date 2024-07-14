@@ -5,6 +5,11 @@ import {
   getCursorSecond,
   sliceByNumber,
 } from "./Waves.functions";
+import {
+  CANVAS_PADDING,
+  GRAPH_PADDING,
+  VERTICAL_SCALE_HEIGHT,
+} from "./constants";
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // local functions
@@ -36,18 +41,15 @@ const _getTimeStr = (second: number) => {
       )}`;
 };
 
-const _clearCanvas = (
-  canvasRef: RefObject<HTMLCanvasElement> | null,
-  constants: { [key: string]: any }
-) => {
+const _clearCanvas = (canvasRef: RefObject<HTMLCanvasElement> | null) => {
   // clear canvas
   if (!canvasRef || !canvasRef.current) return;
   let { canvasCtx, canvasWidth, canvasHeight } = getCanvasContext(canvasRef);
   canvasCtx.clearRect(
-    constants.CANVAS_PADDING,
-    constants.CANVAS_PADDING,
-    canvasWidth - constants.CANVAS_PADDING * 2,
-    canvasHeight - constants.CANVAS_PADDING * 2
+    CANVAS_PADDING,
+    CANVAS_PADDING,
+    canvasWidth - CANVAS_PADDING * 2,
+    canvasHeight - CANVAS_PADDING * 2
   );
 };
 
@@ -144,7 +146,6 @@ const useMouseCanvasSetup = (
 
 const useCoverCanvasSetup = (
   canvasRef: RefObject<HTMLCanvasElement> | null,
-  constants: { [key: string]: any },
   audioBuffer: AudioBuffer | null,
   stereo: boolean | undefined
 ) => {
@@ -155,11 +156,11 @@ const useCoverCanvasSetup = (
       getCanvasContext(canvasRef);
     canvasCtx.fillStyle = "#ffffff";
     canvasCtx.beginPath();
-    canvasCtx.rect(1, 1, constants.CANVAS_PADDING - 2, canvasHeight - 2);
+    canvasCtx.rect(1, 1, CANVAS_PADDING - 2, canvasHeight - 2);
     canvasCtx.rect(
-      canvasWidth - (constants.CANVAS_PADDING - 1),
+      canvasWidth - (CANVAS_PADDING - 1),
       1,
-      constants.CANVAS_PADDING - 2,
+      CANVAS_PADDING - 2,
       canvasHeight - 2
     );
     canvasCtx.closePath();
@@ -168,18 +169,15 @@ const useCoverCanvasSetup = (
     if (stereo) return;
 
     const graphHeight =
-      (canvasHeight -
-        constants.CANVAS_PADDING * 3 -
-        constants.VERTICAL_SCALE_HEIGHT) /
-      2;
+      (canvasHeight - CANVAS_PADDING * 3 - VERTICAL_SCALE_HEIGHT) / 2;
     for (let i = 0; i < audioBuffer.numberOfChannels; i++) {
       // channel text
       canvasCtx.fillStyle = "#2F4147";
       canvasCtx.font = "12px serif";
       canvasCtx.fillText(
         `channel ${i + 1}`,
-        constants.CANVAS_PADDING + 16,
-        graphHeight * i + constants.CANVAS_PADDING * (i + 1) + 16
+        CANVAS_PADDING + 16,
+        graphHeight * i + CANVAS_PADDING * (i + 1) + 16
       );
     }
   }, [audioBuffer]);
@@ -187,7 +185,6 @@ const useCoverCanvasSetup = (
 
 const useFrameCanvasUpdate = (
   canvasRef: RefObject<HTMLCanvasElement> | null,
-  constants: { [key: string]: any },
   audioBuffer: AudioBuffer | null
 ) => {
   useEffect(() => {
@@ -196,27 +193,24 @@ const useFrameCanvasUpdate = (
 
     const { canvasCtx, canvasWidth, canvasHeight } =
       getCanvasContext(canvasRef);
-    const graphWidth = canvasWidth - constants.CANVAS_PADDING * 2;
+    const graphWidth = canvasWidth - CANVAS_PADDING * 2;
     const graphHeight =
-      (canvasHeight -
-        constants.CANVAS_PADDING * 3 -
-        constants.VERTICAL_SCALE_HEIGHT) /
-      2;
+      (canvasHeight - CANVAS_PADDING * 3 - VERTICAL_SCALE_HEIGHT) / 2;
     console.debug(
       `canvas: ${canvasWidth}x${canvasHeight}, graph: ${graphWidth}x${graphHeight}`
     );
 
     for (let i = 0; i < audioBuffer.numberOfChannels; i++) {
       const centerHeight =
-        constants.CANVAS_PADDING * (i * 1) + graphHeight * i + graphHeight / 2;
+        CANVAS_PADDING * (i * 1) + graphHeight * i + graphHeight / 2;
 
       // draw frame
       canvasCtx.strokeStyle = "#347991";
       canvasCtx.lineWidth = 1;
       canvasCtx.beginPath();
       canvasCtx.rect(
-        constants.CANVAS_PADDING,
-        graphHeight * i + constants.CANVAS_PADDING * (i + 1),
+        CANVAS_PADDING,
+        graphHeight * i + CANVAS_PADDING * (i + 1),
         graphWidth,
         graphHeight
       );
@@ -227,8 +221,8 @@ const useFrameCanvasUpdate = (
       canvasCtx.strokeStyle = "#2F4147";
       canvasCtx.lineWidth = 0.2;
       canvasCtx.beginPath();
-      canvasCtx.moveTo(constants.CANVAS_PADDING, centerHeight);
-      canvasCtx.lineTo(constants.CANVAS_PADDING + graphWidth, centerHeight);
+      canvasCtx.moveTo(CANVAS_PADDING, centerHeight);
+      canvasCtx.lineTo(CANVAS_PADDING + graphWidth, centerHeight);
       canvasCtx.closePath();
       canvasCtx.stroke();
     }
@@ -237,7 +231,6 @@ const useFrameCanvasUpdate = (
 
 const useFrameCanvasStereoUpdate = (
   canvasRef: RefObject<HTMLCanvasElement> | null,
-  constants: { [key: string]: any },
   audioBuffer: AudioBuffer | null
 ) => {
   useEffect(() => {
@@ -246,27 +239,20 @@ const useFrameCanvasStereoUpdate = (
 
     const { canvasCtx, canvasWidth, canvasHeight } =
       getCanvasContext(canvasRef);
-    const graphWidth = canvasWidth - constants.CANVAS_PADDING * 2;
+    const graphWidth = canvasWidth - CANVAS_PADDING * 2;
     const graphHeight =
-      canvasHeight -
-      constants.CANVAS_PADDING * 2 -
-      constants.VERTICAL_SCALE_HEIGHT;
+      canvasHeight - CANVAS_PADDING * 2 - VERTICAL_SCALE_HEIGHT;
     console.debug(
       `canvas: ${canvasWidth}x${canvasHeight}, graph: ${graphWidth}x${graphHeight}`
     );
 
-    const centerHeight = constants.CANVAS_PADDING + graphHeight / 2;
+    const centerHeight = CANVAS_PADDING + graphHeight / 2;
 
     // draw frame
     canvasCtx.strokeStyle = "#347991";
     canvasCtx.lineWidth = 1;
     canvasCtx.beginPath();
-    canvasCtx.rect(
-      constants.CANVAS_PADDING,
-      constants.CANVAS_PADDING,
-      graphWidth,
-      graphHeight
-    );
+    canvasCtx.rect(CANVAS_PADDING, CANVAS_PADDING, graphWidth, graphHeight);
     canvasCtx.closePath();
     canvasCtx.stroke();
 
@@ -274,8 +260,8 @@ const useFrameCanvasStereoUpdate = (
     canvasCtx.strokeStyle = "#2F4147";
     canvasCtx.lineWidth = 0.2;
     canvasCtx.beginPath();
-    canvasCtx.moveTo(constants.CANVAS_PADDING, centerHeight);
-    canvasCtx.lineTo(constants.CANVAS_PADDING + graphWidth, centerHeight);
+    canvasCtx.moveTo(CANVAS_PADDING, centerHeight);
+    canvasCtx.lineTo(CANVAS_PADDING + graphWidth, centerHeight);
     canvasCtx.closePath();
     canvasCtx.stroke();
   }, [audioBuffer]);
@@ -284,14 +270,12 @@ const useFrameCanvasStereoUpdate = (
 /**
  * Canvasの描画をクリアする
  * @param dataUrl
- * @param constants
  * @param canvasFrameRef
  * @param canvasWavesRef
  * @param canvasDecorationRef
  */
 const useCanvasClear = (
   dataUrl: string,
-  constants: { [key: string]: any },
   canvasFrameRef: RefObject<HTMLCanvasElement> | null,
   canvasWavesRef: RefObject<HTMLCanvasElement> | null,
   canvasDecorationRef: RefObject<HTMLCanvasElement> | null
@@ -301,9 +285,9 @@ const useCanvasClear = (
 
     // clear canvas
     if (!canvasFrameRef || !canvasFrameRef.current) return;
-    _clearCanvas(canvasFrameRef, constants);
-    _clearCanvas(canvasWavesRef, constants);
-    _clearCanvas(canvasDecorationRef, constants);
+    _clearCanvas(canvasFrameRef);
+    _clearCanvas(canvasWavesRef);
+    _clearCanvas(canvasDecorationRef);
   }, [dataUrl]);
 };
 
@@ -339,7 +323,6 @@ const useScaleEffect = (
 /**
  * マウスの動きによる副作用
  * @param position
- * @param constants
  * @param audioBuffer
  * @param canvasRef
  * @param drewWaves
@@ -349,7 +332,6 @@ const useScaleEffect = (
  */
 const useCursorEffect = (
   position: { [key: string]: number },
-  constants: { [key: string]: any },
   audioBuffer: AudioBuffer | null,
   canvasRef: RefObject<HTMLCanvasElement> | null,
   drewWaves: boolean,
@@ -371,14 +353,11 @@ const useCursorEffect = (
 
     // グラフの範囲外に出たら消したままにする
     if (
-      position.x <
-        constants.CANVAS_PADDING + constants.GRAPH_PADDING - canvasWavesLeft ||
+      position.x < CANVAS_PADDING + GRAPH_PADDING - canvasWavesLeft ||
       position.x >
-        frameWidth -
-          (constants.CANVAS_PADDING + constants.GRAPH_PADDING) -
-          canvasWavesLeft ||
-      position.y < constants.CANVAS_PADDING ||
-      position.y > canvasHeight - constants.VERTICAL_SCALE_HEIGHT
+        frameWidth - (CANVAS_PADDING + GRAPH_PADDING) - canvasWavesLeft ||
+      position.y < CANVAS_PADDING ||
+      position.y > canvasHeight - VERTICAL_SCALE_HEIGHT
     )
       return;
 
@@ -387,10 +366,10 @@ const useCursorEffect = (
     canvasCtx.fillStyle = "#2F4147";
     canvasCtx.globalAlpha = 0.8;
     canvasCtx.beginPath();
-    canvasCtx.moveTo(position.x, constants.CANVAS_PADDING);
+    canvasCtx.moveTo(position.x, CANVAS_PADDING);
     canvasCtx.lineTo(
       position.x,
-      canvasHeight - constants.CANVAS_PADDING - constants.VERTICAL_SCALE_HEIGHT
+      canvasHeight - CANVAS_PADDING - VERTICAL_SCALE_HEIGHT
     );
     canvasCtx.closePath();
     canvasCtx.stroke();
@@ -398,14 +377,14 @@ const useCursorEffect = (
     // カーソル位置のTime表示
     const sec = getCursorSecond(
       canvasWavesWidth,
-      constants.CANVAS_PADDING + constants.GRAPH_PADDING,
+      CANVAS_PADDING + GRAPH_PADDING,
       audioBuffer.duration,
       position.x
     );
     canvasCtx.fillText(
       _getTimeStr(sec),
       position.x + 8,
-      canvasHeight - constants.VERTICAL_SCALE_HEIGHT - 16
+      canvasHeight - VERTICAL_SCALE_HEIGHT - 16
     );
   }, [position]);
 };
@@ -417,7 +396,6 @@ const useCursorEffect = (
  * @param scale
  * @param canvasWavesLeft
  * @param drewWaves
- * @param constants
  * @param canvasRef
  * @returns
  */
@@ -427,7 +405,6 @@ const useSelectedRanges = (
   scale: number,
   canvasWavesLeft: number,
   drewWaves: boolean,
-  constants: { [key: string]: any },
   canvasRef: RefObject<HTMLCanvasElement> | null
 ): number[] => {
   const [selectedRanges, setSelectedRanges] = useState<number[]>([]);
@@ -441,14 +418,11 @@ const useSelectedRanges = (
     const unscaledPosX = Math.round(position.x / scale);
 
     const outOfCanvas =
-      position.x <
-        constants.CANVAS_PADDING + constants.GRAPH_PADDING - canvasWavesLeft ||
+      position.x < CANVAS_PADDING + GRAPH_PADDING - canvasWavesLeft ||
       position.x >
-        frameWidth -
-          (constants.CANVAS_PADDING + constants.GRAPH_PADDING) -
-          canvasWavesLeft ||
-      position.y < constants.CANVAS_PADDING ||
-      position.y > canvasHeight - constants.VERTICAL_SCALE_HEIGHT;
+        frameWidth - (CANVAS_PADDING + GRAPH_PADDING) - canvasWavesLeft ||
+      position.y < CANVAS_PADDING ||
+      position.y > canvasHeight - VERTICAL_SCALE_HEIGHT;
 
     const cloneRanges = JSON.parse(JSON.stringify(selectedRanges));
     const rescaleRanges = sliceByNumber(cloneRanges, 2);
@@ -475,7 +449,7 @@ const useSelectedRanges = (
     } else {
       // 選択終了
       if (outOfCanvas) {
-        cloneRanges.push(canvasWidth - constants.CANVAS_PADDING);
+        cloneRanges.push(canvasWidth - CANVAS_PADDING);
       } else if (cloneRanges.slice(-1)[0] === unscaledPosX) {
         // 同じ位置でMouseUpされた場合は選択とみなさない
         cloneRanges.pop();
@@ -508,14 +482,12 @@ const useSelectedRanges = (
 /**
  * 指定された現在時刻のバーを描画する
  * @param canvasRef
- * @param constants
  * @param audioBuffer
  * @param canvasWavesWidth
  * @param currentTime
  */
 const useCurrentTime = (
   canvasRef: RefObject<HTMLCanvasElement> | null,
-  constants: { [key: string]: any },
   audioBuffer: AudioBuffer | null,
   canvasWavesWidth: number,
   currentTime: number | undefined
@@ -524,15 +496,12 @@ const useCurrentTime = (
     if (!audioBuffer) return;
     if (!canvasRef || !canvasRef.current) return;
     if (!currentTime) return;
-    _clearCanvas(canvasRef, constants);
+    _clearCanvas(canvasRef);
 
     const { canvasCtx, canvasHeight } = getCanvasContext(canvasRef);
     const graphHeight =
-      canvasHeight -
-      constants.CANVAS_PADDING * 2 -
-      constants.VERTICAL_SCALE_HEIGHT;
+      canvasHeight - CANVAS_PADDING * 2 - VERTICAL_SCALE_HEIGHT;
     const { x, y } = getTimePosition(
-      constants,
       canvasWavesWidth,
       audioBuffer.duration,
       currentTime
@@ -551,7 +520,6 @@ const useCurrentTime = (
 
 const useMaxArea = (
   canvasRef: RefObject<HTMLCanvasElement> | null,
-  constants: { [key: string]: any },
   audioBuffer: AudioBuffer | null,
   canvasWavesWidth: number,
   maxArea: number[]
@@ -563,18 +531,14 @@ const useMaxArea = (
 
     const { canvasCtx, canvasHeight } = getCanvasContext(canvasRef);
     const graphHeight =
-      canvasHeight -
-      constants.CANVAS_PADDING * 2 -
-      constants.VERTICAL_SCALE_HEIGHT;
+      canvasHeight - CANVAS_PADDING * 2 - VERTICAL_SCALE_HEIGHT;
 
     const { x: x1, y: y1 } = getTimePosition(
-      constants,
       canvasWavesWidth,
       audioBuffer?.duration,
       maxArea[0] * 1000
     );
     const { x: x2 } = getTimePosition(
-      constants,
       canvasWavesWidth,
       audioBuffer?.duration,
       maxArea[1] * 1000
@@ -583,7 +547,7 @@ const useMaxArea = (
 
     canvasCtx.fillStyle = "rgba(255,0,0, 0.3)";
     canvasCtx.beginPath();
-    canvasCtx.rect(1, 1, constants.CANVAS_PADDING - 2, canvasHeight - 2);
+    canvasCtx.rect(1, 1, CANVAS_PADDING - 2, canvasHeight - 2);
     canvasCtx.rect(x1, y1, x2, graphHeight);
     canvasCtx.closePath();
     canvasCtx.fill();

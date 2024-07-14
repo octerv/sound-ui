@@ -5,29 +5,24 @@ import {
   useFrameCanvasUpdate,
 } from "../Waves.effects";
 import { Content } from "./styled";
+import { CanvasPropsInterface } from "sound-ui/types";
 
-interface Props {
-  canvasRef: React.RefObject<HTMLCanvasElement>;
-  constants: { [key: string]: number };
-  audioBuffer: AudioBuffer | null;
-  width: number;
-  height: number;
+interface Props extends CanvasPropsInterface {
   stereo: boolean | undefined;
 }
 
 const CanvasFrame = ({
   canvasRef,
-  constants,
-  audioBuffer,
   width,
   height,
+  audioBuffer,
   stereo,
 }: Props) => {
   useFrameCanvasSetup(canvasRef);
   if (stereo) {
-    useFrameCanvasStereoUpdate(canvasRef, constants, audioBuffer);
+    useFrameCanvasStereoUpdate(canvasRef, audioBuffer);
   } else {
-    useFrameCanvasUpdate(canvasRef, constants, audioBuffer);
+    useFrameCanvasUpdate(canvasRef, audioBuffer);
   }
 
   return <Content width={width} height={height} ref={canvasRef} />;

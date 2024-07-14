@@ -16,4 +16,11 @@ declare module "sound-ui/types" {
     maxAreaLength?: number; // 秒指定
     setMaxArea?: (area: number[]) => void;
   };
+
+  export interface CanvasPropsInterface {
+    canvasRef: React.RefObject<HTMLCanvasElement>;
+    width: number;
+    height: number;
+    audioBuffer: AudioBuffer | null;
+  }
 }

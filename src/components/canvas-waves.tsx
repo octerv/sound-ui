@@ -3,16 +3,12 @@ import { useEffect } from "react";
 import { useWavesCanvasSetup } from "../Waves.effects";
 import { Content } from "./styled";
 import { drawWaveStereo, drawWaves } from "../Waves.functions";
+import { CanvasPropsInterface } from "sound-ui/types";
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // Interface
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-interface Props {
-  canvasRef: React.RefObject<HTMLCanvasElement>;
-  constants: { [key: string]: number };
-  audioBuffer: AudioBuffer | null;
-  width: number;
-  height: number;
+interface Props extends CanvasPropsInterface {
   left: number;
   samplingLevel: number | undefined;
   normalize: boolean;
@@ -28,11 +24,10 @@ interface Props {
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 const CanvasWaves = ({
   canvasRef,
-  constants,
-  audioBuffer,
   width,
   height,
   left,
+  audioBuffer,
   samplingLevel,
   normalize,
   drawing,
@@ -62,7 +57,6 @@ const CanvasWaves = ({
         drawWaveStereo(
           audioBuffer,
           canvasRef,
-          constants,
           normalize,
           width,
           samplingLevel || 0.01
@@ -71,7 +65,6 @@ const CanvasWaves = ({
         drawWaves(
           audioBuffer,
           canvasRef,
-          constants,
           normalize,
           width,
           samplingLevel || 0.01

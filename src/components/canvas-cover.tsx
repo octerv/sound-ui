@@ -1,25 +1,20 @@
 import React from "react";
 import { Content } from "./styled";
 import { useCoverCanvasSetup } from "../Waves.effects";
+import { CanvasPropsInterface } from "sound-ui/types";
 
-interface Props {
-  canvasRef: React.RefObject<HTMLCanvasElement>;
-  constants: { [key: string]: number };
-  audioBuffer: AudioBuffer | null;
-  width: number;
-  height: number;
+interface Props extends CanvasPropsInterface {
   stereo: boolean | undefined;
 }
 
 const CanvasCover = ({
   canvasRef,
-  constants,
-  audioBuffer,
   width,
   height,
+  audioBuffer,
   stereo,
 }: Props) => {
-  useCoverCanvasSetup(canvasRef, constants, audioBuffer, stereo);
+  useCoverCanvasSetup(canvasRef, audioBuffer, stereo);
   return <Content width={width} height={height} ref={canvasRef} />;
 };
 

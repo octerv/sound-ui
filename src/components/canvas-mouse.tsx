@@ -1,19 +1,15 @@
 import React, { useEffect, useRef } from "react";
 import { Content } from "./styled";
-import { Position } from "sound-ui/types";
+import { CanvasPropsInterface, Position } from "sound-ui/types";
 import { useCursorEffect, useMouseCanvasSetup } from "../Waves.effects";
+import { VERTICAL_SLIDE_WIDTH } from "../constants";
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // Interface
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-interface Props {
-  canvasRef: React.RefObject<HTMLCanvasElement>;
-  constants: { [key: string]: number };
-  audioBuffer: AudioBuffer | null;
+interface Props extends CanvasPropsInterface {
   enable: boolean;
   selectable: boolean | undefined;
-  width: number;
-  height: number;
   left: number;
   drew: boolean;
   scale: number;
@@ -31,12 +27,11 @@ interface Props {
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 const CanvasMouse = ({
   canvasRef,
-  constants,
+  width,
+  height,
   audioBuffer,
   enable,
   selectable,
-  width,
-  height,
   left,
   drew,
   scale,
@@ -55,7 +50,6 @@ const CanvasMouse = ({
 
   useCursorEffect(
     cursorPosition,
-    constants,
     audioBuffer,
     canvasRef,
     drew,
@@ -116,9 +110,9 @@ const CanvasMouse = ({
 
       let newLeft = canvasWavesLeftRef.current || 0;
       if (e.deltaX > 2) {
-        newLeft = newLeft - constants.VERTICAL_SLIDE_WIDTH;
+        newLeft = newLeft - VERTICAL_SLIDE_WIDTH;
       } else if (e.deltaX < -2) {
-        newLeft = newLeft + constants.VERTICAL_SLIDE_WIDTH;
+        newLeft = newLeft + VERTICAL_SLIDE_WIDTH;
       }
 
       if (newLeft <= 0 && newLeft >= width - currentWidth) {

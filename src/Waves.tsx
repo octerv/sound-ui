@@ -17,13 +17,6 @@ import CanvasTimeline from "./components/canvas-timeline";
 import { getMaxArea } from "./Waves.functions";
 import { Position, WavesProps } from "sound-ui/types";
 
-const constants = {
-  CANVAS_PADDING: 8,
-  GRAPH_PADDING: 8,
-  VERTICAL_SCALE_HEIGHT: 24,
-  VERTICAL_SLIDE_WIDTH: 8,
-};
-
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // Component
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
@@ -63,7 +56,6 @@ const Waves = (props: WavesProps) => {
     scale,
     canvasWavesLeft,
     drew,
-    constants,
     canvasMouseRef
   );
   const [maxArea, setMaxArea] = useState([0, 0]);
@@ -96,7 +88,6 @@ const Waves = (props: WavesProps) => {
 
   useCanvasClear(
     props.dataUrl,
-    constants,
     canvasFrameRef,
     canvasWavesRef,
     canvasDecorationRef
@@ -124,7 +115,6 @@ const Waves = (props: WavesProps) => {
     <Area style={areaStyle}>
       <CanvasFrame
         canvasRef={canvasFrameRef}
-        constants={constants}
         audioBuffer={audioBuffer}
         width={props.width}
         height={props.height}
@@ -132,7 +122,6 @@ const Waves = (props: WavesProps) => {
       />
       <CanvasWaves
         canvasRef={canvasWavesRef}
-        constants={constants}
         audioBuffer={audioBuffer}
         width={canvasWavesWidth}
         height={props.height}
@@ -147,7 +136,6 @@ const Waves = (props: WavesProps) => {
       />
       <CanvasDecoration
         canvasRef={canvasDecorationRef}
-        constants={constants}
         audioBuffer={audioBuffer}
         width={canvasWavesWidth}
         height={props.height}
@@ -161,18 +149,14 @@ const Waves = (props: WavesProps) => {
       />
       <CanvasTimeline
         canvasRef={canvasTimelineRef}
-        constants={constants}
         audioBuffer={audioBuffer}
         width={canvasWavesWidth}
         height={props.height}
         left={canvasWavesLeft}
-        scale={scale}
-        stereo={props.stereo}
         currentTime={props.currentTime}
       />
       <CanvasCover
         canvasRef={canvasCoverRef}
-        constants={constants}
         audioBuffer={audioBuffer}
         width={props.width}
         height={props.height}
@@ -180,7 +164,6 @@ const Waves = (props: WavesProps) => {
       />
       <CanvasMouse
         canvasRef={canvasMouseRef}
-        constants={constants}
         audioBuffer={audioBuffer}
         enable={drew}
         selectable={props.selectable}
