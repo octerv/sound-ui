@@ -1,16 +1,13 @@
 import { RefObject, useEffect, useState } from "react";
 import {
-  getCanvasContext,
-  getTimePosition,
-  getCursorSecond,
-  sliceByNumber,
-} from "./Waves.functions";
-import {
   CANVAS_PADDING,
   Color,
   GRAPH_PADDING,
   VERTICAL_SCALE_HEIGHT,
 } from "./constants";
+import { getCursorSecond, getTimePosition } from "./functions.time";
+import { getCanvasContext } from "./functions.canvas";
+import { sliceByNumber } from "./functions.common";
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // local functions

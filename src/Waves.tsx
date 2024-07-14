@@ -7,7 +7,6 @@ import CanvasDecoration from "./components/canvas-decoration";
 import CanvasCover from "./components/canvas-cover";
 import CanvasMouse from "./components/canvas-mouse";
 import CanvasTimeline from "./components/canvas-timeline";
-import { getMaxArea } from "./Waves.functions";
 import { Position, WavesProps } from "sound-ui/types";
 import { useAudioContext, useAudioBuffer } from "./effects.audio";
 import {
@@ -15,6 +14,7 @@ import {
   useCanvasClear,
   useScaleEffect,
 } from "./effects.canvas";
+import { getMaxArea } from "./functions.audio";
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // Component

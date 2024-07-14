@@ -1,8 +1,7 @@
 import React, { startTransition, useRef } from "react";
 import { useEffect } from "react";
 import { Content } from "./styled";
-import { drawWavePeriod } from "../function.wave";
-import { getCanvasContext } from "../functions";
+import { drawWavePeriod, getCanvasContext } from "../functions.canvas";
 import { CanvasPropsInterface } from "sound-ui/types";
 import { useWavesCanvasSetup } from "../effects.canvas";
 

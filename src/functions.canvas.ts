@@ -1,181 +1,133 @@
 import { RefObject } from "react";
-import { Position } from "sound-ui/types";
-import { getCanvasContext } from "./functions";
+import { getMaxValues, sliceAudioBuffer } from "./functions.audio";
 import {
   CANVAS_PADDING,
-  Color,
   GRAPH_PADDING,
+  Color,
   VERTICAL_SCALE_HEIGHT,
 } from "./constants";
-
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-// local functions
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-// SPLIT SCALE
-// duration >= 1:00:00 ... each 10:00 = sampleRate * 600
-// duration >= 30:00 && duration < 1:00:00 ... each 5:00 = sampleRate * 300
-// duration >= 10:00 && duration < 30:00 ... each 3:00 = sampleRate * 180
-// duration >= 1:00 && duration < 10:00 ... each 1:00 = sampleRate * 60
-// duration < 1:00 ... each 0:05 = sampleRate * 5
-/**
- * スケールを変更する
- * @param audioBuffer
- * @param position
- * @param scale
- * @returns
- */
-function _scaling(
-  audioBuffer: AudioBuffer,
-  position: number = 0, // second
-  scale: number = 1.0
-): any {
-  const center =
-    position === 0
-      ? 0
-      : Math.floor(audioBuffer.length * (position / audioBuffer.duration));
-  const dataLength = audioBuffer.length * scale;
-  const options = {
-    length: dataLength,
-    numberOfChannels: audioBuffer.numberOfChannels,
-    sampleRate: audioBuffer.sampleRate,
-  };
-
-  const buffer = new AudioBuffer(options);
-  let start = 0;
-  let end = audioBuffer.length;
-  for (let i = 0; i < audioBuffer.numberOfChannels; i++) {
-    let channelData = new Float32Array(audioBuffer.length);
-    audioBuffer.copyFromChannel(channelData, i);
-    // positionを中心にscale取得する
-    if (0 < center - dataLength / 2 && center + dataLength / 2 < dataLength) {
-      // 両橋がはみ出さない
-      start = center - dataLength / 2;
-      end = center + dataLength / 2;
-    } else if (0 > center - dataLength / 2) {
-      // 左端がはみ出す
-      end = dataLength;
-    } else if (center + dataLength / 2 > dataLength) {
-      start = audioBuffer.length - dataLength;
-    }
-    let scaledChannelData = channelData.slice(start, end);
-    buffer.copyToChannel(scaledChannelData, i);
-  }
-
-  // const buffer = audioBuffer;
-  const duration = buffer.duration;
-
-  // (default interval) = (duration >= 1:00:00)
-  let interval = buffer.sampleRate * 600;
-  if (duration >= 30 * 60 && duration < 60 * 60) {
-    interval = buffer.sampleRate * 300;
-  } else if (duration >= 10 * 60 && duration < 30 * 60) {
-    interval = buffer.sampleRate * 180;
-  } else if (duration >= 1 * 60 && duration < 10 * 60) {
-    interval = buffer.sampleRate * 60;
-  } else if (duration < 60) {
-    interval = buffer.sampleRate * 5;
-  }
-
-  // 目盛りの計算
-  const adjust = Math.floor(start / buffer.sampleRate);
-  let scales: { [index: number]: number } = {};
-  for (let i = 0; i < buffer.length; i = i + interval) {
-    scales[i] = i / buffer.sampleRate + adjust;
-  }
-
-  return { buffer, scales, adjust };
-}
+import { getTimeStr } from "./functions.time";
+import { scaling, sliceByNumber } from "./functions.common";
 
 /**
- * 時刻を文字列として取得する
- * @param second
+ * Canvasのコンテキストを取得する
+ * @param ref
  * @returns
  */
-function _getTimeStr(second: number): string {
-  const hour = Math.floor(second / (60 * 60));
-  const min = Math.floor((second % (60 * 60)) / 60);
-  const sec = Math.floor(second % 60);
-  return hour === 0
-    ? `${("0" + min).slice(-2)}:${("0" + sec).slice(-2)}`
-    : `${("0" + hour).slice(-2)}:${("0" + min).slice(-2)}:${("0" + sec).slice(
-        -2
-      )}`;
-}
-
-/**
- * 最大値を取得する
- * @param audioBuffer
- * @returns
- */
-function _getMax(audioBuffer: AudioBuffer): { [index: number]: number } {
-  // 最大値の取得
-  let max: { [index: number]: number } = {};
-  for (let i = 0; i < audioBuffer.numberOfChannels; i++) {
-    const value = audioBuffer.getChannelData(i).reduce((a, b) => {
-      const aa: number = a < 0 ? -a : a;
-      const bb: number = b < 0 ? -b : b;
-      // console.debug(`${a} -> ${aa}, ${b} -> ${bb}`);
-      return Math.max(aa, bb);
-      // return Math.max(a, b);
-    }, 0);
-    max[i] = value;
-  }
-  return max;
-}
-
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-// export functions
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-/**
- * 配列を指定された個数で分割する
- * @param array
- * @param number
- * @returns
- */
-const sliceByNumber = (array: number[], number: number) => {
-  const length = Math.ceil(array.length / number);
-  return new Array(length)
-    .fill(0)
-    .map((_, i) => array.slice(i * number, (i + 1) * number));
+const getCanvasContext = (
+  ref: RefObject<HTMLCanvasElement>
+): {
+  canvasCtx: CanvasRenderingContext2D;
+  canvasWidth: number;
+  canvasHeight: number;
+} => {
+  const canvasEle: HTMLCanvasElement = ref.current!;
+  const canvasWidth = canvasEle.clientWidth;
+  const canvasHeight = canvasEle.clientHeight;
+  const canvasCtx: CanvasRenderingContext2D = canvasEle.getContext("2d")!;
+  return { canvasCtx, canvasWidth, canvasHeight };
 };
 
 /**
- * カーソル位置の時刻を取得する
- * @param canvasWavesWidth
- * @param adjustWidth 余白を指定
- * @param duration
- * @param x
- * @returns
+ * 指定されたオーディオバッファから特定の期間の波形をキャンバスに描画します。
+ * この関数は、波形を視覚化し、オーディオデータの一部をグラフとして表示するために使用されます。
+ *
+ * @param audioBuffer - 描画する波形データを含むAudioBuffer。nullの場合、処理は実行されません。
+ * @param canvasRef - 描画対象となるHTMLCanvasElementの参照。nullまたは未初期化の場合、処理は実行されません。
+ * @param period - 描画する期間（秒単位）。この期間に基づきAudioBufferからデータが切り出されます。
+ * @param frequency - オプショナル。波形の基本周波数（Hz）。指定されない場合、'Synthesis'と表示されます。
+ *
+ * 処理の詳細：
+ * 1. キャンバスとそのコンテキストを取得し、描画領域の大きさを設定します。
+ * 2. 指定された期間に基づきAudioBufferから波形データを切り出します。
+ * 3. 切り出したデータの長さに応じて、キャンバスに描画するステップ間隔を計算します。
+ * 4. 波形をキャンバスに描画します。波形は中心線からの振幅で表示され、周波数がオプショナルでラベルとして追加されます。
+ *
+ * 注意点：
+ * - 描画される波形は単一チャンネルのデータを使用します（通常、チャンネル0）。
+ * - キャンバスのサイズやパディングは関数内で定義された定数に依存します。
+ * - 描画性能はキャンバスのサイズとデータの量に依存します。大きなデータセットや高解像度のキャンバスで性能問題が発生する可能性があります。
  */
-const getCursorSecond = (
-  canvasWavesWidth: number,
-  adjustWidth: number,
-  duration: number,
-  x: number
+
+const drawWavePeriod = (
+  audioBuffer: AudioBuffer | null,
+  canvasRef: RefObject<HTMLCanvasElement> | null,
+  period: number,
+  frequency?: number
 ) => {
-  if (x === 0) return 0;
-  return ((x - adjustWidth) * duration) / (canvasWavesWidth - adjustWidth * 2);
-};
+  if (!audioBuffer) return;
+  if (!canvasRef || !canvasRef.current) return;
+  console.info("[info] drawing: wave period");
+  console.info(`[info] frequency:${frequency}, period:${period}`);
+  // canvasの取得
+  const { canvasCtx, canvasWidth, canvasHeight } = getCanvasContext(canvasRef);
 
-/**
- * 指定時刻の現在位置を取得する
- * @param canvasWavesWidth
- * @param duration
- * @param currentTime ミリ秒
- * @returns
- */
-const getTimePosition = (
-  canvasWavesWidth: number,
-  duration: number,
-  currentTime: number
-): Position => {
-  const graphWidth = canvasWavesWidth - CANVAS_PADDING * 2 - GRAPH_PADDING * 2;
-  const x =
-    CANVAS_PADDING +
-    GRAPH_PADDING +
-    Math.floor(graphWidth * (currentTime / (duration * 1000)));
-  const y = CANVAS_PADDING;
-  return { x, y };
+  // graph frame size
+  const graphWidth = canvasWidth - CANVAS_PADDING * 2;
+  const graphHeight = canvasHeight - CANVAS_PADDING * 2;
+
+  // 指定秒数で切り出し
+  const buffer = sliceAudioBuffer(audioBuffer, 0, period);
+  // どれくらいの詳細度で描画するか（以下は1/10秒）
+  const stepInterval =
+    buffer.length >= graphWidth ? Math.floor(buffer.length / graphWidth) : 1;
+  console.debug(`length:${buffer.length}, interval:${stepInterval}`);
+
+  // step size
+  const stepWidth = Math.floor(graphWidth / buffer.length);
+  const stepHeight = Math.floor(graphHeight - GRAPH_PADDING * 2);
+  const stepHeightHalf = Math.floor(stepHeight / 2);
+  console.debug(
+    `stepWidth:${stepWidth}, stepHeight:${stepHeight}, half:${stepHeightHalf}`
+  );
+
+  let channelData = buffer.getChannelData(0);
+  const centerHeight = CANVAS_PADDING + graphHeight / 2;
+
+  // 中心線の描画
+  canvasCtx.strokeStyle = Color.DeepSlate;
+  canvasCtx.lineWidth = 1;
+  canvasCtx.beginPath();
+  canvasCtx.moveTo(CANVAS_PADDING, centerHeight);
+  canvasCtx.lineTo(CANVAS_PADDING + graphWidth, centerHeight);
+  canvasCtx.closePath();
+  canvasCtx.stroke();
+
+  // 周波数表示
+  canvasCtx.font = "10px serif";
+  canvasCtx.fillText(
+    frequency ? `${frequency}Hz` : "Synthesis",
+    GRAPH_PADDING,
+    GRAPH_PADDING
+  );
+
+  let prePos = {
+    x: CANVAS_PADDING + GRAPH_PADDING,
+    y: centerHeight,
+  };
+  for (let i = 0; i < channelData.length; i = i + stepInterval) {
+    const amp = channelData[i] * stepHeightHalf;
+
+    const curPos = {
+      x: CANVAS_PADDING + GRAPH_PADDING + stepWidth * (i / stepInterval),
+      y: centerHeight - amp,
+    };
+
+    if (i === 0) {
+      // 先頭は値を入れておくのみにする（0位置の設定のため）
+      prePos = curPos;
+      continue;
+    }
+
+    // 波形の描画
+    canvasCtx.strokeStyle = Color.SkyBlueCyan;
+    canvasCtx.lineWidth = 1;
+    canvasCtx.beginPath();
+    canvasCtx.moveTo(prePos.x, prePos.y);
+    canvasCtx.lineTo(curPos.x, curPos.y);
+    canvasCtx.stroke();
+    prePos = curPos;
+  }
 };
 
 /**
@@ -199,7 +151,7 @@ const drawWaves = (
   console.info("[info] drawing: waves");
 
   // canvasのサイズを変更してスケールを表現
-  const { buffer, scales } = _scaling(audioBuffer);
+  const { buffer, scales } = scaling(audioBuffer);
 
   // どれくらいの詳細度で描画するか（以下は1/10秒）
   const stepInterval = buffer.sampleRate * samplingLevel;
@@ -224,7 +176,7 @@ const drawWaves = (
   canvasCtx.clearRect(0, 0, canvasWidth, canvasHeight);
 
   // prepare normalize
-  const max = _getMax(audioBuffer);
+  const max = getMaxValues(audioBuffer);
 
   for (let i = 0; i < buffer.numberOfChannels; i++) {
     let channelData = buffer.getChannelData(i);
@@ -264,7 +216,7 @@ const drawWaves = (
         if (i === 0) {
           const scaleY = canvasHeight - VERTICAL_SCALE_HEIGHT + 8;
           canvasCtx.font = "10px serif";
-          canvasCtx.fillText(_getTimeStr(scales[j]), curPos.x, scaleY);
+          canvasCtx.fillText(getTimeStr(scales[j]), curPos.x, scaleY);
         }
       }
 
@@ -307,7 +259,7 @@ const drawWaveStereo = (
   console.info("[info] drawing: waves");
 
   // canvasのサイズを変更してスケールを表現
-  const { buffer, scales } = _scaling(audioBuffer);
+  const { buffer, scales } = scaling(audioBuffer);
 
   // どれくらいの詳細度で描画するか（以下は1/10秒）
   const stepInterval = buffer.sampleRate * samplingLevel;
@@ -333,7 +285,7 @@ const drawWaveStereo = (
   canvasCtx.clearRect(0, 0, canvasWidth, canvasHeight);
 
   // prepare normalize
-  const max = _getMax(audioBuffer);
+  const max = getMaxValues(audioBuffer);
 
   // bufferからステレオそれぞれのデータを取り出す
   const channelDataLeft = buffer.getChannelData(0);
@@ -375,7 +327,7 @@ const drawWaveStereo = (
       // 目盛り文字を描画
       const scaleY = canvasHeight - VERTICAL_SCALE_HEIGHT + 8;
       canvasCtx.font = "10px serif";
-      canvasCtx.fillText(_getTimeStr(scales[j]), curPos.x, scaleY);
+      canvasCtx.fillText(getTimeStr(scales[j]), curPos.x, scaleY);
     }
 
     if (j === 0) {
@@ -466,49 +418,13 @@ const drawSelectedRanges = (
   canvasCtx.fill();
 };
 
-const getMaxArea = (audioBuffer: AudioBuffer, length: number): number[] => {
-  const areaIdx = [0, 0];
-  const sampleRate = audioBuffer.sampleRate;
-  console.debug(`sampleRate: ${sampleRate}`);
-  const stepInterval = audioBuffer.sampleRate * 0.1;
-  let maxSum = 0;
-  let sum = 0;
-  // 全てのデータを確認する
-  for (let i = 0; i < audioBuffer.length; i = i + stepInterval) {
-    // 各チャンネル毎に加算する
-    for (let j = 0; j < audioBuffer.numberOfChannels; j++) {
-      sum += Math.abs(audioBuffer.getChannelData(j)[i]);
-      // lengthの秒数を超えている場合は加算範囲をずらす
-      if (i - sampleRate * length > 0) {
-        const beforeIdx = i - sampleRate * length;
-        sum -= Math.abs(audioBuffer.getChannelData(j)[beforeIdx]);
-      }
-    }
-    // 加算結果が最大を超えているかどうか
-    if (maxSum < sum) {
-      maxSum = sum;
-      areaIdx[1] = i;
-      if (i - sampleRate * length > 0) {
-        areaIdx[0] = i - sampleRate * length;
-      }
-    }
-  }
-  return [
-    Math.round((areaIdx[0] / sampleRate) * 1000) / 1000,
-    Math.round((areaIdx[1] / sampleRate) * 1000) / 1000,
-  ];
-};
-
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // export
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 export {
-  getCursorSecond,
-  getTimePosition,
-  sliceByNumber,
   getCanvasContext,
+  drawWavePeriod,
   drawWaves,
   drawWaveStereo,
   drawSelectedRanges,
-  getMaxArea,
 };

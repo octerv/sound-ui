@@ -1,8 +1,8 @@
 import React, { startTransition, useEffect } from "react";
 import { Content } from "./styled";
 import { CanvasPropsInterface, Position } from "sound-ui/types";
-import { drawSelectedRanges, getTimePosition } from "../Waves.functions";
 import { useMaxArea } from "../effects.canvas";
+import { drawSelectedRanges } from "../functions.canvas";
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // Interface

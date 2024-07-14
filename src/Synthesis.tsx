@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { FrequencyConfig, SynthesisProps } from "./Synthesis.types";
 import { Area } from "./components/styled";
 import CanvasFrame from "./components/canvas-frame";
-import { createAudioBuffer, synthesisWaves } from "./Synthesis.functions";
 import CanvasWavePeriod from "./components/canvas-wave-period";
+import { createAudioBuffer, synthesisWaves } from "./functions.audio";
 
 const constants = {
   CANVAS_PADDING: 8,
@@ -28,6 +28,7 @@ const Synthesis = (props: SynthesisProps) => {
 
   // Refs
   const canvasFrameRef = useRef<HTMLCanvasElement>(null);
+  const canvasWavePeriodRef = useRef<HTMLCanvasElement>(null);
 
   // States
   const [waves, setWaves] = useState<JSX.Element[] | null>(null);
@@ -53,7 +54,7 @@ const Synthesis = (props: SynthesisProps) => {
       newWaves.push(
         <CanvasWavePeriod
           key={i}
-          constants={constants}
+          canvasRef={canvasWavePeriodRef}
           audioBuffer={buffer}
           top={top}
           left={0}
@@ -73,7 +74,7 @@ const Synthesis = (props: SynthesisProps) => {
     newWaves.push(
       <CanvasWavePeriod
         key={frequencies.length + 1}
-        constants={constants}
+        canvasRef={canvasWavePeriodRef}
         audioBuffer={synBuffer}
         top={top}
         left={0}
@@ -110,7 +111,6 @@ const Synthesis = (props: SynthesisProps) => {
       {" "}
       <CanvasFrame
         canvasRef={canvasFrameRef}
-        constants={constants}
         audioBuffer={null}
         width={props.width}
         height={props.height}
