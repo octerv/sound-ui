@@ -6,18 +6,14 @@ import {
   useFrameCanvasStereoUpdate,
   useFrameCanvasUpdate,
 } from "../effects.canvas";
+import { useDataContext } from "../contexts/data";
 
 interface Props extends CanvasPropsInterface {
   stereo: boolean | undefined;
 }
 
-const CanvasFrame = ({
-  canvasRef,
-  width,
-  height,
-  audioBuffer,
-  stereo,
-}: Props) => {
+const CanvasFrame = ({ canvasRef, width, height, stereo }: Props) => {
+  const { audioBuffer } = useDataContext();
   useFrameCanvasSetup(canvasRef);
   if (stereo) {
     useFrameCanvasStereoUpdate(canvasRef, audioBuffer);

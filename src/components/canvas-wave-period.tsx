@@ -1,9 +1,10 @@
-import React, { startTransition, useRef } from "react";
+import { startTransition, useRef } from "react";
 import { useEffect } from "react";
 import { Content } from "./styled";
 import { drawWavePeriod, getCanvasContext } from "../functions.canvas";
 import { CanvasPropsInterface } from "sound-ui/types";
 import { useWavesCanvasSetup } from "../effects.canvas";
+import { useDataContext } from "../contexts/data";
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // Interface
@@ -19,7 +20,6 @@ interface Props extends CanvasPropsInterface {
 // Component
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 const CanvasWavePeriod = ({
-  audioBuffer,
   top,
   left,
   width,
@@ -27,6 +27,7 @@ const CanvasWavePeriod = ({
   period,
   frequency,
 }: Props) => {
+  const { audioBuffer } = useDataContext();
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Refs
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/

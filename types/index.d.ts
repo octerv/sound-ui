@@ -17,10 +17,15 @@ declare module "sound-ui/types" {
     setMaxArea?: (area: number[]) => void;
   };
 
+  export type Annotation = {
+    startTime: number;
+    endTime: number;
+    label: string;
+  };
+
   export interface CanvasPropsInterface {
     canvasRef: React.RefObject<HTMLCanvasElement>;
     width: number;
     height: number;
-    audioBuffer: AudioBuffer | null;
   }
 }

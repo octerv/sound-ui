@@ -22,7 +22,7 @@ function _base64ToArrayBuffer(base64: string): ArrayBufferLike | null {
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // effect functions
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-const useAudioContext = (dataUrl: string) => {
+const useAudioContext = (dataUrl: string): AudioContext | null => {
   const [ctx, setCtx] = useState<AudioContext | null>(null);
 
   useEffect(() => {
@@ -34,7 +34,10 @@ const useAudioContext = (dataUrl: string) => {
   return ctx;
 };
 
-const useAudioBuffer = (dataUrl: string, context: AudioContext | null) => {
+const useAudioBuffer = (
+  dataUrl: string,
+  context: AudioContext | null
+): AudioBuffer | null => {
   const [buffer, setBuffer] = useState<AudioBuffer | null>(null);
 
   useEffect(() => {
@@ -70,7 +73,22 @@ const useAudioBuffer = (dataUrl: string, context: AudioContext | null) => {
   return buffer;
 };
 
+const useAudioMeta = (
+  audioBuffer: AudioBuffer | null
+): { numberOfChannels: number; sampleRate: number; duration: number } => {
+  const [numberOfChannels, setNumberOfChannels] = useState<number>(0);
+  const [sampleRate, setSampleRate] = useState<number>(0);
+  const [duration, setDuration] = useState<number>(0);
+  useEffect(() => {
+    if (!audioBuffer) return;
+    setNumberOfChannels(audioBuffer.numberOfChannels);
+    setSampleRate(audioBuffer.sampleRate);
+    setDuration(audioBuffer.duration);
+  }, [audioBuffer]);
+  return { numberOfChannels, sampleRate, duration };
+};
+
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // export
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-export { useAudioContext, useAudioBuffer };
+export { useAudioContext, useAudioBuffer, useAudioMeta };

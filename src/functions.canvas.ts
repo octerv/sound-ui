@@ -8,6 +8,7 @@ import {
 } from "./constants";
 import { getTimeStr } from "./functions.time";
 import { scaling, sliceByNumber } from "./functions.common";
+import { Annotation } from "sound-ui/types";
 
 /**
  * Canvasのコンテキストを取得する
@@ -349,7 +350,7 @@ const drawWaveStereo = (
 
 /**
  * 範囲選択された部分を描画する
- * @param canvasDecorationRef
+ * @param canvasRef
  * @param canvasWavesWidth
  * @param ranges
  * @param position
@@ -357,18 +358,18 @@ const drawWaveStereo = (
  * @param scale
  * @returns
  */
-const drawSelectedRanges = (
-  canvasDecorationRef: RefObject<HTMLCanvasElement> | null,
+const drawSelectedRange = (
+  canvasRef: RefObject<HTMLCanvasElement> | null,
   canvasWavesWidth: number,
   ranges: number[],
   position: { [key: string]: number },
   selecting: boolean,
   scale: number
 ) => {
-  if (!canvasDecorationRef || !canvasDecorationRef.current) return;
+  if (!canvasRef || !canvasRef.current) return;
 
   const canvasWidth = canvasWavesWidth;
-  const { canvasCtx, canvasHeight } = getCanvasContext(canvasDecorationRef);
+  const { canvasCtx, canvasHeight } = getCanvasContext(canvasRef);
 
   // clear
   canvasCtx.clearRect(0, 0, canvasWidth, canvasHeight);
@@ -418,6 +419,79 @@ const drawSelectedRanges = (
   canvasCtx.fill();
 };
 
+/**
+ * 範囲選択された部分を描画する
+ * @param canvasRef
+ * @param canvasWavesWidth
+ * @param annotations
+ * @param position
+ * @param selecting
+ * @param scale
+ * @returns
+ */
+// const drawAnnotations = (
+//   canvasRef: RefObject<HTMLCanvasElement> | null,
+//   canvasWavesWidth: number,
+//   annotations: Annotation[],
+//   position: { [key: string]: number },
+//   selecting: boolean,
+//   scale: number
+// ) => {
+//   if (!canvasRef || !canvasRef.current) return;
+
+//   const canvasWidth = canvasWavesWidth;
+//   const { canvasCtx, canvasHeight } = getCanvasContext(canvasRef);
+
+//   // clear
+//   canvasCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+//   // 選択された範囲を描画する
+//   const scaledAnnotations = annotations.map((annotation: Annotation) => {
+//     return {
+//       startIdx: Math.round(annotation.startTime * scale)
+//     };
+//   });
+//   const rescaleRanges = sliceByNumber(scaledRanges, 2);
+//   canvasCtx.fillStyle = Color.DustyRose;
+//   canvasCtx.globalAlpha = 0.3;
+//   canvasCtx.beginPath();
+//   for (const range of rescaleRanges) {
+//     if (range.length === 2) {
+//       canvasCtx.fillRect(
+//         range[0],
+//         CANVAS_PADDING,
+//         range[1] - range[0],
+//         canvasHeight - CANVAS_PADDING * 2 - VERTICAL_SCALE_HEIGHT
+//       );
+//     } else {
+//       if (selecting) {
+//         // 他の選択範囲に重なってしまわないようにする
+//         let start = range[0];
+//         let end = position.x;
+//         for (const check of rescaleRanges) {
+//           if (check.length === 2) {
+//             if (check[1] < range[0] && position.x <= check[1]) {
+//               start = check[1] + 2;
+//               end = range[0];
+//             }
+//             if (range[0] < check[0] && check[0] <= position.x) {
+//               end = check[0] - 2;
+//             }
+//           }
+//         }
+//         canvasCtx.fillRect(
+//           start,
+//           CANVAS_PADDING,
+//           end - start,
+//           canvasHeight - CANVAS_PADDING * 2 - VERTICAL_SCALE_HEIGHT
+//         );
+//       }
+//     }
+//   }
+//   canvasCtx.closePath();
+//   canvasCtx.fill();
+// };
+
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // export
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
@@ -426,5 +500,5 @@ export {
   drawWavePeriod,
   drawWaves,
   drawWaveStereo,
-  drawSelectedRanges,
+  drawSelectedRange,
 };

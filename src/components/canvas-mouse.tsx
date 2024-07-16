@@ -1,25 +1,25 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Content } from "./styled";
-import { CanvasPropsInterface, Position } from "sound-ui/types";
+import { Annotation, CanvasPropsInterface } from "sound-ui/types";
 import { VERTICAL_SLIDE_WIDTH } from "../constants";
-import { useMouseCanvasSetup, useCursorEffect } from "../effects.canvas";
+import {
+  useMouseCanvasSetup,
+  useCursorEffect,
+  useScaleEffect,
+} from "../effects.canvas";
+import { useScaleContext } from "../contexts/scale";
+import { useActionContext } from "../contexts/action";
+import { useDrawContext } from "../contexts/draw";
+import { useDataContext } from "../contexts/data";
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // Interface
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 interface Props extends CanvasPropsInterface {
-  enable: boolean;
   selectable: boolean | undefined;
-  left: number;
-  drew: boolean;
-  scale: number;
   scaling: boolean;
-  cursorPosition: Position;
-  setSelectingRange: (selecting: boolean) => void;
-  setCursorPosition: (position: Position) => void;
-  setScale: (scale: number) => void;
+  initNormalize: boolean | undefined;
   setScaling: (scaling: boolean) => void;
-  setCanvasWavesLeft: (left: number) => void;
 }
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
@@ -29,20 +29,38 @@ const CanvasMouse = ({
   canvasRef,
   width,
   height,
-  audioBuffer,
-  enable,
   selectable,
-  left,
-  drew,
-  scale,
   scaling,
-  cursorPosition,
-  setSelectingRange,
-  setCursorPosition,
-  setScale,
+  initNormalize,
   setScaling,
-  setCanvasWavesLeft,
 }: Props) => {
+  const { audioBuffer, normalize, setNormalize, annotations, setAnnotations } =
+    useDataContext();
+  const {
+    scale,
+    setScale,
+    canvasWavesLeft,
+    setCanvasWavesLeft,
+    canvasWavesWidth,
+    setCanvasWavesWidth,
+  } = useScaleContext();
+  const { setDrawing, drawn } = useDrawContext();
+  const {
+    cursorPosition,
+    setCursorPosition,
+    setSelecting,
+    selectedRange,
+    setSelectedRange,
+  } = useActionContext();
+
+  const scaleRef = useRef<number>();
+  scaleRef.current = scale;
+  const scalingRef = useRef<boolean>();
+  scalingRef.current = scaling;
+  const canvasWavesLeftRef = useRef<number>();
+  canvasWavesLeftRef.current = canvasWavesLeft;
+  const canvasWavesWidthRef = useRef<number>();
+  canvasWavesWidthRef.current = width;
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Effects
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
@@ -52,24 +70,39 @@ const CanvasMouse = ({
     cursorPosition,
     audioBuffer,
     canvasRef,
-    drew,
-    left,
+    drawn,
+    canvasWavesLeft,
     width,
     scale
   );
 
+  useScaleEffect(
+    scale,
+    cursorPosition,
+    width,
+    canvasWavesLeft,
+    setCanvasWavesLeft,
+    canvasWavesWidth,
+    setCanvasWavesWidth
+  );
+
+  useEffect(() => {
+    if (!drawn) return;
+    setDrawing(true);
+  }, [canvasWavesWidth]);
+
+  useEffect(() => {
+    if (!drawn) return;
+    if (initNormalize === undefined || initNormalize === null) return;
+    if (initNormalize === normalize) return;
+    console.info(`[info] initNormalize: ${initNormalize}`);
+    setNormalize(initNormalize);
+    setDrawing(true);
+  }, [initNormalize]);
+
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Mouse Event Listener
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-  const scaleRef = useRef<number>();
-  scaleRef.current = scale;
-  const scalingRef = useRef<boolean>();
-  scalingRef.current = scaling;
-  const canvasWavesLeftRef = useRef<number>();
-  canvasWavesLeftRef.current = left;
-  const canvasWavesWidthRef = useRef<number>();
-  canvasWavesWidthRef.current = width;
-
   const onMouseMove = (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -122,7 +155,7 @@ const CanvasMouse = ({
   };
 
   useEffect(() => {
-    if (!enable) return;
+    if (!drawn) return;
     if (!canvasRef || !canvasRef.current) return;
 
     // マウスイベント登録
@@ -136,27 +169,35 @@ const CanvasMouse = ({
       canvasRef.current?.removeEventListener("mousemove", onMouseMove);
       canvasRef.current?.removeEventListener("wheel", onMouseWheel);
     };
-  }, [enable]);
+  }, [drawn]);
 
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Mouse Action
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-  const onMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!enable) return;
+  const onMouseDown = () => {
+    if (!drawn) return;
     if (!selectable) return;
-    setSelectingRange(true);
+    setSelectedRange([]);
+    setSelecting(true);
   };
 
-  const onMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!enable) return;
+  const onMouseUp = () => {
+    if (!drawn) return;
     if (!selectable) return;
-    setSelectingRange(false);
+    const prevAnnotations = JSON.parse(JSON.stringify(annotations));
+    const newAnnotation: Annotation = {
+      startTime: selectedRange[0],
+      endTime: selectedRange[1],
+      label: "",
+    };
+    setAnnotations([...prevAnnotations, newAnnotation]);
+    setSelecting(false);
   };
 
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Render
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-  const wavesStyle = { left };
+  const wavesStyle = { left: canvasWavesLeft };
   return (
     <Content
       width={width}

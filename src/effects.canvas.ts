@@ -228,22 +228,22 @@ const useCanvasClear = (
 const useScaleEffect = (
   scale: number,
   position: { [key: string]: number },
-  props: { [key: string]: any },
+  initWidth: number,
   canvasWavesLeft: number,
-  canvasWavesWidth: number,
   setCanvasWavesLeft: (value: number) => void,
+  canvasWavesWidth: number,
   setCanvasWavesWidth: (value: number) => void
 ) => {
   useEffect(() => {
-    const updateWidth = Math.floor(props.width * scale);
+    const updateWidth = Math.floor(initWidth * scale);
     let newLeft = canvasWavesLeft;
     const leftSide = position.x - canvasWavesLeft;
     const leftSideRatio = leftSide / canvasWavesWidth;
     const newPos = Math.floor(updateWidth * leftSideRatio);
     newLeft = position.x - newPos;
 
-    if (props.width - updateWidth > newLeft) {
-      newLeft = props.width - updateWidth;
+    if (initWidth - updateWidth > newLeft) {
+      newLeft = initWidth - updateWidth;
     }
     if (newLeft > 0) {
       newLeft = 0;
@@ -333,19 +333,20 @@ const useCursorEffect = (
  * @param canvasRef
  * @returns
  */
-const useSelectedRanges = (
+const useSelectRange = (
   selecting: boolean,
   position: { [key: string]: number },
   scale: number,
   canvasWavesLeft: number,
   drewWaves: boolean,
-  canvasRef: RefObject<HTMLCanvasElement> | null
-): number[] => {
-  const [selectedRanges, setSelectedRanges] = useState<number[]>([]);
-
+  canvasRef: RefObject<HTMLCanvasElement> | null,
+  selectedRange: number[],
+  setSelectedRange: (selectedRange: number[]) => void
+) => {
   useEffect(() => {
     if (!drewWaves) return;
     if (!canvasRef || !canvasRef.current) return;
+    if (!selecting) return;
     // グラフの範囲外に出たら消したままにする
     const { canvasWidth, canvasHeight } = getCanvasContext(canvasRef);
     const frameWidth = canvasWidth / scale;
@@ -358,10 +359,10 @@ const useSelectedRanges = (
       position.y < CANVAS_PADDING ||
       position.y > canvasHeight - VERTICAL_SCALE_HEIGHT;
 
-    const cloneRanges = JSON.parse(JSON.stringify(selectedRanges));
-    const rescaleRanges = sliceByNumber(cloneRanges, 2);
+    const cloneRange = JSON.parse(JSON.stringify(selectedRange));
+    const rescaleRange = sliceByNumber(cloneRange, 2);
     let isInRanges = false;
-    for (const check of rescaleRanges) {
+    for (const check of rescaleRange) {
       if (check.length === 2) {
         if (check[0] <= position.x && position.x <= check[1]) {
           isInRanges = true;
@@ -369,48 +370,20 @@ const useSelectedRanges = (
       }
     }
 
-    if (selecting) {
-      // 選択開始
-      if (outOfCanvas) return;
-      if (isInRanges) return;
-      if (cloneRanges.length % 2 === 0) {
-        // 範囲選択が偶数の場合は開始位置を追加する
-        cloneRanges.push(unscaledPosX);
-      } else {
-        cloneRanges.pop();
-        cloneRanges.push(unscaledPosX);
-      }
+    // 選択開始
+    if (outOfCanvas) return;
+    if (isInRanges) return;
+    if (cloneRange.length === 0 || cloneRange.length === 1) {
+      // 開始位置もしくは終了位置を追加する
+      cloneRange.push(unscaledPosX);
     } else {
-      // 選択終了
-      if (outOfCanvas) {
-        cloneRanges.push(canvasWidth - CANVAS_PADDING);
-      } else if (cloneRanges.slice(-1)[0] === unscaledPosX) {
-        // 同じ位置でMouseUpされた場合は選択とみなさない
-        cloneRanges.pop();
-      } else if (cloneRanges.length % 2 !== 0) {
-        // 範囲選択が奇数の場合には終了位置を追加する
-        const prePos = cloneRanges.pop() || 0;
-        let start = prePos;
-        let end = unscaledPosX;
-        for (const check of rescaleRanges) {
-          if (check.length === 2) {
-            if (check[1] < prePos && unscaledPosX <= check[1]) {
-              start = check[1] + 2;
-              end = prePos;
-            }
-            if (prePos < check[0] && check[0] <= unscaledPosX) {
-              end = check[0] - 2;
-            }
-          }
-        }
-        cloneRanges.push(start);
-        cloneRanges.push(end);
-      }
+      // 終了位置を入れ替える
+      cloneRange.pop();
+      cloneRange.push(unscaledPosX);
     }
-    setSelectedRanges(cloneRanges);
-  }, [selecting]);
 
-  return selectedRanges;
+    setSelectedRange(cloneRange);
+  }, [position, selecting]);
 };
 
 /**
@@ -501,7 +474,7 @@ export {
   useCanvasClear,
   useScaleEffect,
   useCursorEffect,
-  useSelectedRanges,
+  useSelectRange,
   useCurrentTime,
   useMaxArea,
 };

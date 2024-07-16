@@ -1,21 +1,19 @@
-import React, { startTransition } from "react";
+import { startTransition } from "react";
 import { useEffect } from "react";
 import { Content } from "./styled";
 import { CanvasPropsInterface } from "sound-ui/types";
 import { useWavesCanvasSetup } from "../effects.canvas";
 import { drawWaveStereo, drawWaves } from "../functions.canvas";
+import { useDrawContext } from "../contexts/draw";
+import { useDataContext } from "../contexts/data";
+import { useScaleContext } from "../contexts/scale";
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // Interface
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 interface Props extends CanvasPropsInterface {
-  left: number;
   samplingLevel: number | undefined;
-  normalize: boolean;
-  drawing: boolean;
   stereo: boolean | undefined;
-  setDrew: (drew: boolean) => void;
-  setDrawing: (drawing: boolean) => void;
   setScaling: (scaling: boolean) => void;
 }
 
@@ -26,16 +24,13 @@ const CanvasWaves = ({
   canvasRef,
   width,
   height,
-  left,
-  audioBuffer,
   samplingLevel,
-  normalize,
-  drawing,
   stereo,
-  setDrew,
-  setDrawing,
   setScaling,
 }: Props) => {
+  const { audioBuffer, normalize } = useDataContext();
+  const { canvasWavesLeft } = useScaleContext();
+  const { drawing, setDrawing, setDrawn } = useDrawContext();
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Effects
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
@@ -73,14 +68,14 @@ const CanvasWaves = ({
       console.info("[success] drew");
       setScaling(false);
       setDrawing(false);
-      setDrew(true);
+      setDrawn(true);
     });
   }, [drawing]);
 
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Render
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-  const wavesStyle = { left };
+  const wavesStyle = { left: canvasWavesLeft };
   return (
     <Content width={width} height={height} style={wavesStyle} ref={canvasRef} />
   );
