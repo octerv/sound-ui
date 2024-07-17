@@ -47,6 +47,29 @@ const clearCanvas = (canvasRef: RefObject<HTMLCanvasElement> | null) => {
   );
 };
 
+//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+// Draw frame
+//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+const drawRect = (
+  canvasCtx: CanvasRenderingContext2D,
+  left: number,
+  top: number,
+  width: number,
+  height: number,
+  color: string
+) => {
+  canvasCtx.globalAlpha = 0.8;
+  canvasCtx.lineWidth = 0.5;
+  canvasCtx.strokeStyle = color;
+  canvasCtx.beginPath();
+  canvasCtx.rect(left, top, width, height);
+  canvasCtx.closePath();
+  canvasCtx.stroke();
+};
+
+//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+// Draw wave
+//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 /**
  * 指定されたオーディオバッファから特定の期間の波形をキャンバスに描画します。
  * この関数は、波形を視覚化し、オーディオデータの一部をグラフとして表示するために使用されます。
@@ -366,6 +389,9 @@ const drawWaveStereo = (
   }
 };
 
+//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+// Draw annotation
+//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 /**
  * 範囲選択された部分を描画する
  * @param canvasRef
@@ -516,6 +542,7 @@ const drawSelectedRange = (
 export {
   getCanvasContext,
   clearCanvas,
+  drawRect,
   drawWavePeriod,
   drawWaves,
   drawWaveStereo,

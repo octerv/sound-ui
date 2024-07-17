@@ -4,14 +4,10 @@ import { useCoverCanvasSetup } from "../effects.canvas";
 import { useDataContext } from "../contexts/data";
 import { useScaleContext } from "../contexts/scale";
 
-interface Props extends CanvasPropsInterface {
-  stereo: boolean | undefined;
-}
-
-const CanvasCover = ({ canvasRef, height, stereo }: Props) => {
-  const { audioBuffer } = useDataContext();
+const CanvasCover = ({ canvasRef, height }: CanvasPropsInterface) => {
+  const { numberOfChannels } = useDataContext();
   const { canvasWidth } = useScaleContext();
-  useCoverCanvasSetup(canvasRef, audioBuffer, stereo);
+  useCoverCanvasSetup(canvasRef, numberOfChannels);
   return <Content width={canvasWidth} height={height} ref={canvasRef} />;
 };
 

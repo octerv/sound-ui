@@ -6,7 +6,7 @@ import {
   VERTICAL_SCALE_HEIGHT,
 } from "./constants";
 import { getCursorSecond, getTimePosition, getTimeStr } from "./functions.time";
-import { clearCanvas, getCanvasContext } from "./functions.canvas";
+import { clearCanvas, drawRect, getCanvasContext } from "./functions.canvas";
 import { sliceByNumber } from "./functions.common";
 import { Position } from "sound-ui/types";
 
@@ -14,21 +14,38 @@ import { Position } from "sound-ui/types";
 // effect functions
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 const useFrameCanvasSetup = (
-  canvasRef: RefObject<HTMLCanvasElement> | null
+  canvasRef: RefObject<HTMLCanvasElement> | null,
+  contentHeight: number,
+  canvasWidth: number,
+  numberOfChannels: number
 ) => {
   useEffect(() => {
     if (!canvasRef || !canvasRef.current) return;
-    const { canvasCtx, canvasWidth, canvasHeight } =
-      getCanvasContext(canvasRef);
-    canvasCtx.globalAlpha = 0.8;
-    canvasCtx.lineWidth = 0.5;
-    // 外枠の描画
-    canvasCtx.fillStyle = Color.DeepSeaBlue;
-    canvasCtx.beginPath();
-    canvasCtx.rect(0, 0, canvasWidth, canvasHeight);
-    canvasCtx.closePath();
-    canvasCtx.stroke();
-  }, [canvasRef]);
+    if (numberOfChannels === 0) return;
+    clearCanvas(canvasRef);
+
+    // グラフのサイズを設定
+    const { canvasCtx } = getCanvasContext(canvasRef);
+    const graphWidth = canvasWidth - CANVAS_PADDING * 2;
+    const graphHeight =
+      (contentHeight - VERTICAL_SCALE_HEIGHT) / numberOfChannels -
+      CANVAS_PADDING * 2;
+    console.debug(
+      `canvasWidth: ${canvasWidth}, contentHeight: ${contentHeight}, graph: ${graphWidth}x${graphHeight}`
+    );
+
+    for (let i = 0; i < numberOfChannels; i++) {
+      const numOfPadding = 2 * i + 1;
+      drawRect(
+        canvasCtx,
+        CANVAS_PADDING,
+        graphHeight * i + CANVAS_PADDING * numOfPadding,
+        graphWidth,
+        graphHeight,
+        Color.DeepSeaBlue
+      );
+    }
+  }, [canvasRef, canvasWidth, numberOfChannels]);
 };
 
 const useWavesCanvasSetup = (
@@ -55,31 +72,19 @@ const useMouseCanvasSetup = (
 
 const useCoverCanvasSetup = (
   canvasRef: RefObject<HTMLCanvasElement> | null,
-  audioBuffer: AudioBuffer | null,
-  stereo: boolean | undefined
+  numberOfChannels: number
 ) => {
   useEffect(() => {
-    if (!audioBuffer) return;
     if (!canvasRef || !canvasRef.current) return;
-    const { canvasCtx, canvasWidth, canvasHeight } =
-      getCanvasContext(canvasRef);
-    canvasCtx.fillStyle = Color.PureWhite;
-    canvasCtx.beginPath();
-    canvasCtx.rect(1, 1, CANVAS_PADDING - 2, canvasHeight - 2);
-    canvasCtx.rect(
-      canvasWidth - (CANVAS_PADDING - 1),
-      1,
-      CANVAS_PADDING - 2,
-      canvasHeight - 2
-    );
-    canvasCtx.closePath();
-    canvasCtx.fill();
-
-    if (stereo) return;
+    if (numberOfChannels === 0) return;
+    clearCanvas(canvasRef);
+    const { canvasCtx, canvasHeight } = getCanvasContext(canvasRef);
 
     const graphHeight =
-      (canvasHeight - CANVAS_PADDING * 3 - VERTICAL_SCALE_HEIGHT) / 2;
-    for (let i = 0; i < audioBuffer.numberOfChannels; i++) {
+      (canvasHeight - CANVAS_PADDING * 3 - VERTICAL_SCALE_HEIGHT) /
+      numberOfChannels;
+
+    for (let i = 0; i < numberOfChannels; i++) {
       // channel text
       canvasCtx.fillStyle = Color.DeepSlate;
       canvasCtx.font = "12px serif";
@@ -89,91 +94,7 @@ const useCoverCanvasSetup = (
         graphHeight * i + CANVAS_PADDING * (i + 1) + 16
       );
     }
-  }, [audioBuffer]);
-};
-
-const useFrameCanvasUpdate = (
-  canvasRef: RefObject<HTMLCanvasElement> | null,
-  audioBuffer: AudioBuffer | null
-) => {
-  useEffect(() => {
-    if (!audioBuffer) return;
-    if (!canvasRef || !canvasRef.current) return;
-
-    const { canvasCtx, canvasWidth, canvasHeight } =
-      getCanvasContext(canvasRef);
-    const graphWidth = canvasWidth - CANVAS_PADDING * 2;
-    const graphHeight =
-      (canvasHeight - CANVAS_PADDING * 3 - VERTICAL_SCALE_HEIGHT) / 2;
-    console.debug(
-      `canvas: ${canvasWidth}x${canvasHeight}, graph: ${graphWidth}x${graphHeight}`
-    );
-
-    for (let i = 0; i < audioBuffer.numberOfChannels; i++) {
-      const centerHeight =
-        CANVAS_PADDING * (i * 1) + graphHeight * i + graphHeight / 2;
-
-      // draw frame
-      canvasCtx.strokeStyle = Color.DeepTeal;
-      canvasCtx.lineWidth = 1;
-      canvasCtx.beginPath();
-      canvasCtx.rect(
-        CANVAS_PADDING,
-        graphHeight * i + CANVAS_PADDING * (i + 1),
-        graphWidth,
-        graphHeight
-      );
-      canvasCtx.closePath();
-      canvasCtx.stroke();
-
-      // draw grid (horizontal)
-      canvasCtx.strokeStyle = Color.DeepSlate;
-      canvasCtx.lineWidth = 0.2;
-      canvasCtx.beginPath();
-      canvasCtx.moveTo(CANVAS_PADDING, centerHeight);
-      canvasCtx.lineTo(CANVAS_PADDING + graphWidth, centerHeight);
-      canvasCtx.closePath();
-      canvasCtx.stroke();
-    }
-  }, [audioBuffer]);
-};
-
-const useFrameCanvasStereoUpdate = (
-  canvasRef: RefObject<HTMLCanvasElement> | null,
-  audioBuffer: AudioBuffer | null
-) => {
-  useEffect(() => {
-    if (!audioBuffer) return;
-    if (!canvasRef || !canvasRef.current) return;
-
-    const { canvasCtx, canvasWidth, canvasHeight } =
-      getCanvasContext(canvasRef);
-    const graphWidth = canvasWidth - CANVAS_PADDING * 2;
-    const graphHeight =
-      canvasHeight - CANVAS_PADDING * 2 - VERTICAL_SCALE_HEIGHT;
-    console.debug(
-      `canvas: ${canvasWidth}x${canvasHeight}, graph: ${graphWidth}x${graphHeight}`
-    );
-
-    const centerHeight = CANVAS_PADDING + graphHeight / 2;
-
-    // draw frame
-    canvasCtx.strokeStyle = Color.DeepTeal;
-    canvasCtx.lineWidth = 1;
-    canvasCtx.beginPath();
-    canvasCtx.rect(CANVAS_PADDING, CANVAS_PADDING, graphWidth, graphHeight);
-    canvasCtx.closePath();
-    canvasCtx.stroke();
-
-    // draw grid (horizontal)
-    canvasCtx.strokeStyle = Color.DeepTeal;
-    canvasCtx.lineWidth = 0.2;
-    canvasCtx.beginPath();
-    canvasCtx.moveTo(CANVAS_PADDING, centerHeight);
-    canvasCtx.lineTo(CANVAS_PADDING + graphWidth, centerHeight);
-    canvasCtx.closePath();
-    canvasCtx.stroke();
-  }, [audioBuffer]);
+  }, [numberOfChannels]);
 };
 
 /**
@@ -428,8 +349,6 @@ export {
   useWavesCanvasSetup,
   useMouseCanvasSetup,
   useCoverCanvasSetup,
-  useFrameCanvasUpdate,
-  useFrameCanvasStereoUpdate,
   useCanvasClear,
   useScaling,
   useCursorEffect,
