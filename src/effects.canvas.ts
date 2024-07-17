@@ -56,6 +56,7 @@ const useWavesCanvasSetup = (
     const { canvasCtx } = getCanvasContext(canvasRef);
     canvasCtx.globalAlpha = 0.8;
     canvasCtx.lineWidth = 0.5;
+    // TODO: 波形の中央に横線を引きたい
   }, [canvasRef]);
 };
 
@@ -85,13 +86,14 @@ const useCoverCanvasSetup = (
       numberOfChannels;
 
     for (let i = 0; i < numberOfChannels; i++) {
+      const numOfPadding = 2 * i + 1;
       // channel text
       canvasCtx.fillStyle = Color.DeepSlate;
       canvasCtx.font = "12px serif";
       canvasCtx.fillText(
         `channel ${i + 1}`,
         CANVAS_PADDING + 16,
-        graphHeight * i + CANVAS_PADDING * (i + 1) + 16
+        graphHeight * i + CANVAS_PADDING * numOfPadding + 16
       );
     }
   }, [numberOfChannels]);

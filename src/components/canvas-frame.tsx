@@ -9,8 +9,8 @@ interface Props extends CanvasPropsInterface {
 }
 
 const CanvasFrame = ({ canvasRef, height, stereo }: Props) => {
-  const { audioBuffer, numberOfChannels } = useDataContext();
-  const { contentWidth, contentHeight, canvasWidth } = useScaleContext();
+  const { numberOfChannels } = useDataContext();
+  const { contentHeight, canvasWidth } = useScaleContext();
   useFrameCanvasSetup(canvasRef, contentHeight, canvasWidth, numberOfChannels);
   return <Content width={canvasWidth} height={height} ref={canvasRef} />;
 };

@@ -27,7 +27,7 @@ const CanvasWaves = ({
   stereo,
   setScaling,
 }: Props) => {
-  const { audioBuffer, normalize } = useDataContext();
+  const { audioBuffer, numberOfChannels, normalize } = useDataContext();
   const { canvasWidth } = useScaleContext();
   const { drawing, setDrawing, setDrawn } = useDrawContext();
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
@@ -47,16 +47,17 @@ const CanvasWaves = ({
     if (!canvasRef || !canvasRef.current) return;
     // draw waves
     startTransition(() => {
-      if (stereo) {
-        drawWaveStereo(
+      console.log(`numberOfChannels: ${numberOfChannels}`);
+      if (numberOfChannels === 1) {
+        drawWaves(
           audioBuffer,
           canvasRef,
           normalize,
           canvasWidth,
           samplingLevel || 0.01
         );
-      } else {
-        drawWaves(
+      } else if (numberOfChannels === 2) {
+        drawWaveStereo(
           audioBuffer,
           canvasRef,
           normalize,
