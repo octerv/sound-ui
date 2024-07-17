@@ -22,14 +22,13 @@ interface Props extends CanvasPropsInterface {
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 const CanvasWaves = ({
   canvasRef,
-  width,
   height,
   samplingLevel,
   stereo,
   setScaling,
 }: Props) => {
   const { audioBuffer, normalize } = useDataContext();
-  const { canvasWavesLeft } = useScaleContext();
+  const { canvasWavesLeft, canvasWidth } = useScaleContext();
   const { drawing, setDrawing, setDrawn } = useDrawContext();
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Effects
@@ -53,7 +52,7 @@ const CanvasWaves = ({
           audioBuffer,
           canvasRef,
           normalize,
-          width,
+          canvasWidth,
           samplingLevel || 0.01
         );
       } else {
@@ -61,7 +60,7 @@ const CanvasWaves = ({
           audioBuffer,
           canvasRef,
           normalize,
-          width,
+          canvasWidth,
           samplingLevel || 0.01
         );
       }
@@ -76,9 +75,7 @@ const CanvasWaves = ({
   // Render
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   const wavesStyle = { left: canvasWavesLeft };
-  return (
-    <Content width={width} height={height} style={wavesStyle} ref={canvasRef} />
-  );
+  return <Content width={canvasWidth} height={height} ref={canvasRef} />;
 };
 
 export default CanvasWaves;

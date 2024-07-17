@@ -1,11 +1,10 @@
 import { useEffect, useRef } from "react";
 import { Content } from "./styled";
 import { Annotation, CanvasPropsInterface } from "sound-ui/types";
-import { VERTICAL_SLIDE_WIDTH } from "../constants";
 import {
   useMouseCanvasSetup,
   useCursorEffect,
-  useScaleEffect,
+  useScaling,
 } from "../effects.canvas";
 import { useScaleContext } from "../contexts/scale";
 import { useActionContext } from "../contexts/action";
@@ -16,6 +15,7 @@ import { useDataContext } from "../contexts/data";
 // Interface
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 interface Props extends CanvasPropsInterface {
+  areaRef: React.RefObject<HTMLDivElement>;
   selectable: boolean | undefined;
   scaling: boolean;
   initNormalize: boolean | undefined;
@@ -27,8 +27,8 @@ interface Props extends CanvasPropsInterface {
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 const CanvasMouse = ({
   canvasRef,
-  width,
   height,
+  areaRef,
   selectable,
   scaling,
   initNormalize,
@@ -39,10 +39,11 @@ const CanvasMouse = ({
   const {
     scale,
     setScale,
-    canvasWavesLeft,
-    setCanvasWavesLeft,
-    canvasWavesWidth,
-    setCanvasWavesWidth,
+    width,
+    canvasWidth,
+    setCanvasWidth,
+    canvasScrollLeft,
+    setCanvasScrollLeft,
   } = useScaleContext();
   const { setDrawing, drawn } = useDrawContext();
   const {
@@ -57,39 +58,28 @@ const CanvasMouse = ({
   scaleRef.current = scale;
   const scalingRef = useRef<boolean>();
   scalingRef.current = scaling;
-  const canvasWavesLeftRef = useRef<number>();
-  canvasWavesLeftRef.current = canvasWavesLeft;
   const canvasWavesWidthRef = useRef<number>();
-  canvasWavesWidthRef.current = width;
+  canvasWavesWidthRef.current = canvasWidth;
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Effects
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   useMouseCanvasSetup(canvasRef);
 
-  useCursorEffect(
-    cursorPosition,
-    audioBuffer,
-    canvasRef,
-    drawn,
-    canvasWavesLeft,
-    width,
-    scale
-  );
+  useCursorEffect(cursorPosition, audioBuffer, canvasRef, drawn, canvasWidth);
 
-  useScaleEffect(
+  useScaling(
     scale,
     cursorPosition,
+    setCursorPosition,
     width,
-    canvasWavesLeft,
-    setCanvasWavesLeft,
-    canvasWavesWidth,
-    setCanvasWavesWidth
+    setCanvasWidth,
+    setCanvasScrollLeft
   );
 
   useEffect(() => {
     if (!drawn) return;
     setDrawing(true);
-  }, [canvasWavesWidth]);
+  }, [canvasWidth]);
 
   useEffect(() => {
     if (!drawn) return;
@@ -99,6 +89,12 @@ const CanvasMouse = ({
     setNormalize(initNormalize);
     setDrawing(true);
   }, [initNormalize]);
+
+  useEffect(() => {
+    if (!areaRef.current) return;
+    console.log(`canvasScrollLeft: ${canvasScrollLeft}`);
+    areaRef.current.scrollLeft = canvasScrollLeft;
+  }, [canvasScrollLeft]);
 
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Mouse Event Listener
@@ -111,6 +107,7 @@ const CanvasMouse = ({
     const rect = canvasRef.current.getBoundingClientRect();
     const posX = e.clientX - rect.left;
     const posY = e.clientY - rect.top;
+    console.log(`x: ${posX}, y: ${posY}`);
 
     // scale center
     setCursorPosition({ x: posX, y: posY });
@@ -124,32 +121,15 @@ const CanvasMouse = ({
     // 縦スクロールで拡大縮小
     if (e.deltaY !== 0) {
       let newScale = scaleRef.current || 1.0;
-      if (e.deltaY > 4) {
+      if (e.deltaY < -4) {
         newScale = Math.floor((newScale + 0.2) * 100) / 100;
-      } else if (e.deltaY < -4) {
+      } else if (e.deltaY > 4) {
         newScale = Math.floor((newScale - 0.2) * 100) / 100;
       }
 
       if (newScale >= 1.0 && newScale <= 2.0 && scaleRef.current !== newScale) {
         setScale(newScale);
         setScaling(true);
-      }
-    }
-
-    // 横スクロールで位置移動
-    if (e.deltaX !== 0) {
-      const currentWidth = canvasWavesWidthRef.current || width;
-      if (currentWidth === width) return;
-
-      let newLeft = canvasWavesLeftRef.current || 0;
-      if (e.deltaX > 2) {
-        newLeft = newLeft - VERTICAL_SLIDE_WIDTH;
-      } else if (e.deltaX < -2) {
-        newLeft = newLeft + VERTICAL_SLIDE_WIDTH;
-      }
-
-      if (newLeft <= 0 && newLeft >= width - currentWidth) {
-        setCanvasWavesLeft(newLeft);
       }
     }
   };
@@ -197,12 +177,10 @@ const CanvasMouse = ({
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Render
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-  const wavesStyle = { left: canvasWavesLeft };
   return (
     <Content
-      width={width}
+      width={canvasWidth}
       height={height}
-      style={wavesStyle}
       ref={canvasRef}
       onMouseDown={onMouseDown}
       onMouseUp={onMouseUp}

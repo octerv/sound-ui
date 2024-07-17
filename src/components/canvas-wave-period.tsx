@@ -5,6 +5,7 @@ import { drawWavePeriod, getCanvasContext } from "../functions.canvas";
 import { CanvasPropsInterface } from "sound-ui/types";
 import { useWavesCanvasSetup } from "../effects.canvas";
 import { useDataContext } from "../contexts/data";
+import { useScaleContext } from "../contexts/scale";
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // Interface
@@ -19,15 +20,9 @@ interface Props extends CanvasPropsInterface {
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // Component
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-const CanvasWavePeriod = ({
-  top,
-  left,
-  width,
-  height,
-  period,
-  frequency,
-}: Props) => {
+const CanvasWavePeriod = ({ top, left, height, period, frequency }: Props) => {
   const { audioBuffer } = useDataContext();
+  const { canvasWidth } = useScaleContext();
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Refs
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
@@ -56,7 +51,12 @@ const CanvasWavePeriod = ({
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   const wavesStyle = { top, left };
   return (
-    <Content width={width} height={height} style={wavesStyle} ref={canvasRef} />
+    <Content
+      width={canvasWidth}
+      height={height}
+      style={wavesStyle}
+      ref={canvasRef}
+    />
   );
 };
 

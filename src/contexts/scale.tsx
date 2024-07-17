@@ -1,13 +1,16 @@
 import type { ReactNode } from "react";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 interface ScaleContextType {
   scale: number;
   setScale: (scale: number) => void;
   canvasWavesLeft: number;
   setCanvasWavesLeft: (left: number) => void;
-  canvasWavesWidth: number;
-  setCanvasWavesWidth: (width: number) => void;
+  width: number;
+  canvasWidth: number;
+  setCanvasWidth: (width: number) => void;
+  canvasScrollLeft: number;
+  setCanvasScrollLeft: (left: number) => void;
 }
 
 const ScaleContext = createContext<ScaleContextType | undefined>(undefined);
@@ -20,7 +23,18 @@ type ScaleProviderProps = {
 export const ScaleProvider = ({ children, width }: ScaleProviderProps) => {
   const [scale, setScale] = useState<number>(1.0);
   const [canvasWavesLeft, setCanvasWavesLeft] = useState<number>(0);
-  const [canvasWavesWidth, setCanvasWavesWidth] = useState<number>(width);
+  const [canvasWidth, setCanvasWidth] = useState<number>(width);
+  const [canvasScrollLeft, setCanvasScrollLeft] = useState<number>(0);
+
+  useEffect(() => {
+    let newWidth = width * scale;
+    if (newWidth < width) {
+      setCanvasWidth(width);
+      setScale(1.0);
+    } else {
+      setCanvasWidth(newWidth);
+    }
+  }, [scale]);
 
   return (
     <ScaleContext.Provider
@@ -29,8 +43,11 @@ export const ScaleProvider = ({ children, width }: ScaleProviderProps) => {
         setScale,
         canvasWavesLeft,
         setCanvasWavesLeft,
-        canvasWavesWidth,
-        setCanvasWavesWidth,
+        width,
+        canvasWidth,
+        setCanvasWidth,
+        canvasScrollLeft,
+        setCanvasScrollLeft,
       }}
     >
       {children}

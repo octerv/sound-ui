@@ -8,7 +8,6 @@ import {
 } from "./constants";
 import { getTimeStr } from "./functions.time";
 import { scaling, sliceByNumber } from "./functions.common";
-import { Annotation } from "sound-ui/types";
 
 /**
  * Canvasのコンテキストを取得する
@@ -27,6 +26,25 @@ const getCanvasContext = (
   const canvasHeight = canvasEle.clientHeight;
   const canvasCtx: CanvasRenderingContext2D = canvasEle.getContext("2d")!;
   return { canvasCtx, canvasWidth, canvasHeight };
+};
+
+/**
+ * 指定されたcanvasRefが示すHTMLCanvasElementをクリアします。
+ * canvasRefがnullまたは未定義の場合、何もしません。
+ * CANVAS_PADDINGを考慮して、キャンバスの描画領域全体をクリアします。
+ *
+ * @param {RefObject<HTMLCanvasElement> | null} canvasRef - クリアするキャンバスへの参照。
+ */
+const clearCanvas = (canvasRef: RefObject<HTMLCanvasElement> | null) => {
+  // clear canvas
+  if (!canvasRef || !canvasRef.current) return;
+  let { canvasCtx, canvasWidth, canvasHeight } = getCanvasContext(canvasRef);
+  canvasCtx.clearRect(
+    CANVAS_PADDING,
+    CANVAS_PADDING,
+    canvasWidth - CANVAS_PADDING * 2,
+    canvasHeight - CANVAS_PADDING * 2
+  );
 };
 
 /**
@@ -497,6 +515,7 @@ const drawSelectedRange = (
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 export {
   getCanvasContext,
+  clearCanvas,
   drawWavePeriod,
   drawWaves,
   drawWaveStereo,

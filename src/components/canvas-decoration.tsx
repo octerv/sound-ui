@@ -19,14 +19,9 @@ interface Props extends CanvasPropsInterface {
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // Component
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-const CanvasDecoration = ({
-  canvasRef,
-  width,
-  height,
-  maxAreaLength,
-}: Props) => {
+const CanvasDecoration = ({ canvasRef, height, maxAreaLength }: Props) => {
   const { audioBuffer, annotations } = useDataContext();
-  const { scale, canvasWavesLeft } = useScaleContext();
+  const { scale, canvasWavesLeft, canvasWidth } = useScaleContext();
   const { drawing, drawn } = useDrawContext();
   const { cursorPosition, selecting, selectedRange, setSelectedRange } =
     useActionContext();
@@ -60,7 +55,7 @@ const CanvasDecoration = ({
     // 選択された範囲を描画する
     drawSelectedRange(
       canvasRef,
-      width,
+      canvasWidth,
       selectedRange,
       cursorPosition,
       selecting,
@@ -98,15 +93,13 @@ const CanvasDecoration = ({
   //   });
   // }, [drawing]);
 
-  useMaxArea(canvasRef, audioBuffer, width, maxArea);
+  useMaxArea(canvasRef, audioBuffer, canvasWidth, maxArea);
 
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Render
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   const wavesStyle = { left: canvasWavesLeft };
-  return (
-    <Content width={width} height={height} style={wavesStyle} ref={canvasRef} />
-  );
+  return <Content width={canvasWidth} height={height} ref={canvasRef} />;
 };
 
 export default CanvasDecoration;

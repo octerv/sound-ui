@@ -25,7 +25,6 @@ declare module "sound-ui/types" {
 
   export interface CanvasPropsInterface {
     canvasRef: React.RefObject<HTMLCanvasElement>;
-    width: number;
     height: number;
   }
 }

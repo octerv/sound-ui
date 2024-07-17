@@ -5,35 +5,10 @@ import {
   GRAPH_PADDING,
   VERTICAL_SCALE_HEIGHT,
 } from "./constants";
-import { getCursorSecond, getTimePosition } from "./functions.time";
-import { getCanvasContext } from "./functions.canvas";
+import { getCursorSecond, getTimePosition, getTimeStr } from "./functions.time";
+import { clearCanvas, getCanvasContext } from "./functions.canvas";
 import { sliceByNumber } from "./functions.common";
-
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-// local functions
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-const _getTimeStr = (second: number) => {
-  const hour = Math.floor(second / (60 * 60));
-  const min = Math.floor((second % (60 * 60)) / 60);
-  const sec = Math.floor(second % 60);
-  return hour === 0
-    ? `${("0" + min).slice(-2)}:${("0" + sec).slice(-2)}`
-    : `${("0" + hour).slice(-2)}:${("0" + min).slice(-2)}:${("0" + sec).slice(
-        -2
-      )}`;
-};
-
-const _clearCanvas = (canvasRef: RefObject<HTMLCanvasElement> | null) => {
-  // clear canvas
-  if (!canvasRef || !canvasRef.current) return;
-  let { canvasCtx, canvasWidth, canvasHeight } = getCanvasContext(canvasRef);
-  canvasCtx.clearRect(
-    CANVAS_PADDING,
-    CANVAS_PADDING,
-    canvasWidth - CANVAS_PADDING * 2,
-    canvasHeight - CANVAS_PADDING * 2
-  );
-};
+import { Position } from "sound-ui/types";
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // effect functions
@@ -219,38 +194,32 @@ const useCanvasClear = (
 
     // clear canvas
     if (!canvasFrameRef || !canvasFrameRef.current) return;
-    _clearCanvas(canvasFrameRef);
-    _clearCanvas(canvasWavesRef);
-    _clearCanvas(canvasDecorationRef);
+    clearCanvas(canvasFrameRef);
+    clearCanvas(canvasWavesRef);
+    clearCanvas(canvasDecorationRef);
   }, [dataUrl]);
 };
 
-const useScaleEffect = (
+const useScaling = (
   scale: number,
-  position: { [key: string]: number },
+  position: Position,
+  setCursorPosition: (position: Position) => void,
   initWidth: number,
-  canvasWavesLeft: number,
-  setCanvasWavesLeft: (value: number) => void,
-  canvasWavesWidth: number,
-  setCanvasWavesWidth: (value: number) => void
+  setCanvasWidth: (width: number) => void,
+  setCanvasScrollLeft: (left: number) => void
 ) => {
   useEffect(() => {
+    // Canvasの幅の拡大縮小
     const updateWidth = Math.floor(initWidth * scale);
-    let newLeft = canvasWavesLeft;
-    const leftSide = position.x - canvasWavesLeft;
-    const leftSideRatio = leftSide / canvasWavesWidth;
-    const newPos = Math.floor(updateWidth * leftSideRatio);
-    newLeft = position.x - newPos;
+    setCanvasWidth(updateWidth);
 
-    if (initWidth - updateWidth > newLeft) {
-      newLeft = initWidth - updateWidth;
-    }
-    if (newLeft > 0) {
-      newLeft = 0;
-    }
+    // カーソル位置の調整
+    setCursorPosition({ x: position.x * scale, y: position.y });
 
-    setCanvasWavesLeft(newLeft);
-    setCanvasWavesWidth(updateWidth);
+    // スクロール位置の調整
+    const scaledX = position.x * scale;
+    const adjust = scaledX - position.x;
+    setCanvasScrollLeft(adjust);
   }, [scale]);
 };
 
@@ -259,37 +228,30 @@ const useScaleEffect = (
  * @param position
  * @param audioBuffer
  * @param canvasRef
- * @param drewWaves
- * @param canvasWavesLeft
- * @param canvasWavesWidth
- * @param scale
+ * @param drawn
+ * @param canvasWidth
  */
 const useCursorEffect = (
   position: { [key: string]: number },
   audioBuffer: AudioBuffer | null,
   canvasRef: RefObject<HTMLCanvasElement> | null,
-  drewWaves: boolean,
-  canvasWavesLeft: number,
-  canvasWavesWidth: number,
-  scale: number
+  drawn: boolean,
+  canvasWidth: number
 ) => {
   useEffect(() => {
     if (!audioBuffer) return;
-    if (!drewWaves) return;
+    if (!drawn) return;
     if (!canvasRef || !canvasRef.current) return;
 
-    const { canvasCtx, canvasWidth, canvasHeight } =
-      getCanvasContext(canvasRef);
-    const frameWidth = canvasWidth / scale;
+    const { canvasCtx, canvasHeight } = getCanvasContext(canvasRef);
 
     // clear
     canvasCtx.clearRect(0, 0, canvasWidth, canvasHeight);
 
     // グラフの範囲外に出たら消したままにする
     if (
-      position.x < CANVAS_PADDING + GRAPH_PADDING - canvasWavesLeft ||
-      position.x >
-        frameWidth - (CANVAS_PADDING + GRAPH_PADDING) - canvasWavesLeft ||
+      position.x < CANVAS_PADDING + GRAPH_PADDING ||
+      position.x > canvasWidth - (CANVAS_PADDING + GRAPH_PADDING) ||
       position.y < CANVAS_PADDING ||
       position.y > canvasHeight - VERTICAL_SCALE_HEIGHT
     )
@@ -310,17 +272,17 @@ const useCursorEffect = (
 
     // カーソル位置のTime表示
     const sec = getCursorSecond(
-      canvasWavesWidth,
+      canvasWidth,
       CANVAS_PADDING + GRAPH_PADDING,
       audioBuffer.duration,
       position.x
     );
     canvasCtx.fillText(
-      _getTimeStr(sec),
+      getTimeStr(sec),
       position.x + 8,
       canvasHeight - VERTICAL_SCALE_HEIGHT - 16
     );
-  }, [position]);
+  }, [position, canvasWidth]);
 };
 
 /**
@@ -403,7 +365,7 @@ const useCurrentTime = (
     if (!audioBuffer) return;
     if (!canvasRef || !canvasRef.current) return;
     if (!currentTime) return;
-    _clearCanvas(canvasRef);
+    clearCanvas(canvasRef);
 
     const { canvasCtx, canvasHeight } = getCanvasContext(canvasRef);
     const graphHeight =
@@ -472,7 +434,7 @@ export {
   useFrameCanvasUpdate,
   useFrameCanvasStereoUpdate,
   useCanvasClear,
-  useScaleEffect,
+  useScaling,
   useCursorEffect,
   useSelectRange,
   useCurrentTime,

@@ -7,13 +7,15 @@ import {
   useFrameCanvasUpdate,
 } from "../effects.canvas";
 import { useDataContext } from "../contexts/data";
+import { useScaleContext } from "../contexts/scale";
 
 interface Props extends CanvasPropsInterface {
   stereo: boolean | undefined;
 }
 
-const CanvasFrame = ({ canvasRef, width, height, stereo }: Props) => {
+const CanvasFrame = ({ canvasRef, height, stereo }: Props) => {
   const { audioBuffer } = useDataContext();
+  const { canvasWidth } = useScaleContext();
   useFrameCanvasSetup(canvasRef);
   if (stereo) {
     useFrameCanvasStereoUpdate(canvasRef, audioBuffer);
@@ -21,7 +23,7 @@ const CanvasFrame = ({ canvasRef, width, height, stereo }: Props) => {
     useFrameCanvasUpdate(canvasRef, audioBuffer);
   }
 
-  return <Content width={width} height={height} ref={canvasRef} />;
+  return <Content width={canvasWidth} height={height} ref={canvasRef} />;
 };
 
 export default CanvasFrame;

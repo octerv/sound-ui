@@ -20,6 +20,7 @@ const Waves = (props: WavesProps) => {
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Ref
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+  const areaRef = useRef<HTMLDivElement>(null);
   const canvasFrameRef = useRef<HTMLCanvasElement>(null);
   const canvasWavesRef = useRef<HTMLCanvasElement>(null);
   const canvasDecorationRef = useRef<HTMLCanvasElement>(null);
@@ -50,23 +51,22 @@ const Waves = (props: WavesProps) => {
       width: props.width,
       height: props.height,
       overflowX: "auto",
+      overflowY: "hidden",
     },
   };
   return (
-    <Area style={styles.area}>
+    <Area ref={areaRef} style={styles.area}>
       <DataProvider dataUrl={props.dataUrl}>
         <ScaleProvider width={props.width}>
           <DrawProvider>
             <ActionProvider>
               <CanvasFrame
                 canvasRef={canvasFrameRef}
-                width={props.width}
                 height={props.height}
                 stereo={props.stereo}
               />
               <CanvasWaves
                 canvasRef={canvasWavesRef}
-                width={props.width}
                 height={props.height}
                 samplingLevel={props.samplingLevel}
                 stereo={props.stereo}
@@ -74,26 +74,23 @@ const Waves = (props: WavesProps) => {
               />
               <CanvasDecoration
                 canvasRef={canvasDecorationRef}
-                width={props.width}
                 height={props.height}
                 maxAreaLength={props.maxAreaLength}
               />
               <CanvasTimeline
                 canvasRef={canvasTimelineRef}
-                width={props.width}
                 height={props.height}
                 currentTime={props.currentTime}
               />
               <CanvasCover
                 canvasRef={canvasCoverRef}
-                width={props.width}
                 height={props.height}
                 stereo={props.stereo}
               />
               <CanvasMouse
                 canvasRef={canvasMouseRef}
+                areaRef={areaRef}
                 selectable={props.selectable}
-                width={props.width}
                 height={props.height}
                 scaling={scaling}
                 initNormalize={props.normalize}
