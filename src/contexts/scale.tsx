@@ -4,8 +4,6 @@ import { createContext, useContext, useEffect, useState } from "react";
 interface ScaleContextType {
   scale: number;
   setScale: (scale: number) => void;
-  canvasWavesLeft: number;
-  setCanvasWavesLeft: (left: number) => void;
   width: number;
   canvasWidth: number;
   setCanvasWidth: (width: number) => void;
@@ -22,7 +20,6 @@ type ScaleProviderProps = {
 
 export const ScaleProvider = ({ children, width }: ScaleProviderProps) => {
   const [scale, setScale] = useState<number>(1.0);
-  const [canvasWavesLeft, setCanvasWavesLeft] = useState<number>(0);
   const [canvasWidth, setCanvasWidth] = useState<number>(width);
   const [canvasScrollLeft, setCanvasScrollLeft] = useState<number>(0);
 
@@ -41,8 +38,6 @@ export const ScaleProvider = ({ children, width }: ScaleProviderProps) => {
       value={{
         scale,
         setScale,
-        canvasWavesLeft,
-        setCanvasWavesLeft,
         width,
         canvasWidth,
         setCanvasWidth,

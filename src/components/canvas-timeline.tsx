@@ -10,9 +10,8 @@ interface Props extends CanvasPropsInterface {
 
 const CanvasTimeline = ({ canvasRef, height, currentTime }: Props) => {
   const { audioBuffer } = useDataContext();
-  const { canvasWavesLeft, canvasWidth } = useScaleContext();
+  const { canvasWidth } = useScaleContext();
   useCurrentTime(canvasRef, audioBuffer, canvasWidth, currentTime);
-  const wavesStyle = { left: canvasWavesLeft };
   return <Content width={canvasWidth} height={height} ref={canvasRef} />;
 };
 

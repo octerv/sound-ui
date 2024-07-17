@@ -21,7 +21,7 @@ interface Props extends CanvasPropsInterface {
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 const CanvasDecoration = ({ canvasRef, height, maxAreaLength }: Props) => {
   const { audioBuffer, annotations } = useDataContext();
-  const { scale, canvasWavesLeft, canvasWidth } = useScaleContext();
+  const { scale, canvasWidth } = useScaleContext();
   const { drawing, drawn } = useDrawContext();
   const { cursorPosition, selecting, selectedRange, setSelectedRange } =
     useActionContext();
@@ -42,7 +42,6 @@ const CanvasDecoration = ({ canvasRef, height, maxAreaLength }: Props) => {
     selecting,
     cursorPosition,
     scale,
-    canvasWavesLeft,
     drawn,
     canvasRef,
     selectedRange,
@@ -98,7 +97,6 @@ const CanvasDecoration = ({ canvasRef, height, maxAreaLength }: Props) => {
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Render
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-  const wavesStyle = { left: canvasWavesLeft };
   return <Content width={canvasWidth} height={height} ref={canvasRef} />;
 };
 

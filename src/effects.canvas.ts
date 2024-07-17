@@ -290,7 +290,6 @@ const useCursorEffect = (
  * @param selecting
  * @param position
  * @param scale
- * @param canvasWavesLeft
  * @param drewWaves
  * @param canvasRef
  * @returns
@@ -299,7 +298,6 @@ const useSelectRange = (
   selecting: boolean,
   position: { [key: string]: number },
   scale: number,
-  canvasWavesLeft: number,
   drewWaves: boolean,
   canvasRef: RefObject<HTMLCanvasElement> | null,
   selectedRange: number[],
@@ -315,9 +313,8 @@ const useSelectRange = (
     const unscaledPosX = Math.round(position.x / scale);
 
     const outOfCanvas =
-      position.x < CANVAS_PADDING + GRAPH_PADDING - canvasWavesLeft ||
-      position.x >
-        frameWidth - (CANVAS_PADDING + GRAPH_PADDING) - canvasWavesLeft ||
+      position.x < CANVAS_PADDING + GRAPH_PADDING ||
+      position.x > frameWidth - (CANVAS_PADDING + GRAPH_PADDING) ||
       position.y < CANVAS_PADDING ||
       position.y > canvasHeight - VERTICAL_SCALE_HEIGHT;
 

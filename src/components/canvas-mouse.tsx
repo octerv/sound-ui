@@ -92,7 +92,6 @@ const CanvasMouse = ({
 
   useEffect(() => {
     if (!areaRef.current) return;
-    console.log(`canvasScrollLeft: ${canvasScrollLeft}`);
     areaRef.current.scrollLeft = canvasScrollLeft;
   }, [canvasScrollLeft]);
 
@@ -107,7 +106,6 @@ const CanvasMouse = ({
     const rect = canvasRef.current.getBoundingClientRect();
     const posX = e.clientX - rect.left;
     const posY = e.clientY - rect.top;
-    console.log(`x: ${posX}, y: ${posY}`);
 
     // scale center
     setCursorPosition({ x: posX, y: posY });

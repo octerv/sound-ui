@@ -28,7 +28,7 @@ const CanvasWaves = ({
   setScaling,
 }: Props) => {
   const { audioBuffer, normalize } = useDataContext();
-  const { canvasWavesLeft, canvasWidth } = useScaleContext();
+  const { canvasWidth } = useScaleContext();
   const { drawing, setDrawing, setDrawn } = useDrawContext();
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Effects
@@ -74,7 +74,6 @@ const CanvasWaves = ({
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Render
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-  const wavesStyle = { left: canvasWavesLeft };
   return <Content width={canvasWidth} height={height} ref={canvasRef} />;
 };
 
