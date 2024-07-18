@@ -2,6 +2,7 @@ import { RefObject, useEffect } from "react";
 import {
   CANVAS_PADDING,
   Color,
+  Font,
   GRAPH_PADDING,
   VERTICAL_SCALE_HEIGHT,
 } from "./constants";
@@ -10,6 +11,7 @@ import {
   clearCanvas,
   drawLine,
   drawRect,
+  drawText,
   getCanvasContext,
 } from "./functions.canvas";
 import { sliceByNumber } from "./functions.common";
@@ -135,12 +137,13 @@ const useCoverCanvasSetup = (
     for (let i = 0; i < numberOfChannels; i++) {
       const numOfPadding = 2 * i + 1;
       // channel text
-      canvasCtx.fillStyle = Color.DeepSlate;
-      canvasCtx.font = "12px serif";
-      canvasCtx.fillText(
-        `channel ${i + 1}`,
+      drawText(
+        canvasCtx,
         CANVAS_PADDING + 16,
-        graphHeight * i + CANVAS_PADDING * numOfPadding + 16
+        graphHeight * i + CANVAS_PADDING * numOfPadding + 16,
+        `channel ${i + 1}`,
+        Font.Default,
+        Color.DeepSlate
       );
     }
   }, [numberOfChannels]);
@@ -258,10 +261,13 @@ const useCursorEffect = (
 
     // カーソル位置のTime表示
     const sec = getCursorSecond(canvasWidth, audioBuffer.duration, position.x);
-    canvasCtx.fillText(
-      getTimeStr(sec),
+    drawText(
+      canvasCtx,
       position.x + 8,
-      canvasHeight - VERTICAL_SCALE_HEIGHT - 16
+      canvasHeight - VERTICAL_SCALE_HEIGHT - 16,
+      getTimeStr(sec),
+      Font.Default,
+      Color.DeepSlate
     );
   }, [position, canvasWidth]);
 };

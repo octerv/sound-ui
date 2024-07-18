@@ -37,7 +37,6 @@ const CanvasDecoration = ({ canvasRef, height }: CanvasPropsInterface) => {
     // 選択された範囲を描画する
     drawSelectedRange(
       canvasRef,
-      canvasWidth,
       selectedRange,
       cursorPosition,
       selecting,

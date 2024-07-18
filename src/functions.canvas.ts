@@ -5,6 +5,7 @@ import {
   GRAPH_PADDING,
   Color,
   VERTICAL_SCALE_HEIGHT,
+  Font,
 } from "./constants";
 import { getTimePosition, getTimeStr } from "./functions.time";
 import { scaling, sliceByNumber } from "./functions.common";
@@ -49,7 +50,7 @@ const clearCanvas = (canvasRef: RefObject<HTMLCanvasElement> | null) => {
 };
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-// Draw line
+// Draw object
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 /**
  * 指定されたパラメータに基づいてキャンバスに矩形を描画する関数です。
@@ -82,6 +83,20 @@ const drawRect = (
   canvasCtx.stroke();
 };
 
+/**
+ * 指定されたパラメータに基づいてキャンバスに塗りつぶされた矩形を描画する関数です。
+ * この関数では矩形の位置、大きさ、色、および透明度を指定できます。
+ *
+ * @param {CanvasRenderingContext2D} canvasCtx - 描画に使用するキャンバスのコンテキスト。
+ * @param {number} left - 矩形の左端のX座標。
+ * @param {number} top - 矩形の上端のY座標。
+ * @param {number} width - 矩形の幅。
+ * @param {number} height - 矩形の高さ。
+ * @param {string} color - 矩形を塗りつぶす色。
+ *
+ * 描画される矩形は指定された色で塗りつぶされ、透明度は0.3に設定されます。
+ * 線の太さは0.0ピクセルとして、実質的に枠線は描画されません。
+ */
 const drawFillRect = (
   canvasCtx: CanvasRenderingContext2D,
   left: number,
@@ -129,6 +144,22 @@ const drawLine = (
   canvasCtx.lineTo(left + width, top + height);
   canvasCtx.closePath();
   canvasCtx.stroke();
+};
+
+const drawText = (
+  canvasCtx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  text: string,
+  font: string,
+  color: string,
+  textAlign: CanvasTextAlign = "start"
+) => {
+  canvasCtx.globalAlpha = 0.9;
+  canvasCtx.font = font;
+  canvasCtx.fillStyle = color;
+  canvasCtx.textAlign = textAlign;
+  canvasCtx.fillText(text, x, y);
 };
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
@@ -200,11 +231,13 @@ const drawWavePeriod = (
   canvasCtx.stroke();
 
   // 周波数表示
-  canvasCtx.font = "10px serif";
-  canvasCtx.fillText(
-    frequency ? `${frequency}Hz` : "Synthesis",
+  drawText(
+    canvasCtx,
     GRAPH_PADDING,
-    GRAPH_PADDING
+    GRAPH_PADDING,
+    frequency ? `${frequency}Hz` : "Synthesis",
+    Font.Small,
+    Color.DeepSlate
   );
 
   let prePos = {
@@ -321,8 +354,14 @@ const drawWaveStereo = (
         // 初回のみ目盛り文字を描画
         if (i === 0) {
           const scaleY = canvasHeight - VERTICAL_SCALE_HEIGHT + 8;
-          canvasCtx.font = "10px serif";
-          canvasCtx.fillText(getTimeStr(scales[j]), curPos.x, scaleY);
+          drawText(
+            canvasCtx,
+            curPos.x,
+            scaleY,
+            getTimeStr(scales[j]),
+            Font.Small,
+            Color.DeepSlate
+          );
         }
       }
 
@@ -432,8 +471,14 @@ const drawWavesStereoToMono = (
       canvasCtx.stroke();
       // 目盛り文字を描画
       const scaleY = canvasHeight - VERTICAL_SCALE_HEIGHT + 8;
-      canvasCtx.font = "10px serif";
-      canvasCtx.fillText(getTimeStr(scales[j]), curPos.x, scaleY);
+      drawText(
+        canvasCtx,
+        curPos.x,
+        scaleY,
+        getTimeStr(scales[j]),
+        Font.Small,
+        Color.DeepSlate
+      );
     }
 
     if (j === 0) {
@@ -533,8 +578,14 @@ const drawWaves = (
       canvasCtx.stroke();
       // 目盛り文字を描画
       const scaleY = canvasHeight - VERTICAL_SCALE_HEIGHT + 8;
-      canvasCtx.font = "10px serif";
-      canvasCtx.fillText(getTimeStr(scales[j]), curPos.x, scaleY);
+      drawText(
+        canvasCtx,
+        curPos.x,
+        scaleY,
+        getTimeStr(scales[j]),
+        Font.Small,
+        Color.DeepSlate
+      );
     }
 
     if (j === 0) {
@@ -569,19 +620,16 @@ const drawWaves = (
  */
 const drawSelectedRange = (
   canvasRef: RefObject<HTMLCanvasElement> | null,
-  canvasWavesWidth: number,
   ranges: number[],
   position: { [key: string]: number },
   selecting: boolean,
   scale: number
 ) => {
   if (!canvasRef || !canvasRef.current) return;
-
-  const canvasWidth = canvasWavesWidth;
   const { canvasCtx, canvasHeight } = getCanvasContext(canvasRef);
-
-  // clear
-  canvasCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+  if (ranges.length === 2) {
+    canvasCtx.clearRect(ranges[0], 0, ranges[1] - ranges[0], canvasHeight);
+  }
 
   // 選択された範囲を描画する
   const scaledRanges = ranges.map((r: number) => {
@@ -651,7 +699,19 @@ const drawAnnotations = (
       duration,
       annotation.endTime
     );
-    drawFillRect(canvasCtx, x0, y0, x1 - x0, graphHeight, Color.DustyRose);
+    const w = x1 - x0;
+    drawFillRect(canvasCtx, x0, y0, w, graphHeight, Color.DustyRose);
+    if (annotation.label !== "") {
+      drawText(
+        canvasCtx,
+        x0 + w / 2,
+        y0 + graphHeight / 2,
+        annotation.label,
+        Font.Annotation,
+        Color.DeepSlate,
+        "center"
+      );
+    }
   }
 };
 
@@ -664,6 +724,7 @@ export {
   drawRect,
   drawFillRect,
   drawLine,
+  drawText,
   drawWavePeriod,
   drawWaveStereo,
   drawWavesStereoToMono,

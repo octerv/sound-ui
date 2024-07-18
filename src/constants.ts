@@ -2,6 +2,7 @@ export const CANVAS_PADDING = 8;
 export const GRAPH_PADDING = 8;
 export const VERTICAL_SCALE_HEIGHT = 24;
 export const VERTICAL_SLIDE_WIDTH = 8;
+export const MIN_LABEL_WIDTH = 16;
 
 // colors
 export namespace Color {
@@ -25,4 +26,11 @@ export namespace Color {
   // 追加色
   export const DustyRose = "#7A5D65"; // ダスティローズ色
   export const BrightRed = "#FF0000"; // 明るい赤色。注意や警告に適した色。
+}
+
+// fonts
+export namespace Font {
+  export const Default = "12px Arial";
+  export const Small = "10px Arial";
+  export const Annotation = "24px Arial";
 }
