@@ -7,9 +7,6 @@ import { useWavesCanvasSetup } from "../effects.canvas";
 import { useDataContext } from "../contexts/data";
 import { useScaleContext } from "../contexts/scale";
 
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-// Interface
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 interface Props extends CanvasPropsInterface {
   top: number;
   left: number;
@@ -17,20 +14,15 @@ interface Props extends CanvasPropsInterface {
   frequency?: number;
 }
 
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-// Component
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 const CanvasWavePeriod = ({ top, left, height, period, frequency }: Props) => {
-  const { audioBuffer } = useDataContext();
+  const { dataUrl, audioBuffer } = useDataContext();
   const { canvasWidth } = useScaleContext();
-  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-  // Refs
-  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+
+  // ---------- Refs ----------
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-  // Effects
-  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-  useWavesCanvasSetup(canvasRef);
+
+  // ---------- Effects ----------
+  useWavesCanvasSetup(canvasRef, dataUrl);
 
   useEffect(() => {
     if (!audioBuffer) return;
@@ -46,9 +38,7 @@ const CanvasWavePeriod = ({ top, left, height, period, frequency }: Props) => {
     });
   }, [canvasRef]);
 
-  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-  // Render
-  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+  // ---------- Render ----------
   const wavesStyle = { top, left };
   return (
     <Content

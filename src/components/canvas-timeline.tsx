@@ -13,10 +13,13 @@ const CanvasTimeline = ({ areaRef, currentTime }: Props) => {
   const { duration } = useDataContext();
   const { contentHeight, canvasWidth } = useScaleContext();
 
+  // ---------- Refs ----------
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  // ---------- Events ----------
   useCurrentTime(canvasRef, areaRef, duration, canvasWidth, currentTime);
 
+  // ---------- Render ----------
   return <Content width={canvasWidth} height={contentHeight} ref={canvasRef} />;
 };
 

@@ -12,18 +12,15 @@ import { useDataContext } from "../contexts/data";
 import { useScaleContext } from "../contexts/scale";
 import { DEFAULT_SAMPLING_LEVEL } from "../constants";
 
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-// Component
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 const CanvasWaves = () => {
   const { dataUrl, audioBuffer, numberOfChannels, mono } = useDataContext();
   const { contentHeight, canvasWidth } = useScaleContext();
   const { setDrawing, setDrawn } = useDrawContext();
 
+  // ---------- Refs ----------
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-  // Effects
-  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+
+  // ---------- Effects ----------
   useWavesCanvasSetup(canvasRef, dataUrl);
 
   useEffect(() => {
@@ -61,9 +58,7 @@ const CanvasWaves = () => {
     });
   }, [audioBuffer, numberOfChannels, canvasWidth, mono]);
 
-  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-  // Render
-  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+  // ---------- Render ----------
   return <Content width={canvasWidth} height={contentHeight} ref={canvasRef} />;
 };
 

@@ -1,6 +1,5 @@
 import { startTransition, useEffect, useRef } from "react";
 import { Content } from "./styled";
-import { CanvasPropsInterface } from "sound-ui/types";
 import { useDecorationCanvasSetup, useSelectRange } from "../effects.canvas";
 import { drawAnnotations, drawSelectedRange } from "../functions.canvas";
 import { useScaleContext } from "../contexts/scale";
@@ -18,10 +17,10 @@ const CanvasDecoration = () => {
   const { cursorPosition, selecting, selectedRange, setSelectedRange } =
     useActionContext();
 
+  // ---------- Refs ----------
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-  // Effects
-  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+
+  // ---------- Effects ----------
   useDecorationCanvasSetup(canvasRef, dataUrl);
 
   useSelectRange(
@@ -55,9 +54,7 @@ const CanvasDecoration = () => {
     });
   }, [annotations, canvasWidth]);
 
-  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-  // Render
-  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+  // ---------- Render ----------
   return <Content width={canvasWidth} height={contentHeight} ref={canvasRef} />;
 };
 

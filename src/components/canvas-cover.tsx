@@ -9,10 +9,13 @@ const CanvasCover = () => {
   const { contentHeight, canvasWidth } = useScaleContext();
   const n = mono ? 1 : numberOfChannels;
 
+  // ---------- Refs ----------
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  // ---------- Effects ----------
   useCoverCanvasSetup(canvasRef, n);
 
+  // ---------- Render ----------
   return <Content width={canvasWidth} height={contentHeight} ref={canvasRef} />;
 };
 

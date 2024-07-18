@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Content } from "./styled";
-import { Annotation, CanvasPropsInterface } from "sound-ui/types";
+import { Annotation } from "sound-ui/types";
 import {
   useMouseCanvasSetup,
   useCursorEffect,
@@ -13,18 +13,12 @@ import { useDataContext } from "../contexts/data";
 import { getCursorSecond } from "../functions.time";
 import { MAGNIFICATION, MAX_SCALE } from "../constants";
 
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-// Interface
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 interface Props {
   areaRef: React.RefObject<HTMLDivElement>;
   selectable: boolean | undefined;
   initNormalize: boolean | undefined;
 }
 
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-// Component
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 const CanvasMouse = ({ areaRef, selectable, initNormalize }: Props) => {
   const {
     audioBuffer,
@@ -53,17 +47,16 @@ const CanvasMouse = ({ areaRef, selectable, initNormalize }: Props) => {
     setSelectedRange,
   } = useActionContext();
 
+  // ---------- Refs ----------
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
   const scaleRef = useRef<number>();
   scaleRef.current = scale;
   const scalingRef = useRef<boolean>();
   scalingRef.current = drawing;
   const canvasWavesWidthRef = useRef<number>();
   canvasWavesWidthRef.current = canvasWidth;
-  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-  // Effects
-  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+
+  // ---------- Effects ----------
   useMouseCanvasSetup(canvasRef);
 
   useCursorEffect(cursorPosition, audioBuffer, canvasRef, drawn, canvasWidth);
@@ -96,9 +89,7 @@ const CanvasMouse = ({ areaRef, selectable, initNormalize }: Props) => {
     areaRef.current.scrollLeft = canvasScrollLeft;
   }, [canvasScrollLeft]);
 
-  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-  // Mouse Event Listener
-  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+  // ---------- Mouse event listener ----------
   const onMouseMove = (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -155,9 +146,7 @@ const CanvasMouse = ({ areaRef, selectable, initNormalize }: Props) => {
     };
   }, [drawn]);
 
-  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-  // Mouse Action
-  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+  // ---------- Mouse action ----------
   const onMouseDown = () => {
     if (!drawn) return;
     if (!selectable) return;
@@ -180,9 +169,7 @@ const CanvasMouse = ({ areaRef, selectable, initNormalize }: Props) => {
     setSelecting(false);
   };
 
-  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-  // Render
-  //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+  // ---------- Render ----------
   return (
     <Content
       width={canvasWidth}

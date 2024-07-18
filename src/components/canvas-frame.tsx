@@ -9,9 +9,13 @@ const CanvasFrame = () => {
   const { contentHeight, canvasWidth } = useScaleContext();
   const n = mono ? 1 : numberOfChannels;
 
+  // ---------- Refs ----------
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  // ---------- Effects ----------
   useFrameCanvasSetup(canvasRef, contentHeight, canvasWidth, audioBuffer, n);
+
+  // ---------- Render ----------
   return <Content width={canvasWidth} height={contentHeight} ref={canvasRef} />;
 };
 
