@@ -4,6 +4,9 @@ export const VERTICAL_SCALE_HEIGHT = 24;
 export const VERTICAL_SLIDE_WIDTH = 8;
 export const MIN_LABEL_WIDTH = 10;
 
+// draw
+export const DEFAULT_SAMPLING_LEVEL = 0.01;
+
 // scaling
 export const MAGNIFICATION = 0.5;
 export const MAX_SCALE = 20;

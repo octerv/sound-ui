@@ -1,13 +1,10 @@
 import type { ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
 import { Annotation } from "sound-ui/types";
-import {
-  useAudioBuffer,
-  useAudioContext,
-  useAudioMeta,
-} from "../effects.audio";
+import { useAudioBuffer, useAudioContext } from "../effects.audio";
 
 interface DataContextType {
+  dataUrl: string;
   audioCtx: AudioContext | null;
   audioBuffer: AudioBuffer | null;
   numberOfChannels: number;
@@ -36,8 +33,12 @@ export const DataProvider = ({
   mono,
 }: DataProviderProps) => {
   const audioCtx = useAudioContext(dataUrl);
-  const audioBuffer = useAudioBuffer(dataUrl, audioCtx);
-  const { numberOfChannels, sampleRate, duration } = useAudioMeta(audioBuffer);
+  const {
+    buffer: audioBuffer,
+    numberOfChannels,
+    sampleRate,
+    duration,
+  } = useAudioBuffer(dataUrl, audioCtx);
   const [normalize, setNormalize] = useState<boolean>(false);
   const [annotations, setAnnotations] = useState<Annotation[]>([]);
 
@@ -53,6 +54,7 @@ export const DataProvider = ({
   return (
     <DataContext.Provider
       value={{
+        dataUrl,
         audioCtx,
         audioBuffer,
         numberOfChannels,

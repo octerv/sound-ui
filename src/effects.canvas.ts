@@ -25,6 +25,7 @@ import { Position } from "sound-ui/types";
  * @param {RefObject<HTMLCanvasElement> | null} canvasRef - グラフを描画するキャンバスへの参照。
  * @param {number} contentHeight - キャンバス内のコンテンツの総高さ。
  * @param {number} canvasWidth - キャンバスの幅。
+ * @param {AudioBuffer} audioBuffer - 読み込まれたオーディオデータ
  * @param {number} numberOfChannels - グラフに表示するチャネルの数。
  *
  * キャンバスやチャネルが設定されていない、またはチャネル数が0の場合は何もしません。
@@ -35,10 +36,12 @@ const useFrameCanvasSetup = (
   canvasRef: RefObject<HTMLCanvasElement> | null,
   contentHeight: number,
   canvasWidth: number,
+  audioBuffer: AudioBuffer | null,
   numberOfChannels: number
 ) => {
   useEffect(() => {
     if (!canvasRef || !canvasRef.current) return;
+    if (!audioBuffer) return;
     if (numberOfChannels === 0) return;
     clearCanvas(canvasRef);
 
@@ -63,28 +66,55 @@ const useFrameCanvasSetup = (
         Color.DeepSeaBlue
       );
     }
-  }, [canvasRef, canvasWidth, numberOfChannels]);
+  }, [canvasWidth, audioBuffer, numberOfChannels]);
 };
 
 /**
- * 指定されたキャンバスへの参照を使用して、波形を描画するための初期設定を行うフックです。
- * キャンバスが存在しない、または初期化されていない場合は、何もしません。
- * 設定されるキャンバスのコンテキストは透明度と線の太さが調整され、後に波形の描画が行われます。
+ * 指定されたキャンバスに対して波形表示の準備を行うカスタムフックです。
+ * このフックは、キャンバスの参照と波形データを示すデータURLを受け取り、キャンバスが存在する場合にそのキャンバスをクリアします。
+ * これにより、新たな波形データが描画される前に前の描画を消去することができます。
  *
- * @param {RefObject<HTMLCanvasElement> | null} canvasRef - 波形を描画するキャンバスへの参照。
+ * @param {RefObject<HTMLCanvasElement> | null} canvasRef - 操作するキャンバスへの参照。
+ * @param {string} dataUrl - 波形データのURL。このURLが変更されるたびにキャンバスのクリアがトリガーされます。
  *
- * TODO: 波形の中央に横線を引く実装が必要。
+ * useEffectフックを利用して、キャンバスの参照が有効かつ実際にDOMに存在することを確認した上で、
+ * clearCanvas関数を呼び出してキャンバスをクリアします。これはdataUrlが更新されるたび、
+ * またはコンポーネントが新たにマウントされたときにも実行されます。
+ * このフックは主にオーディオビジュアライゼーションやその他のキャンバスベースの描画で利用され、
+ * 常にクリアなキャンバスから描画を始められるようにします。
  */
 const useWavesCanvasSetup = (
-  canvasRef: RefObject<HTMLCanvasElement> | null
+  canvasRef: RefObject<HTMLCanvasElement> | null,
+  dataUrl: string
 ) => {
   useEffect(() => {
     if (!canvasRef || !canvasRef.current) return;
-    const { canvasCtx } = getCanvasContext(canvasRef);
-    canvasCtx.globalAlpha = 0.8;
-    canvasCtx.lineWidth = 0.5;
-    // TODO: 波形の中央に横線を引きたい
-  }, [canvasRef]);
+    clearCanvas(canvasRef);
+  }, [canvasRef, dataUrl]);
+};
+
+/**
+ * 指定されたキャンバスに対して装飾的な初期設定を適用するカスタムフックです。
+ * このフックは、キャンバスの参照とデータURLを受け取り、キャンバスが存在する場合にそのキャンバスをクリアします。
+ * 主にキャンバスに新しい画像やデコレーションを描画する前の準備として使用されます。
+ *
+ * @param {RefObject<HTMLCanvasElement> | null} canvasRef - クリアするキャンバスへの参照。
+ * @param {string} dataUrl - キャンバスに描画するための画像データのURL。このURLは直接使用されませんが、
+ *                           依存配列に含まれているため、URLが変更されるとキャンバスが再度クリアされます。
+ *
+ * useEffectフックを使用して、canvasRefが指すキャンバスの存在を確認し、存在する場合には
+ * clearCanvas関数を呼び出してキャンバスをクリアします。これにより、キャンバスが新しい描画で使用される際に、
+ * 古い内容がクリアされていることを保証します。dataUrlが変更された場合にもキャンバスをクリアすることで、
+ * 常に最新の状態で使用開始できるようにしています。
+ */
+const useDecorationCanvasSetup = (
+  canvasRef: RefObject<HTMLCanvasElement> | null,
+  dataUrl: string
+) => {
+  useEffect(() => {
+    if (!canvasRef || !canvasRef.current) return;
+    clearCanvas(canvasRef);
+  }, [canvasRef, dataUrl]);
 };
 
 /**
@@ -363,7 +393,6 @@ const useCurrentTime = (
 
     // 親divの中心にcurrentTimeの位置を持ってくるようにスクロール
     const centerPosition = x - areaRef.current.offsetWidth / 2;
-    console.log(`centerPosition: ${centerPosition}`);
     areaRef.current.scrollLeft = centerPosition;
   }, [currentTime]);
 };
@@ -374,6 +403,7 @@ const useCurrentTime = (
 export {
   useFrameCanvasSetup,
   useWavesCanvasSetup,
+  useDecorationCanvasSetup,
   useMouseCanvasSetup,
   useCoverCanvasSetup,
   useCanvasClear,

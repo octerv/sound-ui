@@ -16,26 +16,16 @@ import { MAGNIFICATION, MAX_SCALE } from "../constants";
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // Interface
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-interface Props extends CanvasPropsInterface {
+interface Props {
   areaRef: React.RefObject<HTMLDivElement>;
   selectable: boolean | undefined;
-  scaling: boolean;
   initNormalize: boolean | undefined;
-  setScaling: (scaling: boolean) => void;
 }
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // Component
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-const CanvasMouse = ({
-  canvasRef,
-  height,
-  areaRef,
-  selectable,
-  scaling,
-  initNormalize,
-  setScaling,
-}: Props) => {
+const CanvasMouse = ({ areaRef, selectable, initNormalize }: Props) => {
   const {
     audioBuffer,
     duration,
@@ -45,15 +35,16 @@ const CanvasMouse = ({
     setAnnotations,
   } = useDataContext();
   const {
+    contentWidth,
+    contentHeight,
     scale,
     setScale,
-    contentWidth,
     canvasWidth,
     setCanvasWidth,
     canvasScrollLeft,
     setCanvasScrollLeft,
   } = useScaleContext();
-  const { setDrawing, drawn } = useDrawContext();
+  const { drawing, setDrawing, drawn } = useDrawContext();
   const {
     cursorPosition,
     setCursorPosition,
@@ -62,10 +53,12 @@ const CanvasMouse = ({
     setSelectedRange,
   } = useActionContext();
 
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
   const scaleRef = useRef<number>();
   scaleRef.current = scale;
   const scalingRef = useRef<boolean>();
-  scalingRef.current = scaling;
+  scalingRef.current = drawing;
   const canvasWavesWidthRef = useRef<number>();
   canvasWavesWidthRef.current = canvasWidth;
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
@@ -122,7 +115,8 @@ const CanvasMouse = ({
   const onMouseWheel = (e: WheelEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (scalingRef.current) return;
+    // TODO: `scaling`が使われているのはここの判定のみ、`drawing`に置き換えてみる
+    // if (scalingRef.current) return;
 
     // 縦スクロールで拡大縮小
     if (e.deltaY !== 0) {
@@ -139,7 +133,7 @@ const CanvasMouse = ({
         scaleRef.current !== newScale
       ) {
         setScale(newScale);
-        setScaling(true);
+        setDrawing(true);
       }
     }
   };
@@ -180,7 +174,7 @@ const CanvasMouse = ({
     const newAnnotation: Annotation = {
       startTime: x0,
       endTime: x1,
-      label: "C",
+      label: "",
     };
     setAnnotations([...prevAnnotations, newAnnotation]);
     setSelecting(false);
@@ -192,7 +186,7 @@ const CanvasMouse = ({
   return (
     <Content
       width={canvasWidth}
-      height={height}
+      height={contentHeight}
       ref={canvasRef}
       onMouseDown={onMouseDown}
       onMouseUp={onMouseUp}

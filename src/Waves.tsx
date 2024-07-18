@@ -68,32 +68,18 @@ const Waves = (props: WavesProps) => {
         >
           <DrawProvider>
             <ActionProvider>
-              <CanvasFrame canvasRef={canvasFrameRef} height={props.height} />
-              <CanvasWaves
-                canvasRef={canvasWavesRef}
-                height={props.height}
-                samplingLevel={props.samplingLevel}
-                setScaling={setScaling}
-              />
-              <CanvasDecoration
-                canvasRef={canvasDecorationRef}
-                height={props.height}
-              />
+              <CanvasFrame />
+              <CanvasWaves />
+              <CanvasDecoration />
               <CanvasTimeline
-                canvasRef={canvasTimelineRef}
                 areaRef={areaRef}
-                height={props.height}
                 currentTime={props.currentTime}
               />
-              <CanvasCover canvasRef={canvasCoverRef} height={props.height} />
+              <CanvasCover />
               <CanvasMouse
-                canvasRef={canvasMouseRef}
                 areaRef={areaRef}
                 selectable={props.selectable}
-                height={props.height}
-                scaling={scaling}
                 initNormalize={props.normalize}
-                setScaling={setScaling}
               />
             </ActionProvider>
           </DrawProvider>

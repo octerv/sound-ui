@@ -3,6 +3,8 @@ import { createContext, useContext, useState } from "react";
 import { Position } from "sound-ui/types";
 
 interface ActionContextType {
+  isLoading: boolean;
+  setIsLoading: (isLoading: boolean) => void;
   cursorPosition: Position;
   setCursorPosition: (position: Position) => void;
   selecting: boolean;
@@ -18,6 +20,7 @@ type ActionProviderProps = {
 };
 
 export const ActionProvider = ({ children }: ActionProviderProps) => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [cursorPosition, setCursorPosition] = useState<Position>({
     x: 0,
     y: 0,
@@ -28,6 +31,8 @@ export const ActionProvider = ({ children }: ActionProviderProps) => {
   return (
     <ActionContext.Provider
       value={{
+        isLoading,
+        setIsLoading,
         cursorPosition,
         setCursorPosition,
         selecting,

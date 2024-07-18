@@ -1,7 +1,7 @@
-import { startTransition, useEffect } from "react";
+import { startTransition, useEffect, useRef } from "react";
 import { Content } from "./styled";
 import { CanvasPropsInterface } from "sound-ui/types";
-import { useSelectRange } from "../effects.canvas";
+import { useDecorationCanvasSetup, useSelectRange } from "../effects.canvas";
 import { drawAnnotations, drawSelectedRange } from "../functions.canvas";
 import { useScaleContext } from "../contexts/scale";
 import { useActionContext } from "../contexts/action";
@@ -11,16 +11,19 @@ import { useDataContext } from "../contexts/data";
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // Component
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-const CanvasDecoration = ({ canvasRef, height }: CanvasPropsInterface) => {
-  const { duration, annotations } = useDataContext();
-  const { scale, canvasWidth } = useScaleContext();
+const CanvasDecoration = () => {
+  const { dataUrl, duration, annotations } = useDataContext();
+  const { contentHeight, scale, canvasWidth } = useScaleContext();
   const { drawn } = useDrawContext();
   const { cursorPosition, selecting, selectedRange, setSelectedRange } =
     useActionContext();
 
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Effects
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+  useDecorationCanvasSetup(canvasRef, dataUrl);
+
   useSelectRange(
     selecting,
     cursorPosition,
@@ -55,7 +58,7 @@ const CanvasDecoration = ({ canvasRef, height }: CanvasPropsInterface) => {
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Render
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-  return <Content width={canvasWidth} height={height} ref={canvasRef} />;
+  return <Content width={canvasWidth} height={contentHeight} ref={canvasRef} />;
 };
 
 export default CanvasDecoration;

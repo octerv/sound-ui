@@ -42,8 +42,16 @@ const useAudioContext = (dataUrl: string): AudioContext | null => {
 const useAudioBuffer = (
   dataUrl: string,
   context: AudioContext | null
-): AudioBuffer | null => {
+): {
+  buffer: AudioBuffer | null;
+  numberOfChannels: number;
+  sampleRate: number;
+  duration: number;
+} => {
   const [buffer, setBuffer] = useState<AudioBuffer | null>(null);
+  const [numberOfChannels, setNumberOfChannels] = useState<number>(0);
+  const [sampleRate, setSampleRate] = useState<number>(0);
+  const [duration, setDuration] = useState<number>(0);
 
   useEffect(() => {
     if (!dataUrl) return;
@@ -71,42 +79,14 @@ const useAudioBuffer = (
       console.debug(`duration: ${buffer.duration}`);
       source.buffer = buffer;
       setBuffer(buffer);
+      setNumberOfChannels(buffer.numberOfChannels);
+      setSampleRate(buffer.sampleRate);
+      setDuration(buffer.duration);
       console.info("[success] load sound data");
     })();
   }, [context]);
 
-  return buffer;
-};
-
-/**
- * 指定されたAudioBufferからオーディオのメタデータ（チャンネル数、サンプルレート、持続時間）を抽出し、
- * それらを状態として保持するカスタムフックです。このフックは、AudioBufferが更新されるたびに
- * 内部の状態を更新し、最新のメタデータを提供します。
- *
- * @param {AudioBuffer | null} audioBuffer - メタデータを取得するためのAudioBufferオブジェクト。
- * @returns {{ numberOfChannels: number; sampleRate: number; duration: number }}
- *          - `numberOfChannels`: オーディオのチャンネル数。
- *          - `sampleRate`: オーディオのサンプルレート（単位はHz）。
- *          - `duration`: オーディオの持続時間（単位は秒）。
- *
- * useEffectフックを使用して、提供されたAudioBufferが存在する場合にのみメタデータを状態に設定します。
- * AudioBufferがnullである場合や、以前と同じオブジェクトが再度渡された場合は、状態更新は行われません。
- * このフックは、AudioBufferから直接取得可能な情報を状態としてリアクティブに管理するため、
- * 音声データに関する情報をUIコンポーネントで簡単に表示や使用が可能になります。
- */
-const useAudioMeta = (
-  audioBuffer: AudioBuffer | null
-): { numberOfChannels: number; sampleRate: number; duration: number } => {
-  const [numberOfChannels, setNumberOfChannels] = useState<number>(0);
-  const [sampleRate, setSampleRate] = useState<number>(0);
-  const [duration, setDuration] = useState<number>(0);
-  useEffect(() => {
-    if (!audioBuffer) return;
-    setNumberOfChannels(audioBuffer.numberOfChannels);
-    setSampleRate(audioBuffer.sampleRate);
-    setDuration(audioBuffer.duration);
-  }, [audioBuffer]);
-  return { numberOfChannels, sampleRate, duration };
+  return { buffer, numberOfChannels, sampleRate, duration };
 };
 
 /**
@@ -150,4 +130,4 @@ const useAudioTime = (audioRef: RefObject<HTMLAudioElement>): number => {
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // export
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-export { useAudioContext, useAudioBuffer, useAudioMeta, useAudioTime };
+export { useAudioContext, useAudioBuffer, useAudioTime };
