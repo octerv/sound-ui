@@ -13,8 +13,6 @@ declare module "sound-ui/types" {
     selectable?: boolean;
     stereo?: boolean; // TODO: `mono`フラグに変更する
     currentTime?: number; // ミリ秒数位置指定
-    maxAreaLength?: number; // 秒指定
-    setMaxArea?: (area: number[]) => void;
   };
 
   export type Annotation = {

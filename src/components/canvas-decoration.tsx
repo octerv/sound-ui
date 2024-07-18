@@ -1,4 +1,4 @@
-import { startTransition, useEffect, useState } from "react";
+import { startTransition, useEffect } from "react";
 import { Content } from "./styled";
 import { CanvasPropsInterface } from "sound-ui/types";
 import { useSelectRange } from "../effects.canvas";
@@ -7,37 +7,20 @@ import { useScaleContext } from "../contexts/scale";
 import { useActionContext } from "../contexts/action";
 import { useDrawContext } from "../contexts/draw";
 import { useDataContext } from "../contexts/data";
-import { getMaxArea } from "../functions.audio";
-
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-// Interface
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-interface Props extends CanvasPropsInterface {
-  maxAreaLength: number | undefined;
-}
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // Component
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-const CanvasDecoration = ({ canvasRef, height, maxAreaLength }: Props) => {
-  const { audioBuffer, duration, annotations } = useDataContext();
+const CanvasDecoration = ({ canvasRef, height }: CanvasPropsInterface) => {
+  const { duration, annotations } = useDataContext();
   const { scale, canvasWidth } = useScaleContext();
-  const { drawing, drawn } = useDrawContext();
+  const { drawn } = useDrawContext();
   const { cursorPosition, selecting, selectedRange, setSelectedRange } =
     useActionContext();
 
-  const [maxArea, setMaxArea] = useState([0, 0]);
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Effects
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-  useEffect(() => {
-    if (!audioBuffer) return;
-    if (!maxAreaLength) return;
-    const area = getMaxArea(audioBuffer, maxAreaLength);
-    setMaxArea(area);
-    if (setMaxArea) setMaxArea(area);
-  }, [audioBuffer]);
-
   useSelectRange(
     selecting,
     cursorPosition,

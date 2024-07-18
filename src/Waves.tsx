@@ -75,7 +75,6 @@ const Waves = (props: WavesProps) => {
               <CanvasDecoration
                 canvasRef={canvasDecorationRef}
                 height={props.height}
-                maxAreaLength={props.maxAreaLength}
               />
               <CanvasTimeline
                 canvasRef={canvasTimelineRef}

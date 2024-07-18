@@ -67,7 +67,6 @@ export const Default = () => {
 - normalize(optional:boolean): set true to normalize waves
 - selectable(optional:boolean): set true to select range on waves
 - stereo(optional:boolean): set true, mixing two stereo waveforms into a single waveform
-- maxAreaLength(optional:number): Specify the duration in seconds for which the addition of sound over a certain period of time is maximal
 - setMaxArea(optinal:(area: number[])=>void): return Maximum section, array 0 is start second, array 1 is end second
 
 ## Preview
