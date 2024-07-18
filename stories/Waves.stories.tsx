@@ -1,5 +1,6 @@
 import React, { ChangeEvent, useState } from "react";
 import Waves from "../src/Waves";
+import { openAudioFile, openJsonFile } from "../src/functions.file";
 
 type Annotation = {
   startTime: number;
@@ -23,32 +24,16 @@ export const Default = () => {
   const [currentTime, setCurrentTime] = useState<number>(0); // second
 
   const selectFile = (e: ChangeEvent<HTMLInputElement>) => {
-    const files = e.currentTarget.files;
-    if (!files || files?.length === 0) return;
-    const file = files[0];
-    const reader = new FileReader();
-    reader.addEventListener(
-      "load",
-      () => {
-        if (reader.result) {
-          setDataUrl(reader.result.toString());
-        }
-      },
-      false
-    );
-    if (file) {
-      reader.readAsDataURL(file);
-    }
+    openAudioFile(e).then((newDataUrl) => {
+      if (newDataUrl) {
+        setDataUrl(newDataUrl);
+      }
+    });
   };
 
   const selectJsonFile = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (reader.result) {
-        const jsonData = JSON.parse(reader.result.toString());
+    openJsonFile(e).then((jsonData) => {
+      if (jsonData) {
         const newAnnotations: Annotation[] = [];
         for (const note of jsonData["notes"]) {
           newAnnotations.push({
@@ -59,8 +44,7 @@ export const Default = () => {
         }
         setAnnotations(newAnnotations);
       }
-    };
-    reader.readAsText(file);
+    });
   };
 
   const handleNormalize = () => {
@@ -83,6 +67,7 @@ export const Default = () => {
         Normalize ({normalize ? "ON" : "OFF"})
       </button>
       &nbsp;
+      <button onClick={() => setScale(1.0)}>Zoom min</button>
       <button onClick={() => setScale(20.0)}>Zoom max</button>
       <br />
       {mono ? (
