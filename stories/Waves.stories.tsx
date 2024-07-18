@@ -1,6 +1,7 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useRef, useState } from "react";
 import Waves from "../src/Waves";
 import { openAudioFile, openJsonFile } from "../src/functions.file";
+import { useAudioTime } from "../src/effects.audio";
 
 type Annotation = {
   startTime: number;
@@ -14,6 +15,8 @@ export default {
 };
 
 export const Default = () => {
+  const audioRef = useRef<HTMLAudioElement>(null);
+
   const [dataUrl, setDataUrl] = useState<string>("");
   const [annotations, setAnnotations] = useState<Annotation[] | undefined>(
     undefined
@@ -21,7 +24,7 @@ export const Default = () => {
   const [mono, setMono] = useState<boolean>(false);
   const [normalize, setNormalize] = useState<boolean>(false);
   const [scale, setScale] = useState<number>(1.0);
-  const [currentTime, setCurrentTime] = useState<number>(0); // second
+  const currentTime = useAudioTime(audioRef);
 
   const selectFile = (e: ChangeEvent<HTMLInputElement>) => {
     openAudioFile(e).then((newDataUrl) => {
@@ -60,9 +63,6 @@ export const Default = () => {
         Mono ({mono ? "ON" : "OFF"})
       </button>
       &nbsp;
-      <button onClick={() => setCurrentTime(currentTime - 0.1)}>◀︎</button>
-      <button onClick={() => setCurrentTime(currentTime + 0.1)}>▶︎</button>
-      &nbsp;
       <button onClick={handleNormalize}>
         Normalize ({normalize ? "ON" : "OFF"})
       </button>
@@ -91,10 +91,15 @@ export const Default = () => {
           height={400}
           samplingLevel={0.01}
           normalize={normalize}
+          scale={scale}
           currentTime={currentTime}
           selectable
         />
       )}
+      <div>
+        <audio ref={audioRef} controls src={dataUrl}></audio>
+        <div>Current Time: {currentTime.toFixed(2)}</div>
+      </div>
     </>
   );
 };

@@ -342,12 +342,14 @@ const useSelectRange = (
  */
 const useCurrentTime = (
   canvasRef: RefObject<HTMLCanvasElement> | null,
+  areaRef: React.RefObject<HTMLDivElement>,
   duration: number,
   canvasWidth: number,
   currentTime: number | undefined
 ) => {
   useEffect(() => {
     if (!canvasRef || !canvasRef.current) return;
+    if (!areaRef || !areaRef.current) return;
     if (duration === 0) return;
     if (!currentTime) return;
     clearCanvas(canvasRef);
@@ -358,6 +360,11 @@ const useCurrentTime = (
     const { x, y } = getTimePosition(canvasWidth, duration, currentTime);
 
     drawLine(canvasCtx, x, y, 0, graphHeight, Color.BrightRed);
+
+    // 親divの中心にcurrentTimeの位置を持ってくるようにスクロール
+    const centerPosition = x - areaRef.current.offsetWidth / 2;
+    console.log(`centerPosition: ${centerPosition}`);
+    areaRef.current.scrollLeft = centerPosition;
   }, [currentTime]);
 };
 

@@ -81,6 +81,7 @@ const Waves = (props: WavesProps) => {
               />
               <CanvasTimeline
                 canvasRef={canvasTimelineRef}
+                areaRef={areaRef}
                 height={props.height}
                 currentTime={props.currentTime}
               />

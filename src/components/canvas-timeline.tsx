@@ -5,13 +5,14 @@ import { useScaleContext } from "../contexts/scale";
 import { useDataContext } from "../contexts/data";
 
 interface Props extends CanvasPropsInterface {
+  areaRef: React.RefObject<HTMLDivElement>;
   currentTime: number | undefined;
 }
 
-const CanvasTimeline = ({ canvasRef, height, currentTime }: Props) => {
+const CanvasTimeline = ({ canvasRef, height, areaRef, currentTime }: Props) => {
   const { duration } = useDataContext();
-  const { canvasWidth } = useScaleContext();
-  useCurrentTime(canvasRef, duration, canvasWidth, currentTime);
+  const { contentWidth, canvasWidth } = useScaleContext();
+  useCurrentTime(canvasRef, areaRef, duration, canvasWidth, currentTime);
   return <Content width={canvasWidth} height={height} ref={canvasRef} />;
 };
 
