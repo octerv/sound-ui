@@ -4,14 +4,11 @@ import { useFrameCanvasSetup } from "../effects.canvas";
 import { useDataContext } from "../contexts/data";
 import { useScaleContext } from "../contexts/scale";
 
-interface Props extends CanvasPropsInterface {
-  stereo: boolean | undefined;
-}
-
-const CanvasFrame = ({ canvasRef, height, stereo }: Props) => {
-  const { numberOfChannels } = useDataContext();
+const CanvasFrame = ({ canvasRef, height }: CanvasPropsInterface) => {
+  const { numberOfChannels, mono } = useDataContext();
   const { contentHeight, canvasWidth } = useScaleContext();
-  useFrameCanvasSetup(canvasRef, contentHeight, canvasWidth, numberOfChannels);
+  const n = mono ? 1 : numberOfChannels;
+  useFrameCanvasSetup(canvasRef, contentHeight, canvasWidth, n);
   return <Content width={canvasWidth} height={height} ref={canvasRef} />;
 };
 

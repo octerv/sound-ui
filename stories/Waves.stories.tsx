@@ -8,6 +8,7 @@ export default {
 
 export const Default = () => {
   const [dataUrl, setDataUrl] = useState("");
+  const [mono, setMono] = useState(false);
   const [normalize, setNormalize] = useState(false);
   const [currentTime, setCurrentTime] = useState(0); // second
 
@@ -37,21 +38,39 @@ export const Default = () => {
   return (
     <>
       <input type="file" accept="audio/*" onChange={selectFile} />
-      <button onClick={() => setCurrentTime(currentTime - 0.01)}>◀︎</button>
-      <button onClick={() => setCurrentTime(currentTime + 0.01)}>▶︎</button>
+      <button onClick={() => setMono(!mono)}>
+        Mono ({mono ? "ON" : "OFF"})
+      </button>
+      &nbsp;
+      <button onClick={() => setCurrentTime(currentTime - 0.1)}>◀︎</button>
+      <button onClick={() => setCurrentTime(currentTime + 0.1)}>▶︎</button>
+      &nbsp;
       <button onClick={handleNormalize}>
         Normalize ({normalize ? "ON" : "OFF"})
       </button>
       <br />
-      <Waves
-        dataUrl={dataUrl}
-        width={800}
-        height={400}
-        samplingLevel={0.01}
-        normalize={normalize}
-        currentTime={currentTime}
-        selectable
-      />
+      {mono ? (
+        <Waves
+          dataUrl={dataUrl}
+          width={800}
+          height={400}
+          samplingLevel={0.01}
+          normalize={normalize}
+          currentTime={currentTime}
+          selectable
+          mono
+        />
+      ) : (
+        <Waves
+          dataUrl={dataUrl}
+          width={800}
+          height={400}
+          samplingLevel={0.01}
+          normalize={normalize}
+          currentTime={currentTime}
+          selectable
+        />
+      )}
     </>
   );
 };

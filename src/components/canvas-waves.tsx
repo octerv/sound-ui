@@ -3,7 +3,11 @@ import { useEffect } from "react";
 import { Content } from "./styled";
 import { CanvasPropsInterface } from "sound-ui/types";
 import { useWavesCanvasSetup } from "../effects.canvas";
-import { drawWaveStereo, drawWaves } from "../functions.canvas";
+import {
+  drawWaveStereo,
+  drawWaves,
+  drawWavesStereoToMono,
+} from "../functions.canvas";
 import { useDrawContext } from "../contexts/draw";
 import { useDataContext } from "../contexts/data";
 import { useScaleContext } from "../contexts/scale";
@@ -13,7 +17,6 @@ import { useScaleContext } from "../contexts/scale";
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 interface Props extends CanvasPropsInterface {
   samplingLevel: number | undefined;
-  stereo: boolean | undefined;
   setScaling: (scaling: boolean) => void;
 }
 
@@ -24,10 +27,9 @@ const CanvasWaves = ({
   canvasRef,
   height,
   samplingLevel,
-  stereo,
   setScaling,
 }: Props) => {
-  const { audioBuffer, numberOfChannels, normalize } = useDataContext();
+  const { audioBuffer, numberOfChannels, mono } = useDataContext();
   const { canvasWidth } = useScaleContext();
   const { drawing, setDrawing, setDrawn } = useDrawContext();
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
@@ -42,17 +44,17 @@ const CanvasWaves = ({
   }, [audioBuffer]);
 
   useEffect(() => {
-    if (!drawing) return;
     if (!audioBuffer) return;
     if (!canvasRef || !canvasRef.current) return;
+
     // draw waves
     startTransition(() => {
-      console.log(`numberOfChannels: ${numberOfChannels}`);
       if (numberOfChannels === 1) {
-        drawWaves(
+        drawWaves(audioBuffer, canvasRef, canvasWidth, samplingLevel || 0.01);
+      } else if (mono && numberOfChannels === 2) {
+        drawWavesStereoToMono(
           audioBuffer,
           canvasRef,
-          normalize,
           canvasWidth,
           samplingLevel || 0.01
         );
@@ -60,7 +62,6 @@ const CanvasWaves = ({
         drawWaveStereo(
           audioBuffer,
           canvasRef,
-          normalize,
           canvasWidth,
           samplingLevel || 0.01
         );
@@ -70,7 +71,7 @@ const CanvasWaves = ({
       setDrawing(false);
       setDrawn(true);
     });
-  }, [drawing]);
+  }, [audioBuffer, numberOfChannels, canvasWidth, mono]);
 
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Render

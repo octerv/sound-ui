@@ -56,20 +56,15 @@ const Waves = (props: WavesProps) => {
   };
   return (
     <Area ref={areaRef} style={styles.area}>
-      <DataProvider dataUrl={props.dataUrl}>
+      <DataProvider dataUrl={props.dataUrl} mono={props.mono}>
         <ScaleProvider contentWidth={props.width} contentHeight={props.height}>
           <DrawProvider>
             <ActionProvider>
-              <CanvasFrame
-                canvasRef={canvasFrameRef}
-                height={props.height}
-                stereo={props.stereo}
-              />
+              <CanvasFrame canvasRef={canvasFrameRef} height={props.height} />
               <CanvasWaves
                 canvasRef={canvasWavesRef}
                 height={props.height}
                 samplingLevel={props.samplingLevel}
-                stereo={props.stereo}
                 setScaling={setScaling}
               />
               <CanvasDecoration

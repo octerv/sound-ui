@@ -11,7 +11,7 @@ declare module "sound-ui/types" {
     samplingLevel?: number; // max: 0.001, 0.01, 0.1, 1.0など
     normalize?: boolean;
     selectable?: boolean;
-    stereo?: boolean; // TODO: `mono`フラグに変更する
+    mono?: boolean;
     currentTime?: number; // ミリ秒数位置指定
   };
 

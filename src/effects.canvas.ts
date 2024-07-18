@@ -128,6 +128,7 @@ const useCoverCanvasSetup = (
     if (!canvasRef || !canvasRef.current) return;
     if (numberOfChannels === 0) return;
     clearCanvas(canvasRef);
+    if (numberOfChannels === 1) return;
     const { canvasCtx, canvasHeight } = getCanvasContext(canvasRef);
 
     const graphHeight =

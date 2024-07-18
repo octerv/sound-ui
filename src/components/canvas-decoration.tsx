@@ -45,7 +45,6 @@ const CanvasDecoration = ({ canvasRef, height }: CanvasPropsInterface) => {
   }, [cursorPosition, selecting]);
 
   useEffect(() => {
-    console.log(annotations);
     if (annotations.length === 0) return;
     // 選択された範囲を描画する
     startTransition(() => {

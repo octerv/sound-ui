@@ -81,7 +81,6 @@ const useAudioMeta = (
   const [duration, setDuration] = useState<number>(0);
   useEffect(() => {
     if (!audioBuffer) return;
-    console.log(`duration: ${duration}`);
     setNumberOfChannels(audioBuffer.numberOfChannels);
     setSampleRate(audioBuffer.sampleRate);
     setDuration(audioBuffer.duration);

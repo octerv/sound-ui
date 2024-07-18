@@ -5,9 +5,10 @@ import { useDataContext } from "../contexts/data";
 import { useScaleContext } from "../contexts/scale";
 
 const CanvasCover = ({ canvasRef, height }: CanvasPropsInterface) => {
-  const { numberOfChannels } = useDataContext();
+  const { numberOfChannels, mono } = useDataContext();
   const { canvasWidth } = useScaleContext();
-  useCoverCanvasSetup(canvasRef, numberOfChannels);
+  const n = mono ? 1 : numberOfChannels;
+  useCoverCanvasSetup(canvasRef, n);
   return <Content width={canvasWidth} height={height} ref={canvasRef} />;
 };
 

@@ -41,12 +41,7 @@ const clearCanvas = (canvasRef: RefObject<HTMLCanvasElement> | null) => {
   // clear canvas
   if (!canvasRef || !canvasRef.current) return;
   let { canvasCtx, canvasWidth, canvasHeight } = getCanvasContext(canvasRef);
-  canvasCtx.clearRect(
-    CANVAS_PADDING,
-    CANVAS_PADDING,
-    canvasWidth - CANVAS_PADDING * 2,
-    canvasHeight - CANVAS_PADDING * 2
-  );
+  canvasCtx.clearRect(0, 0, canvasWidth, canvasHeight);
 };
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
@@ -273,7 +268,6 @@ const drawWavePeriod = (
  * 波形を描画する（ステレオ）
  * @param audioBuffer
  * @param canvasRef
- * @param normalize
  * @param canvasWavesWidth
  * @param samplingLevel
  * @returns
@@ -281,7 +275,6 @@ const drawWavePeriod = (
 const drawWaveStereo = (
   audioBuffer: AudioBuffer | null,
   canvasRef: RefObject<HTMLCanvasElement> | null,
-  normalize: boolean,
   canvasWavesWidth: number,
   samplingLevel: number
 ) => {
@@ -314,17 +307,8 @@ const drawWaveStereo = (
   // clear previous waves
   canvasCtx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-  // prepare normalize
-  const max = getMaxValues(audioBuffer);
-
   for (let i = 0; i < buffer.numberOfChannels; i++) {
     let channelData = buffer.getChannelData(i);
-    if (normalize && max[i]) {
-      console.debug(`max[${i}]: ${max[i]}`);
-      channelData = channelData.map((a: number) => {
-        return a / max[i];
-      });
-    }
     const centerHeight =
       CANVAS_PADDING * (i * 1) + graphHeight * i + graphHeight / 2;
 
@@ -387,7 +371,6 @@ const drawWaveStereo = (
  * 波形を描画する
  * @param audioBuffer
  * @param canvasRef
- * @param normalize
  * @param canvasWavesWidth
  * @param samplingLevel
  * @returns
@@ -395,13 +378,12 @@ const drawWaveStereo = (
 const drawWavesStereoToMono = (
   audioBuffer: AudioBuffer | null,
   canvasRef: RefObject<HTMLCanvasElement> | null,
-  normalize: boolean,
   canvasWavesWidth: number,
   samplingLevel: number
 ) => {
   if (!audioBuffer) return;
   if (!canvasRef || !canvasRef.current) return;
-  console.info("[info] drawing: stereo waves");
+  console.info("[info] drawing: stereo to mono");
 
   // canvasのサイズを変更してスケールを表現
   const { buffer, scales } = scaling(audioBuffer);
@@ -428,9 +410,6 @@ const drawWavesStereoToMono = (
 
   // clear previous waves
   canvasCtx.clearRect(0, 0, canvasWidth, canvasHeight);
-
-  // prepare normalize
-  const max = getMaxValues(audioBuffer);
 
   // bufferからステレオそれぞれのデータを取り出す
   const channelDataLeft = buffer.getChannelData(0);
@@ -502,7 +481,6 @@ const drawWavesStereoToMono = (
  * 波形を描画する
  * @param audioBuffer
  * @param canvasRef
- * @param normalize
  * @param canvasWavesWidth
  * @param samplingLevel
  * @returns
@@ -510,7 +488,6 @@ const drawWavesStereoToMono = (
 const drawWaves = (
   audioBuffer: AudioBuffer | null,
   canvasRef: RefObject<HTMLCanvasElement> | null,
-  normalize: boolean,
   canvasWavesWidth: number,
   samplingLevel: number
 ) => {
@@ -543,9 +520,6 @@ const drawWaves = (
 
   // clear previous waves
   canvasCtx.clearRect(0, 0, canvasWidth, canvasHeight);
-
-  // prepare normalize
-  const max = getMaxValues(audioBuffer);
 
   // bufferからモノラルのデータを取り出す
   const channelData = buffer.getChannelData(0);

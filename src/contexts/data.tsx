@@ -13,6 +13,7 @@ interface DataContextType {
   numberOfChannels: number;
   sampleRate: number;
   duration: number; // second(14.999)
+  mono: boolean | undefined;
   normalize: boolean;
   setNormalize: (normalize: boolean) => void;
   annotations: Annotation[];
@@ -24,9 +25,14 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 type DataProviderProps = {
   children: ReactNode;
   dataUrl: string;
+  mono: boolean | undefined;
 };
 
-export const DataProvider = ({ children, dataUrl }: DataProviderProps) => {
+export const DataProvider = ({
+  children,
+  dataUrl,
+  mono,
+}: DataProviderProps) => {
   const audioCtx = useAudioContext(dataUrl);
   const audioBuffer = useAudioBuffer(dataUrl, audioCtx);
   const { numberOfChannels, sampleRate, duration } = useAudioMeta(audioBuffer);
@@ -45,6 +51,7 @@ export const DataProvider = ({ children, dataUrl }: DataProviderProps) => {
         numberOfChannels,
         sampleRate,
         duration,
+        mono,
         normalize,
         setNormalize,
         annotations,
