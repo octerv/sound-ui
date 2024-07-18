@@ -92,7 +92,7 @@ const CanvasDecoration = ({ canvasRef, height, maxAreaLength }: Props) => {
   //   });
   // }, [drawing]);
 
-  useMaxArea(canvasRef, audioBuffer, canvasWidth, maxArea);
+  // useMaxArea(canvasRef, audioBuffer, canvasWidth, maxArea);
 
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Render

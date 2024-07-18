@@ -48,8 +48,22 @@ const clearCanvas = (canvasRef: RefObject<HTMLCanvasElement> | null) => {
 };
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-// Draw frame
+// Draw line
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+/**
+ * 指定されたパラメータに基づいてキャンバスに矩形を描画する関数です。
+ * この関数では矩形の位置、大きさ、および色を指定できます。また、透明度と線の太さも設定されています。
+ *
+ * @param {CanvasRenderingContext2D} canvasCtx - 描画に使用するキャンバスのコンテキスト。
+ * @param {number} left - 矩形の左端のX座標。
+ * @param {number} top - 矩形の上端のY座標。
+ * @param {number} width - 矩形の幅。
+ * @param {number} height - 矩形の高さ。
+ * @param {string} color - 矩形の枠線の色。
+ *
+ * 描画される矩形は、指定された色で、透明度は0.8、線の太さは0.5ピクセルです。
+ * 矩形の位置とサイズは、left, top, width, height によって指定されます。
+ */
 const drawRect = (
   canvasCtx: CanvasRenderingContext2D,
   left: number,
@@ -63,6 +77,38 @@ const drawRect = (
   canvasCtx.strokeStyle = color;
   canvasCtx.beginPath();
   canvasCtx.rect(left, top, width, height);
+  canvasCtx.closePath();
+  canvasCtx.stroke();
+};
+
+/**
+ * 指定されたパラメータに基づいてキャンバスに直線を描画する関数です。
+ * この関数では線の開始点と終了点、色、透明度、および線の太さを指定できます。
+ *
+ * @param {CanvasRenderingContext2D} canvasCtx - 描画に使用するキャンバスのコンテキスト。
+ * @param {number} left - 線の開始点のX座標。
+ * @param {number} top - 線の開始点のY座標。
+ * @param {number} width - 線の終了点までのX方向の距離。
+ * @param {number} height - 線の終了点までのY方向の距離。
+ * @param {string} color - 線の色。
+ *
+ * 関数は指定された開始点から幅と高さに基づく終了点まで線を描画します。
+ * 描画される線は指定された色で、透明度は0.8、線の太さは1.0ピクセルです。
+ */
+const drawLine = (
+  canvasCtx: CanvasRenderingContext2D,
+  left: number,
+  top: number,
+  width: number,
+  height: number,
+  color: string
+) => {
+  canvasCtx.strokeStyle = color;
+  canvasCtx.globalAlpha = 0.8;
+  canvasCtx.lineWidth = 1.0;
+  canvasCtx.beginPath();
+  canvasCtx.moveTo(left, top);
+  canvasCtx.lineTo(left + width, top + height);
   canvasCtx.closePath();
   canvasCtx.stroke();
 };
@@ -644,6 +690,7 @@ export {
   getCanvasContext,
   clearCanvas,
   drawRect,
+  drawLine,
   drawWavePeriod,
   drawWaveStereo,
   drawWavesStereoToMono,

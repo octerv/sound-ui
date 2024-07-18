@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
+import { CANVAS_PADDING, GRAPH_PADDING } from "../constants";
 
 interface ScaleContextType {
   contentWidth: number;
@@ -10,6 +11,7 @@ interface ScaleContextType {
   setCanvasWidth: (width: number) => void;
   canvasScrollLeft: number;
   setCanvasScrollLeft: (left: number) => void;
+  graphWidth: number;
 }
 
 const ScaleContext = createContext<ScaleContextType | undefined>(undefined);
@@ -28,6 +30,11 @@ export const ScaleProvider = ({
   const [scale, setScale] = useState<number>(1.0);
   const [canvasWidth, setCanvasWidth] = useState<number>(contentWidth);
   const [canvasScrollLeft, setCanvasScrollLeft] = useState<number>(0);
+  const [graphWidth, setGraphWidth] = useState<number>(
+    contentWidth - CANVAS_PADDING * 2 - GRAPH_PADDING * 2
+  );
+  // Paddingは以下の設計
+  // | Content | CANVAS_PADDING | Canvas | GRAPH_PADDING | Graph | GRAPH_PADDING | Canvas | CANVAS_PADDING | Content |
 
   useEffect(() => {
     let newWidth = contentWidth * scale;
@@ -50,6 +57,7 @@ export const ScaleProvider = ({
         setCanvasWidth,
         canvasScrollLeft,
         setCanvasScrollLeft,
+        graphWidth,
       }}
     >
       {children}

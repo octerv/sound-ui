@@ -1,4 +1,4 @@
-import { RefObject, useEffect, useState } from "react";
+import { RefObject, useEffect } from "react";
 import {
   CANVAS_PADDING,
   Color,
@@ -6,13 +6,29 @@ import {
   VERTICAL_SCALE_HEIGHT,
 } from "./constants";
 import { getCursorSecond, getTimePosition, getTimeStr } from "./functions.time";
-import { clearCanvas, drawRect, getCanvasContext } from "./functions.canvas";
+import {
+  clearCanvas,
+  drawLine,
+  drawRect,
+  getCanvasContext,
+} from "./functions.canvas";
 import { sliceByNumber } from "./functions.common";
 import { Position } from "sound-ui/types";
 
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-// effect functions
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+/**
+ * 指定されたキャンバスにグラフを設定するためのフックです。
+ * キャンバスは複数のチャネルで区切られたグラフを描画するために使用されます。
+ * グラフのサイズと位置は、入力パラメータに基づいて動的に計算されます。
+ *
+ * @param {RefObject<HTMLCanvasElement> | null} canvasRef - グラフを描画するキャンバスへの参照。
+ * @param {number} contentHeight - キャンバス内のコンテンツの総高さ。
+ * @param {number} canvasWidth - キャンバスの幅。
+ * @param {number} numberOfChannels - グラフに表示するチャネルの数。
+ *
+ * キャンバスやチャネルが設定されていない、またはチャネル数が0の場合は何もしません。
+ * キャンバスは初期化され、指定されたチャネル数に基づいて各チャネルのグラフが描画されます。
+ * 各チャネルのグラフは縦に並べられ、適切なパディングが適用されます。
+ */
 const useFrameCanvasSetup = (
   canvasRef: RefObject<HTMLCanvasElement> | null,
   contentHeight: number,
@@ -48,6 +64,15 @@ const useFrameCanvasSetup = (
   }, [canvasRef, canvasWidth, numberOfChannels]);
 };
 
+/**
+ * 指定されたキャンバスへの参照を使用して、波形を描画するための初期設定を行うフックです。
+ * キャンバスが存在しない、または初期化されていない場合は、何もしません。
+ * 設定されるキャンバスのコンテキストは透明度と線の太さが調整され、後に波形の描画が行われます。
+ *
+ * @param {RefObject<HTMLCanvasElement> | null} canvasRef - 波形を描画するキャンバスへの参照。
+ *
+ * TODO: 波形の中央に横線を引く実装が必要。
+ */
 const useWavesCanvasSetup = (
   canvasRef: RefObject<HTMLCanvasElement> | null
 ) => {
@@ -60,6 +85,16 @@ const useWavesCanvasSetup = (
   }, [canvasRef]);
 };
 
+/**
+ * 指定されたキャンバスへの参照を利用して、マウスイベントに対応する描画設定を初期化するフックです。
+ * キャンバスが存在しない、または初期化されていない場合は、何も行われません。
+ * 初期設定として、透明度と線の太さを指定していますが、具体的なマウスイベントに関する処理は
+ * 追加されていません。
+ *
+ * @param {RefObject<HTMLCanvasElement> | null} canvasRef - 描画設定を適用するキャンバスへの参照。
+ *
+ * このフックを使用する場合は、実際のマウスイベントハンドラーをフック外で設定する必要があります。
+ */
 const useMouseCanvasSetup = (
   canvasRef: RefObject<HTMLCanvasElement> | null
 ) => {
@@ -71,6 +106,18 @@ const useMouseCanvasSetup = (
   }, [canvasRef]);
 };
 
+/**
+ * 指定されたキャンバスへの参照を使用して、チャンネルごとのラベル付きカバーセットアップを初期化するフックです。
+ * チャンネル数が0の場合、またはキャンバスが存在しない場合は、処理を行いません。
+ * キャンバスはクリアされ、指定されたチャンネル数に基づき、各チャンネルにラベルを描画します。
+ * ラベルはチャンネル毎に適切な位置に配置されます。
+ *
+ * @param {RefObject<HTMLCanvasElement> | null} canvasRef - 描画を行うキャンバスへの参照。
+ * @param {number} numberOfChannels - 描画するチャンネルの数。
+ *
+ * 各チャンネルの高さは、キャンバスの総高さから一定のパディングと垂直スケールの高さを差し引いたものを
+ * チャンネル数で割ることにより計算されます。チャンネルのラベルは、その高さに基づいて適切な位置に配置されます。
+ */
 const useCoverCanvasSetup = (
   canvasRef: RefObject<HTMLCanvasElement> | null,
   numberOfChannels: number
@@ -123,6 +170,22 @@ const useCanvasClear = (
   }, [dataUrl]);
 };
 
+/**
+ * スケール値に基づいてキャンバスの幅を調整し、カーソルとスクロール位置を適切に設定するフックです。
+ * 指定されたスケール倍率を使用して初期キャンバス幅を調整し、新しい幅を設定します。
+ * また、カーソル位置もスケールに応じて調整され、スクロール位置がカーソル位置に追従するように設定されます。
+ *
+ * @param {number} scale - 適用するスケール倍率。
+ * @param {Position} position - 現在のカーソル位置。
+ * @param {(position: Position) => void} setCursorPosition - カーソル位置を設定する関数。
+ * @param {number} initWidth - スケール適用前の初期キャンバス幅。
+ * @param {(width: number) => void} setCanvasWidth - キャンバスの幅を設定する関数。
+ * @param {(left: number) => void} setCanvasScrollLeft - キャンバスのスクロール位置を設定する関数。
+ *
+ * このフックは、スケール値が変更されるたびにキャンバスの幅、カーソル位置、およびスクロール位置を更新します。
+ * スケール倍率の適用によってカーソル位置が変更された場合、それに応じてスクロール位置も調整され、
+ * キャンバス上でのカーソルの相対位置が維持されるようにします。
+ */
 const useScaling = (
   scale: number,
   position: Position,
@@ -271,42 +334,45 @@ const useSelectRange = (
 /**
  * 指定された現在時刻のバーを描画する
  * @param canvasRef
- * @param audioBuffer
- * @param canvasWavesWidth
+ * @param duration
+ * @param canvasWidth
  * @param currentTime
  */
 const useCurrentTime = (
   canvasRef: RefObject<HTMLCanvasElement> | null,
-  audioBuffer: AudioBuffer | null,
-  canvasWavesWidth: number,
+  duration: number,
+  canvasWidth: number,
   currentTime: number | undefined
 ) => {
   useEffect(() => {
-    if (!audioBuffer) return;
     if (!canvasRef || !canvasRef.current) return;
+    if (duration === 0) return;
     if (!currentTime) return;
     clearCanvas(canvasRef);
 
     const { canvasCtx, canvasHeight } = getCanvasContext(canvasRef);
     const graphHeight =
       canvasHeight - CANVAS_PADDING * 2 - VERTICAL_SCALE_HEIGHT;
-    const { x, y } = getTimePosition(
-      canvasWavesWidth,
-      audioBuffer.duration,
-      currentTime
-    );
+    const { x, y } = getTimePosition(canvasWidth, duration, currentTime);
 
-    // draw
-    canvasCtx.strokeStyle = "red";
-    canvasCtx.lineWidth = 1.0;
-    canvasCtx.beginPath();
-    canvasCtx.moveTo(x, y);
-    canvasCtx.lineTo(x, y + graphHeight);
-    canvasCtx.closePath();
-    canvasCtx.stroke();
+    drawLine(canvasCtx, x, y, 0, graphHeight, Color.BrightRed);
   }, [currentTime]);
 };
 
+/**
+ * 指定されたキャンバスにオーディオバッファーの最大領域を視覚化するためのフックです。
+ * オーディオバッファーから特定の時間範囲に基づいてグラフを描画し、その領域をハイライト表示します。
+ * ハイライトされる領域は、指定された最大領域配列（秒単位）に基づいて計算されます。
+ *
+ * @param {RefObject<HTMLCanvasElement> | null} canvasRef - 描画を行うキャンバスへの参照。
+ * @param {AudioBuffer | null} audioBuffer - 描画の基となるオーディオバッファー。
+ * @param {number} canvasWavesWidth - キャンバスの波形表示部分の幅。
+ * @param {number[]} maxArea - 最大領域を表す2要素の配列。開始時刻と終了時刻（秒単位）を示す。
+ *
+ * このフックは、maxArea 配列、audioBuffer、または canvasRef のいずれかが更新された場合に再計算を行います。
+ * maxArea[1] が 0 の場合、または audioBuffer または canvasRef が null の場合は何も行いません。
+ * 最大領域は、指定された開始時刻と終了時刻に基づいて、キャンバス上に赤い半透明の矩形として描画されます。
+ */
 const useMaxArea = (
   canvasRef: RefObject<HTMLCanvasElement> | null,
   audioBuffer: AudioBuffer | null,
