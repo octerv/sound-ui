@@ -6,6 +6,7 @@ import {
   Color,
   VERTICAL_SCALE_HEIGHT,
   Font,
+  MIN_LABEL_WIDTH,
 } from "./constants";
 import { getTimePosition, getTimeStr } from "./functions.time";
 import { scaling, sliceByNumber } from "./functions.common";
@@ -675,7 +676,7 @@ const drawAnnotations = (
     );
     const w = x1 - x0;
     drawFillRect(canvasCtx, x0, y0, w, graphHeight, Color.DustyRose);
-    if (annotation.label !== "") {
+    if (annotation.label !== "" && w >= MIN_LABEL_WIDTH) {
       drawText(
         canvasCtx,
         x0 + w / 2,

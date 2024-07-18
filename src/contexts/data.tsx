@@ -25,12 +25,14 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 type DataProviderProps = {
   children: ReactNode;
   dataUrl: string;
+  inputAnnotations: Annotation[] | undefined;
   mono: boolean | undefined;
 };
 
 export const DataProvider = ({
   children,
   dataUrl,
+  inputAnnotations,
   mono,
 }: DataProviderProps) => {
   const audioCtx = useAudioContext(dataUrl);
@@ -42,6 +44,11 @@ export const DataProvider = ({
   useEffect(() => {
     setAnnotations([]);
   }, [dataUrl]);
+
+  useEffect(() => {
+    if (!inputAnnotations) return;
+    setAnnotations(inputAnnotations);
+  }, [inputAnnotations]);
 
   return (
     <DataContext.Provider

@@ -2,7 +2,11 @@ export const CANVAS_PADDING = 8;
 export const GRAPH_PADDING = 8;
 export const VERTICAL_SCALE_HEIGHT = 24;
 export const VERTICAL_SLIDE_WIDTH = 8;
-export const MIN_LABEL_WIDTH = 16;
+export const MIN_LABEL_WIDTH = 10;
+
+// scaling
+export const MAGNIFICATION = 0.5;
+export const MAX_SCALE = 20;
 
 // colors
 export namespace Color {
@@ -32,5 +36,5 @@ export namespace Color {
 export namespace Font {
   export const Default = "12px Arial";
   export const Small = "10px Arial";
-  export const Annotation = "24px Arial";
+  export const Annotation = "16px Arial";
 }

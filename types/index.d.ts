@@ -6,12 +6,14 @@ declare module "sound-ui/types" {
 
   export type WavesProps = {
     dataUrl: string;
+    annotations?: Annotation[];
     width: number;
     height: number;
     samplingLevel?: number; // max: 0.001, 0.01, 0.1, 1.0など
     normalize?: boolean;
     selectable?: boolean;
     mono?: boolean;
+    scale?: number;
     currentTime?: number; // ミリ秒数位置指定
   };
 

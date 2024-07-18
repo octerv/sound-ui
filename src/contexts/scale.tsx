@@ -20,12 +20,14 @@ type ScaleProviderProps = {
   children: ReactNode;
   contentWidth: number;
   contentHeight: number;
+  inputScale?: number;
 };
 
 export const ScaleProvider = ({
   children,
   contentWidth,
   contentHeight,
+  inputScale = 1.0,
 }: ScaleProviderProps) => {
   const [scale, setScale] = useState<number>(1.0);
   const [canvasWidth, setCanvasWidth] = useState<number>(contentWidth);
@@ -45,6 +47,8 @@ export const ScaleProvider = ({
       setCanvasWidth(newWidth);
     }
   }, [scale]);
+
+  useEffect(() => setScale(inputScale), [inputScale]);
 
   return (
     <ScaleContext.Provider

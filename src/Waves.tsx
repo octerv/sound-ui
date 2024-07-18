@@ -56,8 +56,16 @@ const Waves = (props: WavesProps) => {
   };
   return (
     <Area ref={areaRef} style={styles.area}>
-      <DataProvider dataUrl={props.dataUrl} mono={props.mono}>
-        <ScaleProvider contentWidth={props.width} contentHeight={props.height}>
+      <DataProvider
+        dataUrl={props.dataUrl}
+        inputAnnotations={props.annotations}
+        mono={props.mono}
+      >
+        <ScaleProvider
+          contentWidth={props.width}
+          contentHeight={props.height}
+          inputScale={props.scale}
+        >
           <DrawProvider>
             <ActionProvider>
               <CanvasFrame canvasRef={canvasFrameRef} height={props.height} />

@@ -11,6 +11,7 @@ import { useActionContext } from "../contexts/action";
 import { useDrawContext } from "../contexts/draw";
 import { useDataContext } from "../contexts/data";
 import { getCursorSecond } from "../functions.time";
+import { MAGNIFICATION, MAX_SCALE } from "../constants";
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // Interface
@@ -127,12 +128,16 @@ const CanvasMouse = ({
     if (e.deltaY !== 0) {
       let newScale = scaleRef.current || 1.0;
       if (e.deltaY < -4) {
-        newScale = Math.floor((newScale + 0.2) * 100) / 100;
+        newScale = Math.floor((newScale + MAGNIFICATION) * 100) / 100;
       } else if (e.deltaY > 4) {
-        newScale = Math.floor((newScale - 0.2) * 100) / 100;
+        newScale = Math.floor((newScale - MAGNIFICATION) * 100) / 100;
       }
 
-      if (newScale >= 1.0 && newScale <= 2.0 && scaleRef.current !== newScale) {
+      if (
+        newScale >= 1.0 &&
+        newScale <= MAX_SCALE &&
+        scaleRef.current !== newScale
+      ) {
         setScale(newScale);
         setScaling(true);
       }

@@ -1,27 +1,6 @@
 import { useEffect, useState } from "react";
+import { base64ToArrayBuffer } from "./functions.common";
 
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-// local functions
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-function _base64ToArrayBuffer(base64: string): ArrayBufferLike | null {
-  const idx = base64.indexOf(",");
-  if (idx <= 0) return null;
-
-  // "data:audio/mpeg;base64," を空文字に置換する（削除する）
-  console.info(`[info]: ${base64.substring(0, idx)}`);
-  const target = base64.substring(idx + 1);
-  const binary_string = window.atob(target);
-  const len = binary_string.length;
-  const bytes = new Uint8Array(len);
-  for (let i = 0; i < len; i++) {
-    bytes[i] = binary_string.charCodeAt(i);
-  }
-  return bytes.buffer;
-}
-
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-// effect functions
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 const useAudioContext = (dataUrl: string): AudioContext | null => {
   const [ctx, setCtx] = useState<AudioContext | null>(null);
 
@@ -52,7 +31,7 @@ const useAudioBuffer = (
     analyser.connect(context.destination);
 
     // base64 to arrayBuffer
-    const buf = _base64ToArrayBuffer(dataUrl);
+    const buf = base64ToArrayBuffer(dataUrl);
 
     if (!buf) {
       console.error("[error] load sound data");
