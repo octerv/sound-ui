@@ -10,6 +10,7 @@ import { useScaleContext } from "../contexts/scale";
 import { useActionContext } from "../contexts/action";
 import { useDrawContext } from "../contexts/draw";
 import { useDataContext } from "../contexts/data";
+import { getCursorSecond } from "../functions.time";
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // Interface
@@ -34,12 +35,18 @@ const CanvasMouse = ({
   initNormalize,
   setScaling,
 }: Props) => {
-  const { audioBuffer, normalize, setNormalize, annotations, setAnnotations } =
-    useDataContext();
+  const {
+    audioBuffer,
+    duration,
+    normalize,
+    setNormalize,
+    annotations,
+    setAnnotations,
+  } = useDataContext();
   const {
     scale,
     setScale,
-    width,
+    contentWidth,
     canvasWidth,
     setCanvasWidth,
     canvasScrollLeft,
@@ -71,7 +78,7 @@ const CanvasMouse = ({
     scale,
     cursorPosition,
     setCursorPosition,
-    width,
+    contentWidth,
     setCanvasWidth,
     setCanvasScrollLeft
   );
@@ -163,9 +170,11 @@ const CanvasMouse = ({
     if (!drawn) return;
     if (!selectable) return;
     const prevAnnotations = JSON.parse(JSON.stringify(annotations));
+    const x0 = getCursorSecond(canvasWidth, duration, selectedRange[0]);
+    const x1 = getCursorSecond(canvasWidth, duration, selectedRange[1]);
     const newAnnotation: Annotation = {
-      startTime: selectedRange[0],
-      endTime: selectedRange[1],
+      startTime: x0,
+      endTime: x1,
       label: "",
     };
     setAnnotations([...prevAnnotations, newAnnotation]);

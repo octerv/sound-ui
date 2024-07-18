@@ -12,7 +12,7 @@ interface DataContextType {
   audioBuffer: AudioBuffer | null;
   numberOfChannels: number;
   sampleRate: number;
-  duration: number;
+  duration: number; // second(14.999)
   normalize: boolean;
   setNormalize: (normalize: boolean) => void;
   annotations: Annotation[];

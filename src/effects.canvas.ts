@@ -257,12 +257,7 @@ const useCursorEffect = (
     canvasCtx.stroke();
 
     // カーソル位置のTime表示
-    const sec = getCursorSecond(
-      canvasWidth,
-      CANVAS_PADDING + GRAPH_PADDING,
-      audioBuffer.duration,
-      position.x
-    );
+    const sec = getCursorSecond(canvasWidth, audioBuffer.duration, position.x);
     canvasCtx.fillText(
       getTimeStr(sec),
       position.x + 8,
@@ -359,56 +354,6 @@ const useCurrentTime = (
   }, [currentTime]);
 };
 
-/**
- * 指定されたキャンバスにオーディオバッファーの最大領域を視覚化するためのフックです。
- * オーディオバッファーから特定の時間範囲に基づいてグラフを描画し、その領域をハイライト表示します。
- * ハイライトされる領域は、指定された最大領域配列（秒単位）に基づいて計算されます。
- *
- * @param {RefObject<HTMLCanvasElement> | null} canvasRef - 描画を行うキャンバスへの参照。
- * @param {AudioBuffer | null} audioBuffer - 描画の基となるオーディオバッファー。
- * @param {number} canvasWavesWidth - キャンバスの波形表示部分の幅。
- * @param {number[]} maxArea - 最大領域を表す2要素の配列。開始時刻と終了時刻（秒単位）を示す。
- *
- * このフックは、maxArea 配列、audioBuffer、または canvasRef のいずれかが更新された場合に再計算を行います。
- * maxArea[1] が 0 の場合、または audioBuffer または canvasRef が null の場合は何も行いません。
- * 最大領域は、指定された開始時刻と終了時刻に基づいて、キャンバス上に赤い半透明の矩形として描画されます。
- */
-const useMaxArea = (
-  canvasRef: RefObject<HTMLCanvasElement> | null,
-  audioBuffer: AudioBuffer | null,
-  canvasWavesWidth: number,
-  maxArea: number[]
-) => {
-  useEffect(() => {
-    if (!audioBuffer) return;
-    if (!canvasRef || !canvasRef.current) return;
-    if (maxArea[1] === 0) return;
-
-    const { canvasCtx, canvasHeight } = getCanvasContext(canvasRef);
-    const graphHeight =
-      canvasHeight - CANVAS_PADDING * 2 - VERTICAL_SCALE_HEIGHT;
-
-    const { x: x1, y: y1 } = getTimePosition(
-      canvasWavesWidth,
-      audioBuffer?.duration,
-      maxArea[0] * 1000
-    );
-    const { x: x2 } = getTimePosition(
-      canvasWavesWidth,
-      audioBuffer?.duration,
-      maxArea[1] * 1000
-    );
-    console.debug(`area x1:${x1},y1:${y1},x2:${x2},y2:${graphHeight}`);
-
-    canvasCtx.fillStyle = "rgba(255,0,0, 0.3)";
-    canvasCtx.beginPath();
-    canvasCtx.rect(1, 1, CANVAS_PADDING - 2, canvasHeight - 2);
-    canvasCtx.rect(x1, y1, x2, graphHeight);
-    canvasCtx.closePath();
-    canvasCtx.fill();
-  }, [maxArea]);
-};
-
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // export
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
@@ -422,5 +367,4 @@ export {
   useCursorEffect,
   useSelectRange,
   useCurrentTime,
-  useMaxArea,
 };

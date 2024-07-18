@@ -6,8 +6,9 @@ import {
   Color,
   VERTICAL_SCALE_HEIGHT,
 } from "./constants";
-import { getTimeStr } from "./functions.time";
+import { getTimePosition, getTimeStr } from "./functions.time";
 import { scaling, sliceByNumber } from "./functions.common";
+import { Annotation } from "sound-ui/types";
 
 /**
  * Canvasのコンテキストを取得する
@@ -79,6 +80,23 @@ const drawRect = (
   canvasCtx.rect(left, top, width, height);
   canvasCtx.closePath();
   canvasCtx.stroke();
+};
+
+const drawFillRect = (
+  canvasCtx: CanvasRenderingContext2D,
+  left: number,
+  top: number,
+  width: number,
+  height: number,
+  color: string
+) => {
+  canvasCtx.globalAlpha = 0.3;
+  canvasCtx.lineWidth = 0.0;
+  canvasCtx.fillStyle = color;
+  canvasCtx.beginPath();
+  canvasCtx.fillRect(left, top, width, height);
+  canvasCtx.closePath();
+  canvasCtx.fill();
 };
 
 /**
@@ -610,78 +628,32 @@ const drawSelectedRange = (
   canvasCtx.fill();
 };
 
-/**
- * 範囲選択された部分を描画する
- * @param canvasRef
- * @param canvasWavesWidth
- * @param annotations
- * @param position
- * @param selecting
- * @param scale
- * @returns
- */
-// const drawAnnotations = (
-//   canvasRef: RefObject<HTMLCanvasElement> | null,
-//   canvasWavesWidth: number,
-//   annotations: Annotation[],
-//   position: { [key: string]: number },
-//   selecting: boolean,
-//   scale: number
-// ) => {
-//   if (!canvasRef || !canvasRef.current) return;
+const drawAnnotations = (
+  canvasRef: RefObject<HTMLCanvasElement> | null,
+  canvasWidth: number,
+  duration: number,
+  annotations: Annotation[]
+) => {
+  if (!canvasRef || !canvasRef.current) return;
+  const { canvasCtx, canvasHeight } = getCanvasContext(canvasRef);
+  const graphHeight = canvasHeight - CANVAS_PADDING * 2 - VERTICAL_SCALE_HEIGHT;
+  clearCanvas(canvasRef);
 
-//   const canvasWidth = canvasWavesWidth;
-//   const { canvasCtx, canvasHeight } = getCanvasContext(canvasRef);
-
-//   // clear
-//   canvasCtx.clearRect(0, 0, canvasWidth, canvasHeight);
-
-//   // 選択された範囲を描画する
-//   const scaledAnnotations = annotations.map((annotation: Annotation) => {
-//     return {
-//       startIdx: Math.round(annotation.startTime * scale)
-//     };
-//   });
-//   const rescaleRanges = sliceByNumber(scaledRanges, 2);
-//   canvasCtx.fillStyle = Color.DustyRose;
-//   canvasCtx.globalAlpha = 0.3;
-//   canvasCtx.beginPath();
-//   for (const range of rescaleRanges) {
-//     if (range.length === 2) {
-//       canvasCtx.fillRect(
-//         range[0],
-//         CANVAS_PADDING,
-//         range[1] - range[0],
-//         canvasHeight - CANVAS_PADDING * 2 - VERTICAL_SCALE_HEIGHT
-//       );
-//     } else {
-//       if (selecting) {
-//         // 他の選択範囲に重なってしまわないようにする
-//         let start = range[0];
-//         let end = position.x;
-//         for (const check of rescaleRanges) {
-//           if (check.length === 2) {
-//             if (check[1] < range[0] && position.x <= check[1]) {
-//               start = check[1] + 2;
-//               end = range[0];
-//             }
-//             if (range[0] < check[0] && check[0] <= position.x) {
-//               end = check[0] - 2;
-//             }
-//           }
-//         }
-//         canvasCtx.fillRect(
-//           start,
-//           CANVAS_PADDING,
-//           end - start,
-//           canvasHeight - CANVAS_PADDING * 2 - VERTICAL_SCALE_HEIGHT
-//         );
-//       }
-//     }
-//   }
-//   canvasCtx.closePath();
-//   canvasCtx.fill();
-// };
+  // 選択された範囲を描画する
+  for (const annotation of annotations) {
+    const { x: x0, y: y0 } = getTimePosition(
+      canvasWidth,
+      duration,
+      annotation.startTime
+    );
+    const { x: x1, y: y1 } = getTimePosition(
+      canvasWidth,
+      duration,
+      annotation.endTime
+    );
+    drawFillRect(canvasCtx, x0, y0, x1 - x0, graphHeight, Color.DustyRose);
+  }
+};
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // export
@@ -690,10 +662,12 @@ export {
   getCanvasContext,
   clearCanvas,
   drawRect,
+  drawFillRect,
   drawLine,
   drawWavePeriod,
   drawWaveStereo,
   drawWavesStereoToMono,
   drawWaves,
   drawSelectedRange,
+  drawAnnotations,
 };

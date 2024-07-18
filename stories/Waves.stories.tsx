@@ -9,7 +9,7 @@ export default {
 export const Default = () => {
   const [dataUrl, setDataUrl] = useState("");
   const [normalize, setNormalize] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0); // second
 
   const selectFile = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.currentTarget.files;
@@ -37,8 +37,8 @@ export const Default = () => {
   return (
     <>
       <input type="file" accept="audio/*" onChange={selectFile} />
-      <button onClick={() => setCurrentTime(currentTime - 100)}>◀︎</button>
-      <button onClick={() => setCurrentTime(currentTime + 100)}>▶︎</button>
+      <button onClick={() => setCurrentTime(currentTime - 0.01)}>◀︎</button>
+      <button onClick={() => setCurrentTime(currentTime + 0.01)}>▶︎</button>
       <button onClick={handleNormalize}>
         Normalize ({normalize ? "ON" : "OFF"})
       </button>

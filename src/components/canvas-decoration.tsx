@@ -1,8 +1,8 @@
 import { startTransition, useEffect, useState } from "react";
 import { Content } from "./styled";
 import { CanvasPropsInterface } from "sound-ui/types";
-import { useMaxArea, useSelectRange } from "../effects.canvas";
-import { drawSelectedRange } from "../functions.canvas";
+import { useSelectRange } from "../effects.canvas";
+import { drawAnnotations, drawSelectedRange } from "../functions.canvas";
 import { useScaleContext } from "../contexts/scale";
 import { useActionContext } from "../contexts/action";
 import { useDrawContext } from "../contexts/draw";
@@ -20,7 +20,7 @@ interface Props extends CanvasPropsInterface {
 // Component
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 const CanvasDecoration = ({ canvasRef, height, maxAreaLength }: Props) => {
-  const { audioBuffer, annotations } = useDataContext();
+  const { audioBuffer, duration, annotations } = useDataContext();
   const { scale, canvasWidth } = useScaleContext();
   const { drawing, drawn } = useDrawContext();
   const { cursorPosition, selecting, selectedRange, setSelectedRange } =
@@ -50,7 +50,7 @@ const CanvasDecoration = ({ canvasRef, height, maxAreaLength }: Props) => {
 
   useEffect(() => {
     if (!selecting) return;
-    if (selectedRange.length !== 2) return;
+    if (duration === 0) return;
     // 選択された範囲を描画する
     drawSelectedRange(
       canvasRef,
@@ -66,33 +66,10 @@ const CanvasDecoration = ({ canvasRef, height, maxAreaLength }: Props) => {
     console.log(annotations);
     if (annotations.length === 0) return;
     // 選択された範囲を描画する
-    // drawSelectedRanges(
-    //   canvasRef,
-    //   width,
-    //   selectedRanges,
-    //   cursorPosition,
-    //   selecting,
-    //   scale
-    // );
-  }, [annotations]);
-
-  // useEffect(() => {
-  //   if (!drawing) return;
-  //   if (!canvasRef || !canvasRef.current) return;
-  //   // draw waves
-  //   startTransition(() => {
-  //     drawSelectedRanges(
-  //       canvasRef,
-  //       width,
-  //       selectedRanges,
-  //       cursorPosition,
-  //       selecting,
-  //       scale
-  //     );
-  //   });
-  // }, [drawing]);
-
-  // useMaxArea(canvasRef, audioBuffer, canvasWidth, maxArea);
+    startTransition(() => {
+      drawAnnotations(canvasRef, canvasWidth, duration, annotations);
+    });
+  }, [annotations, canvasWidth]);
 
   //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
   // Render

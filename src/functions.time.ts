@@ -19,7 +19,7 @@ function getTimeStr(second: number): string {
 
 /**
  * 指定時刻の現在位置を取得する
- * @param canvasWavesWidth
+ * @param canvasWidth
  * @param duration
  * @param currentTime ミリ秒
  * @returns
@@ -33,7 +33,7 @@ const getTimePosition = (
   const x =
     CANVAS_PADDING +
     GRAPH_PADDING +
-    Math.floor(graphWidth * (currentTime / (duration * 1000)));
+    Math.floor(graphWidth * (currentTime / duration));
   const y = CANVAS_PADDING;
   return { x, y };
 };
@@ -41,18 +41,13 @@ const getTimePosition = (
 /**
  * カーソル位置の時刻を取得する
  * @param canvasWidth
- * @param adjustWidth 余白を指定
  * @param duration
  * @param x
  * @returns
  */
-const getCursorSecond = (
-  canvasWidth: number,
-  adjustWidth: number,
-  duration: number,
-  x: number
-) => {
+const getCursorSecond = (canvasWidth: number, duration: number, x: number) => {
   if (x === 0) return 0;
+  const adjustWidth = CANVAS_PADDING + GRAPH_PADDING;
   return ((x - adjustWidth) * duration) / (canvasWidth - adjustWidth * 2);
 };
 
