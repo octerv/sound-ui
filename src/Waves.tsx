@@ -11,6 +11,7 @@ import { ScaleProvider } from "./contexts/scale";
 import { ActionProvider } from "./contexts/action";
 import { DrawProvider } from "./contexts/draw";
 import { DataProvider } from "./contexts/data";
+import Controller from "./components/controller";
 
 const Waves = (props: WavesProps) => {
   // ---------- Refs ----------
@@ -27,11 +28,7 @@ const Waves = (props: WavesProps) => {
   };
   return (
     <Area ref={areaRef} style={styles.area}>
-      <DataProvider
-        dataUrl={props.dataUrl}
-        inputAnnotations={props.annotations}
-        mono={props.mono}
-      >
+      <DataProvider>
         <ScaleProvider
           contentWidth={props.width}
           contentHeight={props.height}
@@ -39,6 +36,7 @@ const Waves = (props: WavesProps) => {
         >
           <DrawProvider>
             <ActionProvider>
+              <Controller {...props} />
               <CanvasFrame />
               <CanvasWaves />
               <CanvasDecoration />

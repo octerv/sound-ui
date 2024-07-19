@@ -85,7 +85,7 @@ const useFrameCanvasSetup = (
  */
 const useWavesCanvasSetup = (
   canvasRef: RefObject<HTMLCanvasElement> | null,
-  dataUrl: string
+  dataUrl: string | undefined
 ) => {
   useEffect(() => {
     if (!canvasRef || !canvasRef.current) return;
@@ -109,7 +109,7 @@ const useWavesCanvasSetup = (
  */
 const useDecorationCanvasSetup = (
   canvasRef: RefObject<HTMLCanvasElement> | null,
-  dataUrl: string
+  dataUrl: string | undefined
 ) => {
   useEffect(() => {
     if (!canvasRef || !canvasRef.current) return;

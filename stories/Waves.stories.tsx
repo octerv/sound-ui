@@ -70,32 +70,18 @@ export const Default = () => {
       <button onClick={() => setScale(1.0)}>Zoom min</button>
       <button onClick={() => setScale(20.0)}>Zoom max</button>
       <br />
-      {mono ? (
-        <Waves
-          dataUrl={dataUrl}
-          annotations={annotations}
-          width={800}
-          height={400}
-          samplingLevel={0.01}
-          normalize={normalize}
-          scale={scale}
-          currentTime={currentTime}
-          selectable
-          mono
-        />
-      ) : (
-        <Waves
-          dataUrl={dataUrl}
-          annotations={annotations}
-          width={800}
-          height={400}
-          samplingLevel={0.01}
-          normalize={normalize}
-          scale={scale}
-          currentTime={currentTime}
-          selectable
-        />
-      )}
+      <Waves
+        dataUrl={dataUrl}
+        annotations={annotations}
+        width={800}
+        height={400}
+        samplingLevel={0.01}
+        normalize={normalize}
+        scale={scale}
+        currentTime={currentTime}
+        selectable
+        {...(mono && { mono })}
+      />
       <div>
         <audio ref={audioRef} controls src={dataUrl}></audio>
         <div>Current Time: {currentTime.toFixed(2)}</div>
