@@ -390,10 +390,6 @@ const useCurrentTime = (
     const { x, y } = getTimePosition(canvasWidth, duration, currentTime);
 
     drawLine(canvasCtx, x, y, 0, graphHeight, Color.BrightRed);
-
-    // 親divの中心にcurrentTimeの位置を持ってくるようにスクロール
-    const centerPosition = x - areaRef.current.offsetWidth / 2;
-    areaRef.current.scrollLeft = centerPosition;
   }, [currentTime]);
 };
 

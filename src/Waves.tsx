@@ -36,20 +36,13 @@ const Waves = (props: WavesProps) => {
         >
           <DrawProvider>
             <ActionProvider>
-              <Controller {...props} />
+              <Controller {...props} areaRef={areaRef} />
               <CanvasFrame />
               <CanvasWaves />
               <CanvasDecoration />
-              <CanvasTimeline
-                areaRef={areaRef}
-                currentTime={props.currentTime}
-              />
+              <CanvasTimeline areaRef={areaRef} />
               <CanvasCover />
-              <CanvasMouse
-                areaRef={areaRef}
-                selectable={props.selectable}
-                initNormalize={props.normalize}
-              />
+              <CanvasMouse />
             </ActionProvider>
           </DrawProvider>
         </ScaleProvider>

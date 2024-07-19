@@ -18,6 +18,13 @@ interface DataContextType {
   setMono: (mono: boolean) => void;
   normalize: boolean;
   setNormalize: (normalize: boolean) => void;
+  // control audio
+  currentTime: number;
+  setCurrentTime: (currentTime: number) => void;
+  clickable: boolean;
+  setClickable: (clickable: boolean) => void;
+  clickedTime: number;
+  setClickedTime: (clickedTime: number) => void;
   // annotation
   annotations: Annotation[];
   setAnnotations: (annotations: Annotation[]) => void;
@@ -43,6 +50,9 @@ export const DataProvider = ({ children }: DataProviderProps) => {
   } = useAudioBuffer(dataUrl, audioCtx);
   const [mono, setMono] = useState<boolean>(false);
   const [normalize, setNormalize] = useState<boolean>(false);
+  const [currentTime, setCurrentTime] = useState<number>(0);
+  const [clickable, setClickable] = useState<boolean>(false);
+  const [clickedTime, setClickedTime] = useState<number>(0);
   const [annotations, setAnnotations] = useState<Annotation[]>([]);
   const [selectable, setSelectable] = useState<boolean>(false);
 
@@ -60,6 +70,12 @@ export const DataProvider = ({ children }: DataProviderProps) => {
         setMono,
         normalize,
         setNormalize,
+        currentTime,
+        setCurrentTime,
+        clickable,
+        setClickable,
+        clickedTime,
+        setClickedTime,
         annotations,
         setAnnotations,
         selectable,

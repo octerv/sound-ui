@@ -13,20 +13,15 @@ import { useDataContext } from "../contexts/data";
 import { getCursorSecond } from "../functions.time";
 import { MAGNIFICATION, MAX_SCALE } from "../constants";
 
-interface Props {
-  areaRef: React.RefObject<HTMLDivElement>;
-  selectable: boolean | undefined;
-  initNormalize: boolean | undefined;
-}
-
-const CanvasMouse = ({ areaRef, selectable, initNormalize }: Props) => {
+const CanvasMouse = () => {
   const {
     audioBuffer,
     duration,
-    normalize,
-    setNormalize,
+    clickable,
+    setClickedTime,
     annotations,
     setAnnotations,
+    selectable,
   } = useDataContext();
   const {
     contentWidth,
@@ -35,10 +30,9 @@ const CanvasMouse = ({ areaRef, selectable, initNormalize }: Props) => {
     setScale,
     canvasWidth,
     setCanvasWidth,
-    canvasScrollLeft,
     setCanvasScrollLeft,
   } = useScaleContext();
-  const { drawing, setDrawing, drawn } = useDrawContext();
+  const { drawn } = useDrawContext();
   const {
     cursorPosition,
     setCursorPosition,
@@ -51,10 +45,6 @@ const CanvasMouse = ({ areaRef, selectable, initNormalize }: Props) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const scaleRef = useRef<number>();
   scaleRef.current = scale;
-  const scalingRef = useRef<boolean>();
-  scalingRef.current = drawing;
-  const canvasWavesWidthRef = useRef<number>();
-  canvasWavesWidthRef.current = canvasWidth;
 
   // ---------- Effects ----------
   useMouseCanvasSetup(canvasRef);
@@ -69,25 +59,6 @@ const CanvasMouse = ({ areaRef, selectable, initNormalize }: Props) => {
     setCanvasWidth,
     setCanvasScrollLeft
   );
-
-  useEffect(() => {
-    if (!drawn) return;
-    setDrawing(true);
-  }, [canvasWidth]);
-
-  useEffect(() => {
-    if (!drawn) return;
-    if (initNormalize === undefined || initNormalize === null) return;
-    if (initNormalize === normalize) return;
-    console.info(`[info] initNormalize: ${initNormalize}`);
-    setNormalize(initNormalize);
-    setDrawing(true);
-  }, [initNormalize]);
-
-  useEffect(() => {
-    if (!areaRef.current) return;
-    areaRef.current.scrollLeft = canvasScrollLeft;
-  }, [canvasScrollLeft]);
 
   // ---------- Mouse event listener ----------
   const onMouseMove = (e: MouseEvent) => {
@@ -106,8 +77,6 @@ const CanvasMouse = ({ areaRef, selectable, initNormalize }: Props) => {
   const onMouseWheel = (e: WheelEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    // TODO: `scaling`が使われているのはここの判定のみ、`drawing`に置き換えてみる
-    // if (scalingRef.current) return;
 
     // 縦スクロールで拡大縮小
     if (e.deltaY !== 0) {
@@ -124,7 +93,6 @@ const CanvasMouse = ({ areaRef, selectable, initNormalize }: Props) => {
         scaleRef.current !== newScale
       ) {
         setScale(newScale);
-        setDrawing(true);
       }
     }
   };
@@ -156,17 +124,28 @@ const CanvasMouse = ({ areaRef, selectable, initNormalize }: Props) => {
 
   const onMouseUp = () => {
     if (!drawn) return;
-    if (!selectable) return;
-    const prevAnnotations = JSON.parse(JSON.stringify(annotations));
-    const x0 = getCursorSecond(canvasWidth, duration, selectedRange[0]);
-    const x1 = getCursorSecond(canvasWidth, duration, selectedRange[1]);
-    const newAnnotation: Annotation = {
-      startTime: x0,
-      endTime: x1,
-      label: "",
-    };
-    setAnnotations([...prevAnnotations, newAnnotation]);
-    setSelecting(false);
+
+    if (clickable) {
+      const newClickedTime = getCursorSecond(
+        canvasWidth,
+        duration,
+        cursorPosition.x
+      );
+      setClickedTime(newClickedTime);
+    }
+
+    if (selectable) {
+      const prevAnnotations = JSON.parse(JSON.stringify(annotations));
+      const x0 = getCursorSecond(canvasWidth, duration, selectedRange[0]);
+      const x1 = getCursorSecond(canvasWidth, duration, selectedRange[1]);
+      const newAnnotation: Annotation = {
+        startTime: x0,
+        endTime: x1,
+        label: "",
+      };
+      setAnnotations([...prevAnnotations, newAnnotation]);
+      setSelecting(false);
+    }
   };
 
   // ---------- Render ----------

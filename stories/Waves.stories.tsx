@@ -22,6 +22,8 @@ export const Default = () => {
     undefined
   );
   const [mono, setMono] = useState<boolean>(false);
+  const [clickable, setClickable] = useState<boolean>(false);
+  const [selectable, setSelectable] = useState<boolean>(false);
   const [normalize, setNormalize] = useState<boolean>(false);
   const [scale, setScale] = useState<number>(1.0);
   const currentTime = useAudioTime(audioRef);
@@ -54,6 +56,13 @@ export const Default = () => {
     setNormalize(!normalize);
   };
 
+  // 再生位置を秒数で指定する関数
+  const setPlayPosition = (seconds: number) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = seconds;
+    }
+  };
+
   return (
     <>
       <input type="file" accept="audio/*" onChange={selectFile} />
@@ -61,6 +70,14 @@ export const Default = () => {
       <br />
       <button onClick={() => setMono(!mono)}>
         Mono ({mono ? "ON" : "OFF"})
+      </button>
+      &nbsp;
+      <button onClick={() => setClickable(!clickable)}>
+        Clickable ({clickable ? "ON" : "OFF"})
+      </button>
+      &nbsp;
+      <button onClick={() => setSelectable(!selectable)}>
+        Selectable ({selectable ? "ON" : "OFF"})
       </button>
       &nbsp;
       <button onClick={handleNormalize}>
@@ -79,8 +96,10 @@ export const Default = () => {
         normalize={normalize}
         scale={scale}
         currentTime={currentTime}
-        selectable
+        {...(clickable && { clickable })}
+        {...(selectable && { selectable })}
         {...(mono && { mono })}
+        setPlayPosition={setPlayPosition}
       />
       <div>
         <audio ref={audioRef} controls src={dataUrl}></audio>

@@ -6,11 +6,10 @@ import { useRef } from "react";
 
 interface Props {
   areaRef: React.RefObject<HTMLDivElement>;
-  currentTime: number | undefined;
 }
 
-const CanvasTimeline = ({ areaRef, currentTime }: Props) => {
-  const { duration } = useDataContext();
+const CanvasTimeline = ({ areaRef }: Props) => {
+  const { duration, currentTime } = useDataContext();
   const { contentHeight, canvasWidth } = useScaleContext();
 
   // ---------- Refs ----------

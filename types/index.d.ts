@@ -11,10 +11,12 @@ declare module "sound-ui/types" {
     height: number;
     samplingLevel?: number; // max: 0.001, 0.01, 0.1, 1.0など
     normalize?: boolean;
+    clickable?: boolean;
     selectable?: boolean;
     mono?: boolean;
     scale?: number;
     currentTime?: number; // ミリ秒数位置指定
+    setPlayPosition?: (seconds: number) => void;
   };
 
   export type Annotation = {
