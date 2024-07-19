@@ -4,25 +4,31 @@ import { Content } from "./styled";
 import { drawWavePeriod, getCanvasContext } from "../functions.canvas";
 import { CanvasPropsInterface } from "sound-ui/types";
 import { useWavesCanvasSetup } from "../effects.canvas";
-import { useDataContext } from "../contexts/data";
 import { useScaleContext } from "../contexts/scale";
 
 interface Props extends CanvasPropsInterface {
+  audioBuffer: AudioBuffer;
   top: number;
   left: number;
   period: number;
   frequency?: number;
 }
 
-const CanvasWavePeriod = ({ top, left, height, period, frequency }: Props) => {
-  const { dataUrl, audioBuffer } = useDataContext();
+const CanvasWavePeriod = ({
+  audioBuffer,
+  top,
+  left,
+  height,
+  period,
+  frequency,
+}: Props) => {
   const { canvasWidth } = useScaleContext();
 
   // ---------- Refs ----------
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // ---------- Effects ----------
-  useWavesCanvasSetup(canvasRef, dataUrl);
+  useWavesCanvasSetup(canvasRef, "");
 
   useEffect(() => {
     if (!audioBuffer) return;

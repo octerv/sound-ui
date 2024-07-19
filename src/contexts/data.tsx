@@ -4,7 +4,7 @@ import { Annotation } from "sound-ui/types";
 import { useAudioBuffer, useAudioContext } from "../effects.audio";
 
 interface DataContextType {
-  dataUrl: string;
+  dataUrl: string | undefined;
   audioCtx: AudioContext | null;
   audioBuffer: AudioBuffer | null;
   numberOfChannels: number;
@@ -21,9 +21,9 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 
 type DataProviderProps = {
   children: ReactNode;
-  dataUrl: string;
-  inputAnnotations: Annotation[] | undefined;
-  mono: boolean | undefined;
+  dataUrl?: string | undefined;
+  inputAnnotations?: Annotation[] | undefined;
+  mono?: boolean | undefined;
 };
 
 export const DataProvider = ({

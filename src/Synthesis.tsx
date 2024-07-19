@@ -4,6 +4,8 @@ import { Area } from "./components/styled";
 import CanvasFrame from "./components/canvas-frame";
 import CanvasWavePeriod from "./components/canvas-wave-period";
 import { createAudioBuffer, synthesisWaves } from "./functions.audio";
+import { DataProvider } from "./contexts/data";
+import { ScaleProvider } from "./contexts/scale";
 
 const constants = {
   CANVAS_PADDING: 8,
@@ -58,7 +60,6 @@ const Synthesis = (props: SynthesisProps) => {
           audioBuffer={buffer}
           top={top}
           left={0}
-          width={props.width}
           height={height}
           period={period}
           frequency={frequencies[i]}
@@ -78,7 +79,6 @@ const Synthesis = (props: SynthesisProps) => {
         audioBuffer={synBuffer}
         top={top}
         left={0}
-        width={props.width}
         height={height * 2}
         period={period}
       />
@@ -108,15 +108,13 @@ const Synthesis = (props: SynthesisProps) => {
   };
   return (
     <Area style={areaStyle}>
-      {" "}
-      <CanvasFrame
-        canvasRef={canvasFrameRef}
-        audioBuffer={null}
-        width={props.width}
-        height={props.height}
-        stereo={false}
-      />
-      {waves}
+      <DataProvider>
+        <ScaleProvider contentWidth={props.width} contentHeight={props.height}>
+          <CanvasFrame />
+
+          {waves}
+        </ScaleProvider>
+      </DataProvider>
     </Area>
   );
 };

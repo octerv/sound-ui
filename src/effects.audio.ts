@@ -13,7 +13,7 @@ import { base64ToArrayBuffer } from "./functions.common";
  * useEffectフック内でAudioContextを生成し、useStateを用いてそのインスタンスを管理します。
  * これにより、コンポーネントのライフサイクルに応じたAudioContextの生成と破棄が可能になります。
  */
-const useAudioContext = (dataUrl: string): AudioContext | null => {
+const useAudioContext = (dataUrl: string | undefined): AudioContext | null => {
   const [ctx, setCtx] = useState<AudioContext | null>(null);
 
   useEffect(() => {
@@ -40,7 +40,7 @@ const useAudioContext = (dataUrl: string): AudioContext | null => {
  * 生成されたAudioBufferは、useStateを用いて状態として保持され、最終的に返されます。
  */
 const useAudioBuffer = (
-  dataUrl: string,
+  dataUrl: string | undefined,
   context: AudioContext | null
 ): {
   buffer: AudioBuffer | null;
