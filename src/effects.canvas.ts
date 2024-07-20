@@ -205,45 +205,6 @@ const useCanvasClear = (
 };
 
 /**
- * スケール値に基づいてキャンバスの幅を調整し、カーソルとスクロール位置を適切に設定するフックです。
- * 指定されたスケール倍率を使用して初期キャンバス幅を調整し、新しい幅を設定します。
- * また、カーソル位置もスケールに応じて調整され、スクロール位置がカーソル位置に追従するように設定されます。
- *
- * @param {number} scale - 適用するスケール倍率。
- * @param {Position} position - 現在のカーソル位置。
- * @param {(position: Position) => void} setCursorPosition - カーソル位置を設定する関数。
- * @param {number} initWidth - スケール適用前の初期キャンバス幅。
- * @param {(width: number) => void} setCanvasWidth - キャンバスの幅を設定する関数。
- * @param {(left: number) => void} setCanvasScrollLeft - キャンバスのスクロール位置を設定する関数。
- *
- * このフックは、スケール値が変更されるたびにキャンバスの幅、カーソル位置、およびスクロール位置を更新します。
- * スケール倍率の適用によってカーソル位置が変更された場合、それに応じてスクロール位置も調整され、
- * キャンバス上でのカーソルの相対位置が維持されるようにします。
- */
-const useScaling = (
-  scale: number,
-  position: Position,
-  setCursorPosition: (position: Position) => void,
-  initWidth: number,
-  setCanvasWidth: (width: number) => void,
-  setCanvasScrollLeft: (left: number) => void
-) => {
-  useEffect(() => {
-    // Canvasの幅の拡大縮小
-    const updateWidth = Math.floor(initWidth * scale);
-    setCanvasWidth(updateWidth);
-
-    // カーソル位置の調整
-    setCursorPosition({ x: position.x * scale, y: position.y });
-
-    // スクロール位置の調整
-    const scaledX = position.x * scale;
-    const adjust = scaledX - position.x;
-    setCanvasScrollLeft(adjust);
-  }, [scale]);
-};
-
-/**
  * マウスの動きによる副作用
  * @param position
  * @param audioBuffer
@@ -403,7 +364,6 @@ export {
   useMouseCanvasSetup,
   useCoverCanvasSetup,
   useCanvasClear,
-  useScaling,
   useCursorEffect,
   useSelectRange,
   useCurrentTime,

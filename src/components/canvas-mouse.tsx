@@ -1,11 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Content } from "./styled";
 import { Annotation } from "sound-ui/types";
-import {
-  useMouseCanvasSetup,
-  useCursorEffect,
-  useScaling,
-} from "../effects.canvas";
+import { useMouseCanvasSetup, useCursorEffect } from "../effects.canvas";
 import { useScaleContext } from "../contexts/scale";
 import { useActionContext } from "../contexts/action";
 import { useDrawContext } from "../contexts/draw";
@@ -23,15 +19,7 @@ const CanvasMouse = () => {
     setAnnotations,
     selectable,
   } = useDataContext();
-  const {
-    contentWidth,
-    contentHeight,
-    scale,
-    setScale,
-    canvasWidth,
-    setCanvasWidth,
-    setCanvasScrollLeft,
-  } = useScaleContext();
+  const { contentHeight, scale, setScale, canvasWidth } = useScaleContext();
   const { drawn } = useDrawContext();
   const {
     cursorPosition,
@@ -50,15 +38,6 @@ const CanvasMouse = () => {
   useMouseCanvasSetup(canvasRef);
 
   useCursorEffect(cursorPosition, audioBuffer, canvasRef, drawn, canvasWidth);
-
-  useScaling(
-    scale,
-    cursorPosition,
-    setCursorPosition,
-    contentWidth,
-    setCanvasWidth,
-    setCanvasScrollLeft
-  );
 
   // ---------- Mouse event listener ----------
   const onMouseMove = (e: MouseEvent) => {
@@ -82,9 +61,9 @@ const CanvasMouse = () => {
     if (e.deltaY !== 0) {
       let newScale = scaleRef.current || 1.0;
       if (e.deltaY < -4) {
-        newScale = Math.floor((newScale + MAGNIFICATION) * 100) / 100;
+        newScale = Math.floor((newScale + MAGNIFICATION) * 10) / 10;
       } else if (e.deltaY > 4) {
-        newScale = Math.floor((newScale - MAGNIFICATION) * 100) / 100;
+        newScale = Math.floor((newScale - MAGNIFICATION) * 10) / 10;
       }
 
       if (
