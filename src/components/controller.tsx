@@ -18,6 +18,7 @@ const Controller = (props: Props) => {
     setClickable,
     clickedTime,
     setAnnotations,
+    setConfThreshold,
     setMono,
     setSelectable,
   } = useDataContext();
@@ -118,6 +119,12 @@ const Controller = (props: Props) => {
     console.info("[info] update annotations");
     setAnnotations(props.annotations);
   }, [props.annotations]);
+
+  useEffect(() => {
+    if (!props.confThreshold) return;
+    console.info(`[info] update confidence threshold: ${props.confThreshold}`);
+    setConfThreshold(props.confThreshold);
+  }, [props.confThreshold]);
 
   // ---------- edit ----------
   useEffect(() => {

@@ -7,6 +7,7 @@ declare module "sound-ui/types" {
   export type WavesProps = {
     dataUrl?: string;
     annotations?: Annotation[];
+    confThreshold?: number;
     width: number;
     height: number;
     samplingLevel?: number; // max: 0.001, 0.01, 0.1, 1.0など
@@ -23,6 +24,7 @@ declare module "sound-ui/types" {
     startTime: number;
     endTime: number;
     label: string;
+    confidence: number;
   };
 
   export interface CanvasPropsInterface {

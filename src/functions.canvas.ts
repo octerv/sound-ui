@@ -142,6 +142,17 @@ const drawLine = (
   canvasCtx.stroke();
 };
 
+/**
+ * Draws text on a given canvas context at specified coordinates.
+ *
+ * @param {CanvasRenderingContext2D} canvasCtx - The canvas rendering context where the text will be drawn.
+ * @param {number} x - The x-coordinate of the text's starting point.
+ * @param {number} y - The y-coordinate of the text's starting point.
+ * @param {string} text - The text string to be drawn. If the text contains '\n', it will be split into multiple lines and each line will be drawn separately.
+ * @param {string} font - The font style to be applied to the text (e.g., "16px Arial").
+ * @param {string} color - The fill color of the text.
+ * @param {CanvasTextAlign} [textAlign="start"] - The alignment of the text relative to the x-coordinate. Default is "start".
+ */
 const drawText = (
   canvasCtx: CanvasRenderingContext2D,
   x: number,
@@ -655,7 +666,8 @@ const drawAnnotations = (
   canvasRef: RefObject<HTMLCanvasElement> | null,
   canvasWidth: number,
   duration: number,
-  annotations: Annotation[]
+  annotations: Annotation[],
+  confThreshold: number
 ) => {
   if (!canvasRef || !canvasRef.current) return;
   const { canvasCtx, canvasHeight } = getCanvasContext(canvasRef);
@@ -664,6 +676,7 @@ const drawAnnotations = (
 
   // 選択された範囲を描画する
   for (const annotation of annotations) {
+    if (annotation.confidence < confThreshold) continue;
     const { x: x0, y: y0 } = getTimePosition(
       canvasWidth,
       duration,
@@ -683,6 +696,15 @@ const drawAnnotations = (
         y0 + graphHeight / 2,
         annotation.label,
         Font.Annotation,
+        Color.DeepSlate,
+        "center"
+      );
+      drawText(
+        canvasCtx,
+        x0 + w / 2,
+        y0 + graphHeight / 2 + 13,
+        annotation.confidence.toFixed(2),
+        Font.Default,
         Color.DeepSlate,
         "center"
       );

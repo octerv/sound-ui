@@ -28,6 +28,8 @@ interface DataContextType {
   // annotation
   annotations: Annotation[];
   setAnnotations: (annotations: Annotation[]) => void;
+  confThreshold: number;
+  setConfThreshold: (threshold: number) => void;
   // edit
   selectable: boolean;
   setSelectable: (selectable: boolean) => void;
@@ -54,6 +56,7 @@ export const DataProvider = ({ children }: DataProviderProps) => {
   const [clickable, setClickable] = useState<boolean>(false);
   const [clickedTime, setClickedTime] = useState<number>(0);
   const [annotations, setAnnotations] = useState<Annotation[]>([]);
+  const [confThreshold, setConfThreshold] = useState<number>(0.0);
   const [selectable, setSelectable] = useState<boolean>(false);
 
   return (
@@ -78,6 +81,8 @@ export const DataProvider = ({ children }: DataProviderProps) => {
         setClickedTime,
         annotations,
         setAnnotations,
+        confThreshold,
+        setConfThreshold,
         selectable,
         setSelectable,
       }}

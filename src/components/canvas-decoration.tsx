@@ -11,7 +11,7 @@ import { useDataContext } from "../contexts/data";
 // Component
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 const CanvasDecoration = () => {
-  const { dataUrl, duration, annotations } = useDataContext();
+  const { dataUrl, duration, annotations, confThreshold } = useDataContext();
   const { contentHeight, scale, canvasWidth } = useScaleContext();
   const { drawn } = useDrawContext();
   const { cursorPosition, selecting, selectedRange, setSelectedRange } =
@@ -50,9 +50,15 @@ const CanvasDecoration = () => {
     if (annotations.length === 0) return;
     // 選択された範囲を描画する
     startTransition(() => {
-      drawAnnotations(canvasRef, canvasWidth, duration, annotations);
+      drawAnnotations(
+        canvasRef,
+        canvasWidth,
+        duration,
+        annotations,
+        confThreshold
+      );
     });
-  }, [annotations, canvasWidth]);
+  }, [annotations, confThreshold, canvasWidth]);
 
   // ---------- Render ----------
   return <Content width={canvasWidth} height={contentHeight} ref={canvasRef} />;

@@ -2,11 +2,13 @@ import React, { ChangeEvent, useRef, useState } from "react";
 import Waves from "../src/Waves";
 import { openAudioFile, openJsonFile } from "../src/functions.file";
 import { useAudioTime } from "../src/effects.audio";
+import { MAX_SCALE } from "../src/constants";
 
 type Annotation = {
   startTime: number;
   endTime: number;
   label: string;
+  confidence: number;
 };
 
 export default {
@@ -21,6 +23,7 @@ export const Default = () => {
   const [annotations, setAnnotations] = useState<Annotation[] | undefined>(
     undefined
   );
+  const [confThreshold, setConfThreshold] = useState<number>(0.0);
   const [mono, setMono] = useState<boolean>(false);
   const [clickable, setClickable] = useState<boolean>(false);
   const [selectable, setSelectable] = useState<boolean>(false);
@@ -40,12 +43,24 @@ export const Default = () => {
     openJsonFile(e).then((jsonData) => {
       if (jsonData) {
         const newAnnotations: Annotation[] = [];
-        for (const note of jsonData["notes"]) {
-          newAnnotations.push({
-            startTime: note[0],
-            endTime: note[1],
-            label: note[2],
-          });
+        if ("notes" in jsonData) {
+          for (const note of jsonData["notes"]) {
+            newAnnotations.push({
+              startTime: note[0],
+              endTime: note[1],
+              label: note[2],
+              confidence: note[3],
+            });
+          }
+        } else if ("time_intervals" in jsonData) {
+          for (const interval of jsonData["time_intervals"]) {
+            newAnnotations.push({
+              startTime: interval[0],
+              endTime: interval[1],
+              label: "",
+              confidence: 1.0,
+            });
+          }
         }
         setAnnotations(newAnnotations);
       }
@@ -85,11 +100,12 @@ export const Default = () => {
       </button>
       &nbsp;
       <button onClick={() => setScale(1.0)}>Zoom min</button>
-      <button onClick={() => setScale(20.0)}>Zoom max</button>
+      <button onClick={() => setScale(MAX_SCALE)}>Zoom max</button>
       <br />
       <Waves
         dataUrl={dataUrl}
         annotations={annotations}
+        confThreshold={confThreshold}
         width={800}
         height={400}
         samplingLevel={0.01}
@@ -101,6 +117,20 @@ export const Default = () => {
         {...(mono && { mono })}
         setPlayPosition={setPlayPosition}
       />
+      <div>
+        <label htmlFor="confidenceSlider">
+          Confidence: {confThreshold.toFixed(2)}
+        </label>
+        <input
+          id="confidenceSlider"
+          type="range"
+          min="0.0"
+          max="1.0"
+          step="0.05"
+          value={confThreshold}
+          onChange={(e) => setConfThreshold(parseFloat(e.target.value))}
+        />
+      </div>
       <div>
         <audio ref={audioRef} controls src={dataUrl}></audio>
         <div>Current Time: {currentTime.toFixed(2)}</div>
