@@ -121,6 +121,7 @@ const CanvasMouse = () => {
         startTime: x0,
         endTime: x1,
         label: "",
+        confidence: 0.0,
       };
       setAnnotations([...prevAnnotations, newAnnotation]);
       setSelecting(false);
