@@ -40,6 +40,36 @@ const openAudioFile = (
 };
 
 /**
+ * Fetches an audio file from a given URL and converts it to a data URL.
+ *
+ * @param url - The URL of the audio file to be converted.
+ * @returns A Promise that resolves to a data URL string or null if the conversion fails.
+ *          The Promise rejects with an error message if the fetch or conversion fails.
+ */
+const openAudioUrl = (url: string): Promise<string | null> => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (reader.result) {
+          resolve(reader.result as string);
+        } else {
+          resolve(null);
+        }
+      };
+      reader.onerror = () => {
+        reject(reader.error);
+      };
+      reader.readAsDataURL(blob);
+    } catch (err) {
+      reject("Failed to fetch URL to Data URL");
+    }
+  });
+};
+
+/**
  * ユーザーが選択したJSONファイルを読み込み、その内容をJSONオブジェクトとして返す非同期関数です。
  * ファイルが選択されていない場合や、選択されたファイルの読み込みに失敗した場合はnullを返します。
  * ファイルリーダーを使用してファイルをテキストとして読み込み、その後JSONとしてパースします。
@@ -77,7 +107,27 @@ const openJsonFile = (
   });
 };
 
+/**
+ * Fetches a JSON file from a given URL and parses it into a JavaScript object.
+ *
+ * @param url - The URL of the JSON file to be fetched and parsed.
+ * @returns A Promise that resolves to the parsed JSON object or null if the fetch or parsing fails.
+ *          The Promise rejects with an error message if the fetch or parsing fails.
+ */
+const openJsonUrl = (url: string): Promise<any | null> => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await fetch(url);
+      const text = await response.text();
+      const jsonData = JSON.parse(text);
+      resolve(jsonData);
+    } catch (err) {
+      reject("Failed to fetch or parse JSON from URL");
+    }
+  });
+};
+
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // Export
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-export { openAudioFile, openJsonFile };
+export { openAudioFile, openAudioUrl, openJsonFile, openJsonUrl };

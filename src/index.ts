@@ -2,7 +2,12 @@ import Synthesis from "./Synthesis";
 import Waves from "./Waves";
 import { SynthesisProps } from "./Synthesis.types";
 import { Annotation } from "sound-ui/types";
-import { openAudioFile, openJsonFile } from "./functions.file";
+import {
+  openAudioFile,
+  openAudioUrl,
+  openJsonFile,
+  openJsonUrl,
+} from "./functions.file";
 
 export {
   Waves,
@@ -10,5 +15,7 @@ export {
   SynthesisProps,
   Annotation,
   openAudioFile,
+  openAudioUrl,
   openJsonFile,
+  openJsonUrl,
 };
