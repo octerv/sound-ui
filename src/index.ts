@@ -8,6 +8,7 @@ import {
   openJsonFile,
   openJsonUrl,
 } from "./functions.file";
+import { useAudioTime } from "./effects.audio";
 
 export {
   Waves,
@@ -18,4 +19,5 @@ export {
   openAudioUrl,
   openJsonFile,
   openJsonUrl,
+  useAudioTime,
 };
