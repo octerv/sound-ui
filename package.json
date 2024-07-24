@@ -1,6 +1,6 @@
 {
   "name": "sound-ui",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "description": "Sound UI Components with React.",
   "main": "build/index.js",
   "types": "build/index.d.ts",
