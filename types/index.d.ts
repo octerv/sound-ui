@@ -16,6 +16,7 @@ declare module "sound-ui/types" {
     selectable?: boolean;
     mono?: boolean;
     scale?: number;
+    setZoomLevel?: (zoomLevel: number) => void;
     currentTime?: number; // ミリ秒数位置指定
     setPlayPosition?: (seconds: number) => void;
   };

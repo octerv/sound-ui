@@ -73,6 +73,10 @@ const Controller = (props: Props) => {
       cursorPosition.x - props.areaRef.current.scrollLeft;
     const newScrollLeft = newCursorPositionX - cursorRelativePositionX;
     setScrollLeft(newScrollLeft);
+
+    if (props.setZoomLevel) {
+      props.setZoomLevel(scale);
+    }
   }, [scale]);
 
   useEffect(() => {

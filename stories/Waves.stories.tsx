@@ -71,6 +71,12 @@ export const Default = () => {
     setNormalize(!normalize);
   };
 
+  // 拡大縮小を指定する関数
+  const setZoomLevel = (zoomLevel: number) => {
+    if (scale === zoomLevel) return;
+    setScale(zoomLevel);
+  };
+
   // 再生位置を秒数で指定する関数
   const setPlayPosition = (seconds: number) => {
     if (audioRef.current) {
@@ -101,6 +107,7 @@ export const Default = () => {
       &nbsp;
       <button onClick={() => setScale(1.0)}>Zoom min</button>
       <button onClick={() => setScale(MAX_SCALE)}>Zoom max</button>
+      ZoomLevel: {scale}
       <br />
       <Waves
         dataUrl={dataUrl}
@@ -111,6 +118,7 @@ export const Default = () => {
         samplingLevel={0.01}
         normalize={normalize}
         scale={scale}
+        setZoomLevel={setZoomLevel}
         currentTime={currentTime}
         {...(clickable && { clickable })}
         {...(selectable && { selectable })}
