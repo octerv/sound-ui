@@ -4,6 +4,7 @@ import { useDataContext } from "../contexts/data";
 import { useScaleContext } from "../contexts/scale";
 import { getTimePosition } from "../functions.time";
 import { useActionContext } from "../contexts/action";
+import { useDrawContext } from "../contexts/draw";
 
 interface Props extends WavesProps {
   areaRef: React.RefObject<HTMLDivElement>;
@@ -31,6 +32,7 @@ const Controller = (props: Props) => {
     scrollLeft,
     setScrollLeft,
   } = useScaleContext();
+  const { drawn } = useDrawContext();
   const { cursorPosition, setCursorPosition } = useActionContext();
 
   // ---------- Refs ----------
@@ -84,6 +86,11 @@ const Controller = (props: Props) => {
     if (!props.areaRef.current) return;
     props.areaRef.current.scrollLeft = scrollLeft;
   }, [scrollLeft]);
+
+  useEffect(() => {
+    if (!props.setUpdateStatus) return;
+    props.setUpdateStatus(drawn ? "drawn" : "pending");
+  }, [drawn]);
 
   // ---------- control audio ----------
   useEffect(() => {

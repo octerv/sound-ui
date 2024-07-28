@@ -84,6 +84,11 @@ export const Default = () => {
     }
   };
 
+  // 描画ステータス
+  const setUpdateStatus = (status: string) => {
+    console.log(`status: ${status}`);
+  };
+
   return (
     <>
       <input type="file" accept="audio/*" onChange={selectFile} />
@@ -124,6 +129,7 @@ export const Default = () => {
         {...(selectable && { selectable })}
         {...(mono && { mono })}
         setPlayPosition={setPlayPosition}
+        setUpdateStatus={setUpdateStatus}
       />
       <div>
         <label htmlFor="confidenceSlider">

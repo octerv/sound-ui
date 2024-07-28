@@ -19,6 +19,7 @@ declare module "sound-ui/types" {
     setZoomLevel?: (zoomLevel: number) => void;
     currentTime?: number; // ミリ秒数位置指定
     setPlayPosition?: (seconds: number) => void;
+    setUpdateStatus?: (status: string) => void;
   };
 
   export type Annotation = {
