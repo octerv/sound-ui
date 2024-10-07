@@ -52,6 +52,15 @@ export const Default = () => {
               confidence: note[3],
             });
           }
+        } else if ("drums" in jsonData) {
+          for (const note of jsonData["drums"]) {
+            newAnnotations.push({
+              startTime: note[0],
+              endTime: note[1],
+              label: note[2],
+              confidence: note[3],
+            });
+          }
         } else if ("time_intervals" in jsonData) {
           for (const interval of jsonData["time_intervals"]) {
             newAnnotations.push({
