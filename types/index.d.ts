@@ -7,6 +7,7 @@ declare module "sound-ui/types" {
   export type WavesProps = {
     dataUrl?: string;
     annotations?: Annotation[];
+    classes?: string[];
     confThreshold?: number;
     width: number;
     height: number;

@@ -667,6 +667,7 @@ const drawAnnotations = (
   canvasWidth: number,
   duration: number,
   annotations: Annotation[],
+  classes: string[],
   confThreshold: number
 ) => {
   if (!canvasRef || !canvasRef.current) return;
@@ -690,10 +691,17 @@ const drawAnnotations = (
     const w = x1 - x0;
     drawFillRect(canvasCtx, x0, y0, w, graphHeight, Color.DustyRose);
     if (annotation.label !== "" && w >= MIN_LABEL_WIDTH) {
+      let labelY = y0 + graphHeight / 2;
+      if (classes.length >= 0) {
+        // classesが指定されている場合に高さを調整
+        const labelInterval = graphHeight / classes.length;
+        const labelIdx = classes.indexOf(annotation.label);
+        labelY = y0 + graphHeight - labelInterval * (labelIdx + 1);
+      }
       drawText(
         canvasCtx,
         x0 + w / 2,
-        y0 + graphHeight / 2,
+        labelY,
         annotation.label,
         Font.Annotation,
         Color.DeepSlate,
@@ -702,7 +710,7 @@ const drawAnnotations = (
       drawText(
         canvasCtx,
         x0 + w / 2,
-        y0 + graphHeight / 2 + 13,
+        labelY + 13,
         annotation.confidence.toFixed(2),
         Font.Default,
         Color.DeepSlate,

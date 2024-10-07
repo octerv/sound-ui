@@ -19,6 +19,7 @@ const Controller = (props: Props) => {
     setClickable,
     clickedTime,
     setAnnotations,
+    setClasses,
     setConfThreshold,
     setMono,
     setSelectable,
@@ -130,6 +131,12 @@ const Controller = (props: Props) => {
     console.info("[info] update annotations");
     setAnnotations(props.annotations);
   }, [props.annotations]);
+
+  useEffect(() => {
+    if (!props.classes) return;
+    console.info("[info] update classes");
+    setClasses(props.classes);
+  });
 
   useEffect(() => {
     if (!props.confThreshold) return;

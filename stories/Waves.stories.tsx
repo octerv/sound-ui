@@ -23,6 +23,7 @@ export const Default = () => {
   const [annotations, setAnnotations] = useState<Annotation[] | undefined>(
     undefined
   );
+  const [classes, setClasses] = useState<string[] | undefined>(undefined);
   const [confThreshold, setConfThreshold] = useState<number>(0.0);
   const [mono, setMono] = useState<boolean>(false);
   const [clickable, setClickable] = useState<boolean>(false);
@@ -61,6 +62,7 @@ export const Default = () => {
               confidence: note[3],
             });
           }
+          setClasses(jsonData["classes"]);
         } else if ("time_intervals" in jsonData) {
           for (const interval of jsonData["time_intervals"]) {
             newAnnotations.push({
@@ -126,6 +128,7 @@ export const Default = () => {
       <Waves
         dataUrl={dataUrl}
         annotations={annotations}
+        classes={classes}
         confThreshold={confThreshold}
         width={800}
         height={400}
