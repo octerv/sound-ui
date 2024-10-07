@@ -674,18 +674,31 @@ const drawSelectedRange = (
   canvasCtx.fill();
 };
 
+/**
+ * アノテーションを描画する
+ * @param canvasWidth
+ * @param canvasHeight
+ * @param samplingLevel
+ * @returns
+ */
 const drawAnnotations = (
-  canvasRef: RefObject<HTMLCanvasElement> | null,
   canvasWidth: number,
+  canvasHeight: number,
   duration: number,
   annotations: Annotation[],
   classes: string[],
   confThreshold: number
-) => {
-  if (!canvasRef || !canvasRef.current) return;
-  const { canvasCtx, canvasHeight } = getCanvasContext(canvasRef);
+): HTMLCanvasElement | null => {
+  // canvasの取得
+  const offscreenCanvas = document.createElement("canvas");
+  offscreenCanvas.width = canvasWidth;
+  offscreenCanvas.height = canvasHeight;
+  const canvasCtx = offscreenCanvas.getContext("2d");
+  if (!canvasCtx) return null;
+  canvasCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+  // グラフの高さを取得
   const graphHeight = canvasHeight - CANVAS_PADDING * 2 - VERTICAL_SCALE_HEIGHT;
-  clearCanvas(canvasRef);
 
   // 選択された範囲を描画する
   for (const annotation of annotations) {
@@ -730,6 +743,8 @@ const drawAnnotations = (
       );
     }
   }
+
+  return offscreenCanvas;
 };
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/

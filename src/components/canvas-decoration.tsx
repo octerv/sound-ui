@@ -51,14 +51,20 @@ const CanvasDecoration = () => {
     if (annotations.length === 0) return;
     // 選択された範囲を描画する
     startTransition(() => {
-      drawAnnotations(
-        canvasRef,
+      let offscreenCanvas: HTMLCanvasElement | null = null;
+      offscreenCanvas = drawAnnotations(
         canvasWidth,
+        contentHeight,
         duration,
         annotations,
         classes,
         confThreshold
       );
+
+      if (offscreenCanvas) {
+        const mainCtx = canvasRef.current?.getContext("2d");
+        mainCtx?.drawImage(offscreenCanvas, 0, 0);
+      }
     });
   }, [annotations, confThreshold, canvasWidth]);
 
