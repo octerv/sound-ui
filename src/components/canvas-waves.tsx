@@ -35,22 +35,34 @@ const CanvasWaves = () => {
 
     // draw waves
     startTransition(() => {
+      let offscreenCanvas: HTMLCanvasElement | null = null;
+
       if (numberOfChannels === 1) {
-        drawWaves(audioBuffer, canvasRef, canvasWidth, DEFAULT_SAMPLING_LEVEL);
-      } else if (mono && numberOfChannels === 2) {
-        drawWavesStereoToMono(
+        offscreenCanvas = drawWaves(
           audioBuffer,
-          canvasRef,
           canvasWidth,
+          contentHeight,
+          DEFAULT_SAMPLING_LEVEL
+        );
+      } else if (mono && numberOfChannels === 2) {
+        offscreenCanvas = drawWavesStereoToMono(
+          audioBuffer,
+          canvasWidth,
+          contentHeight,
           DEFAULT_SAMPLING_LEVEL
         );
       } else if (numberOfChannels === 2) {
-        drawWaveStereo(
+        offscreenCanvas = drawWaveStereo(
           audioBuffer,
-          canvasRef,
           canvasWidth,
+          contentHeight,
           DEFAULT_SAMPLING_LEVEL
         );
+      }
+
+      if (offscreenCanvas) {
+        const mainCtx = canvasRef.current?.getContext("2d");
+        mainCtx?.drawImage(offscreenCanvas, 0, 0);
       }
       console.info("[success] drew");
       setDrawing(false);

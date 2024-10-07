@@ -1,5 +1,5 @@
 import { RefObject } from "react";
-import { getMaxValues, sliceAudioBuffer } from "./functions.audio";
+import { sliceAudioBuffer } from "./functions.audio";
 import {
   CANVAS_PADDING,
   GRAPH_PADDING,
@@ -279,19 +279,18 @@ const drawWavePeriod = (
 /**
  * 波形を描画する（ステレオ）
  * @param audioBuffer
- * @param canvasRef
- * @param canvasWavesWidth
+ * @param canvasWidth
+ * @param canvasHeight
  * @param samplingLevel
  * @returns
  */
 const drawWaveStereo = (
   audioBuffer: AudioBuffer | null,
-  canvasRef: RefObject<HTMLCanvasElement> | null,
-  canvasWavesWidth: number,
+  canvasWidth: number,
+  canvasHeight: number,
   samplingLevel: number
-) => {
-  if (!audioBuffer) return;
-  if (!canvasRef || !canvasRef.current) return;
+): HTMLCanvasElement | null => {
+  if (!audioBuffer) return null;
   console.info("[info] drawing: waves");
 
   // canvasのサイズを変更してスケールを表現
@@ -302,8 +301,11 @@ const drawWaveStereo = (
   console.debug(`sampling level: ${samplingLevel}, interval: ${stepInterval}`);
 
   // canvasの取得
-  const canvasWidth = canvasWavesWidth;
-  const { canvasCtx, canvasHeight } = getCanvasContext(canvasRef);
+  const offscreenCanvas = document.createElement("canvas");
+  offscreenCanvas.width = canvasWidth;
+  offscreenCanvas.height = canvasHeight;
+  const canvasCtx = offscreenCanvas.getContext("2d");
+  if (!canvasCtx) return null;
 
   // graph frame size
   const graphWidth = canvasWidth - CANVAS_PADDING * 2;
@@ -377,24 +379,25 @@ const drawWaveStereo = (
       prePos = curPos;
     }
   }
+
+  return offscreenCanvas;
 };
 
 /**
  * 波形を描画する
  * @param audioBuffer
- * @param canvasRef
- * @param canvasWavesWidth
+ * @param canvasWidth
+ * @param canvasHeight
  * @param samplingLevel
  * @returns
  */
 const drawWavesStereoToMono = (
   audioBuffer: AudioBuffer | null,
-  canvasRef: RefObject<HTMLCanvasElement> | null,
-  canvasWavesWidth: number,
+  canvasWidth: number,
+  canvasHeight: number,
   samplingLevel: number
-) => {
-  if (!audioBuffer) return;
-  if (!canvasRef || !canvasRef.current) return;
+): HTMLCanvasElement | null => {
+  if (!audioBuffer) return null;
   console.info("[info] drawing: stereo to mono");
 
   // canvasのサイズを変更してスケールを表現
@@ -405,8 +408,11 @@ const drawWavesStereoToMono = (
   console.debug(`sampling level: ${samplingLevel}, interval: ${stepInterval}`);
 
   // canvasの取得
-  const canvasWidth = canvasWavesWidth;
-  const { canvasCtx, canvasHeight } = getCanvasContext(canvasRef);
+  const offscreenCanvas = document.createElement("canvas");
+  offscreenCanvas.width = canvasWidth;
+  offscreenCanvas.height = canvasHeight;
+  const canvasCtx = offscreenCanvas.getContext("2d");
+  if (!canvasCtx) return null;
   console.debug(`canvasWidth: ${canvasWidth}, canvasHeight: ${canvasHeight}`);
 
   // graph frame size
@@ -487,24 +493,25 @@ const drawWavesStereoToMono = (
     canvasCtx.stroke();
     prePos = curPos;
   }
+
+  return offscreenCanvas;
 };
 
 /**
  * 波形を描画する
  * @param audioBuffer
- * @param canvasRef
- * @param canvasWavesWidth
+ * @param canvasWidth
+ * @param canvasHeight
  * @param samplingLevel
  * @returns
  */
 const drawWaves = (
   audioBuffer: AudioBuffer | null,
-  canvasRef: RefObject<HTMLCanvasElement> | null,
-  canvasWavesWidth: number,
+  canvasWidth: number,
+  canvasHeight: number,
   samplingLevel: number
-) => {
-  if (!audioBuffer) return;
-  if (!canvasRef || !canvasRef.current) return;
+): HTMLCanvasElement | null => {
+  if (!audioBuffer) return null;
   console.info("[info] drawing: stereo waves");
 
   // canvasのサイズを変更してスケールを表現
@@ -515,8 +522,11 @@ const drawWaves = (
   console.debug(`sampling level: ${samplingLevel}, interval: ${stepInterval}`);
 
   // canvasの取得
-  const canvasWidth = canvasWavesWidth;
-  const { canvasCtx, canvasHeight } = getCanvasContext(canvasRef);
+  const offscreenCanvas = document.createElement("canvas");
+  offscreenCanvas.width = canvasWidth;
+  offscreenCanvas.height = canvasHeight;
+  const canvasCtx = offscreenCanvas.getContext("2d");
+  if (!canvasCtx) return null;
   console.debug(`canvasWidth: ${canvasWidth}, canvasHeight: ${canvasHeight}`);
 
   // graph frame size
@@ -589,6 +599,8 @@ const drawWaves = (
     canvasCtx.stroke();
     prePos = curPos;
   }
+
+  return offscreenCanvas;
 };
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
