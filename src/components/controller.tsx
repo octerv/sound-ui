@@ -56,6 +56,7 @@ const Controller = (props: Props) => {
     if (!props.dataUrl) return;
     console.info("[info] update dataUrl");
     setDataUrl(props.dataUrl);
+    setCurrentTimeX(0);
     setAnnotations([]);
   }, [props.dataUrl]);
 
@@ -74,45 +75,38 @@ const Controller = (props: Props) => {
   useEffect(() => {
     if (!audioBuffer) return;
     console.info(`[info] update zoomLevel: ${zoomLevel}`);
-    // TODO: マウスホイールで連続拡大縮小操作が多重実行されることを要修正
-    // 再生位置を取得しておく
-    const { x } = getTimePosition(canvasWidth, duration, currentTime);
 
-    // Canvasの幅を変更
-    const newCanvasWidth = contentWidth * zoomLevel;
+    // 再生位置を取得
+    const { x: px } = getTimePosition(canvasWidth, duration, currentTime);
+    let newCanvasWidth = contentWidth * zoomLevel;
+    const { x: nx } = getTimePosition(newCanvasWidth, duration, currentTime);
+    let newScrollLeft = 0;
+
     if (newCanvasWidth <= contentWidth) {
-      // 時間軸のメモリを計算
-      const newTimeScales = getTimeScales(audioBuffer, contentWidth);
-
-      // 値の更新
-      setCanvasWidth(contentWidth);
-      setZoomLevel(1.0);
-      setScrollLeft(0);
-      setCurrentTimeX(x);
-      setTimeScales(newTimeScales);
+      newCanvasWidth = contentWidth;
     } else {
       // 新しいスクロール位置を計算
-      const prevScale = Math.floor((canvasWidth / contentWidth) * 10) / 10;
-      // 描画領域のカーソル位置をオフスクリーンの位置に変換して倍率をかける
+      const previousZoomLevel =
+        Math.floor((canvasWidth / contentWidth) * 10) / 10;
       const offscreenCursorPositionX =
-        ((cursorPosition.x + scrollLeft) / prevScale) * zoomLevel;
-      const newScrollLeft = offscreenCursorPositionX - cursorPosition.x;
-
-      // 時間軸のメモリを計算
-      const newTimeScales = getTimeScales(audioBuffer, newCanvasWidth);
-
-      // 値の更新
-      setCanvasWidth(newCanvasWidth);
-      setScrollLeft(newScrollLeft);
-      setCurrentTimeX(x - newScrollLeft);
-      setTimeScales(newTimeScales);
+        ((cursorPosition.x + scrollLeft) / previousZoomLevel) * zoomLevel;
+      newScrollLeft = offscreenCursorPositionX - cursorPosition.x;
     }
+
+    // 時間軸のメモリを計算
+    const newTimeScales = getTimeScales(audioBuffer, newCanvasWidth);
+
+    // 値の更新
+    setCanvasWidth(newCanvasWidth);
+    setScrollLeft(newScrollLeft);
+    setCurrentTimeX(nx - newScrollLeft);
+    setTimeScales(newTimeScales);
 
     // 親コンポーネントに伝える
     if (props.setZoomLevel) {
       props.setZoomLevel(zoomLevel);
     }
-  }, [zoomLevel]);
+  }, [audioBuffer, zoomLevel]);
 
   // -----------------------------------------------------------------------------
   // Section: オーディオの再生に関する操作
