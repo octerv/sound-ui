@@ -592,10 +592,6 @@ const drawAnnotations = (
   offscreenCanvas.height = canvasHeight;
   const canvasCtx = offscreenCanvas.getContext("2d");
   if (!canvasCtx) return null;
-  canvasCtx.clearRect(0, 0, canvasWidth, canvasHeight);
-
-  // グラフの高さを取得
-  const graphHeight = canvasHeight - CANVAS_PADDING * 2 - VERTICAL_SCALE_HEIGHT;
 
   // 選択された範囲を描画する
   for (const annotation of annotations) {
@@ -611,14 +607,14 @@ const drawAnnotations = (
       annotation.endTime
     );
     const w = x1 - x0;
-    drawFillRect(canvasCtx, x0, y0, w, graphHeight, Color.DustyRose);
+    drawFillRect(canvasCtx, x0, y0, w, canvasHeight, Color.DustyRose);
     if (annotation.label !== "" && w >= MIN_LABEL_WIDTH) {
-      let labelY = y0 + graphHeight / 2;
+      let labelY = y0 + canvasHeight / 2;
       if (classes.length >= 0) {
         // classesが指定されている場合に高さを調整
-        const labelInterval = graphHeight / classes.length;
+        const labelInterval = canvasHeight / classes.length;
         const labelIdx = classes.indexOf(annotation.label);
-        labelY = y0 + graphHeight - labelInterval * (labelIdx + 1);
+        labelY = y0 + canvasHeight - labelInterval * (labelIdx + 1);
       }
       drawText(
         canvasCtx,
