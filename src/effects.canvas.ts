@@ -23,8 +23,8 @@ import { Position } from "sound-ui/types";
  * グラフのサイズと位置は、入力パラメータに基づいて動的に計算されます。
  *
  * @param {RefObject<HTMLCanvasElement> | null} canvasRef - グラフを描画するキャンバスへの参照。
+ * @param {number} contentHeight - キャンバス内のコンテンツの総幅。
  * @param {number} contentHeight - キャンバス内のコンテンツの総高さ。
- * @param {number} canvasWidth - キャンバスの幅。
  * @param {AudioBuffer} audioBuffer - 読み込まれたオーディオデータ
  * @param {number} numberOfChannels - グラフに表示するチャネルの数。
  *
@@ -34,8 +34,8 @@ import { Position } from "sound-ui/types";
  */
 const useFrameCanvasSetup = (
   canvasRef: RefObject<HTMLCanvasElement> | null,
+  contentWidth: number,
   contentHeight: number,
-  canvasWidth: number,
   audioBuffer: AudioBuffer | null,
   numberOfChannels: number
 ) => {
@@ -47,26 +47,32 @@ const useFrameCanvasSetup = (
 
     // グラフのサイズを設定
     const { canvasCtx } = getCanvasContext(canvasRef);
-    const graphWidth = canvasWidth - CANVAS_PADDING * 2;
-    const graphHeight =
-      (contentHeight - VERTICAL_SCALE_HEIGHT) / numberOfChannels -
-      CANVAS_PADDING * 2;
-    console.debug(
-      `canvasWidth: ${canvasWidth}, contentHeight: ${contentHeight}, graph: ${graphWidth}x${graphHeight}`
+    const graphWidth = contentWidth - CANVAS_PADDING * 2;
+    const graphHeight = contentHeight - CANVAS_PADDING - VERTICAL_SCALE_HEIGHT;
+
+    // 外枠の描画
+    drawRect(
+      canvasCtx,
+      CANVAS_PADDING,
+      CANVAS_PADDING,
+      graphWidth,
+      graphHeight,
+      Color.DeepSeaBlue
     );
 
-    for (let i = 0; i < numberOfChannels; i++) {
-      const numOfPadding = 2 * i + 1;
-      drawRect(
+    // チャンネルを分割する線を描画
+    for (let i = 1; i < numberOfChannels; i++) {
+      const separateHeight = (graphHeight / numberOfChannels) * i;
+      drawLine(
         canvasCtx,
         CANVAS_PADDING,
-        graphHeight * i + CANVAS_PADDING * numOfPadding,
+        separateHeight,
         graphWidth,
-        graphHeight,
+        0,
         Color.DeepSeaBlue
       );
     }
-  }, [canvasWidth, audioBuffer, numberOfChannels]);
+  }, [audioBuffer, numberOfChannels]);
 };
 
 /**
@@ -211,57 +217,70 @@ const useCanvasClear = (
  * @param canvasRef
  * @param drawn
  * @param canvasWidth
+ * @param scrollLeft
  */
 const useCursorEffect = (
   position: { [key: string]: number },
   audioBuffer: AudioBuffer | null,
   canvasRef: RefObject<HTMLCanvasElement> | null,
   drawn: boolean,
-  canvasWidth: number
+  contentWidth: number,
+  contentHeight: number,
+  canvasWidth: number,
+  graphWidth: number,
+  graphHeight: number,
+  scale: number,
+  scrollLeft: number
 ) => {
   useEffect(() => {
     if (!audioBuffer) return;
     if (!drawn) return;
     if (!canvasRef || !canvasRef.current) return;
 
-    const { canvasCtx, canvasHeight } = getCanvasContext(canvasRef);
+    const { canvasCtx } = getCanvasContext(canvasRef);
 
     // clear
-    canvasCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+    canvasCtx.clearRect(0, 0, contentWidth, contentHeight);
 
     // グラフの範囲外に出たら消したままにする
     if (
-      position.x < CANVAS_PADDING + GRAPH_PADDING ||
-      position.x > canvasWidth - (CANVAS_PADDING + GRAPH_PADDING) ||
+      position.x < CANVAS_PADDING ||
+      position.x > contentWidth - CANVAS_PADDING ||
       position.y < CANVAS_PADDING ||
-      position.y > canvasHeight - VERTICAL_SCALE_HEIGHT
-    )
+      position.y > contentHeight - VERTICAL_SCALE_HEIGHT
+    ) {
       return;
+    }
 
-    // draw
-    canvasCtx.strokeStyle = Color.DeepSlate;
-    canvasCtx.fillStyle = Color.DeepSlate;
-    canvasCtx.globalAlpha = 0.8;
-    canvasCtx.beginPath();
-    canvasCtx.moveTo(position.x, CANVAS_PADDING);
-    canvasCtx.lineTo(
+    // カーソル位置のバーを描画
+    drawLine(
+      canvasCtx,
       position.x,
-      canvasHeight - CANVAS_PADDING - VERTICAL_SCALE_HEIGHT
+      CANVAS_PADDING,
+      0,
+      graphHeight,
+      Color.DeepSlate
     );
-    canvasCtx.closePath();
-    canvasCtx.stroke();
 
-    // カーソル位置のTime表示
-    const sec = getCursorSecond(canvasWidth, audioBuffer.duration, position.x);
+    // カーソル位置の時刻を描画
+    const sec = getCursorSecond(
+      canvasWidth,
+      graphWidth,
+      scale,
+      audioBuffer.duration,
+      position.x,
+      scrollLeft
+    );
+    const x = position.x > contentWidth / 2 ? position.x - 36 : position.x + 8;
     drawText(
       canvasCtx,
-      position.x + 8,
-      canvasHeight - VERTICAL_SCALE_HEIGHT - 16,
+      x,
+      contentHeight - VERTICAL_SCALE_HEIGHT - 16,
       getTimeStr(sec),
       Font.Default,
       Color.DeepSlate
     );
-  }, [position, canvasWidth]);
+  }, [position, canvasWidth, scrollLeft]);
 };
 
 /**
@@ -324,36 +343,6 @@ const useSelectRange = (
   }, [position, selecting]);
 };
 
-/**
- * 指定された現在時刻のバーを描画する
- * @param canvasRef
- * @param duration
- * @param canvasWidth
- * @param currentTime
- */
-const useCurrentTime = (
-  canvasRef: RefObject<HTMLCanvasElement> | null,
-  areaRef: React.RefObject<HTMLDivElement>,
-  duration: number,
-  canvasWidth: number,
-  currentTime: number | undefined
-) => {
-  useEffect(() => {
-    if (!canvasRef || !canvasRef.current) return;
-    if (!areaRef || !areaRef.current) return;
-    if (duration === 0) return;
-    if (!currentTime) return;
-    clearCanvas(canvasRef);
-
-    const { canvasCtx, canvasHeight } = getCanvasContext(canvasRef);
-    const graphHeight =
-      canvasHeight - CANVAS_PADDING * 2 - VERTICAL_SCALE_HEIGHT;
-    const { x, y } = getTimePosition(canvasWidth, duration, currentTime);
-
-    drawLine(canvasCtx, x, y, 0, graphHeight, Color.BrightRed);
-  }, [currentTime]);
-};
-
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // export
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
@@ -366,5 +355,4 @@ export {
   useCanvasClear,
   useCursorEffect,
   useSelectRange,
-  useCurrentTime,
 };

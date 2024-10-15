@@ -40,7 +40,7 @@ const Waves = (props: WavesProps) => {
               <CanvasFrame />
               <CanvasWaves />
               <CanvasDecoration />
-              <CanvasTimeline areaRef={areaRef} />
+              <CanvasTimeline />
               <CanvasCover />
               <CanvasMouse />
             </ActionProvider>

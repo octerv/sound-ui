@@ -13,7 +13,7 @@ import { useDataContext } from "../contexts/data";
 const CanvasDecoration = () => {
   const { dataUrl, duration, annotations, classes, confThreshold } =
     useDataContext();
-  const { contentHeight, scale, canvasWidth } = useScaleContext();
+  const { contentWidth, contentHeight, scale, canvasWidth } = useScaleContext();
   const { drawn } = useDrawContext();
   const { cursorPosition, selecting, selectedRange, setSelectedRange } =
     useActionContext();
@@ -69,7 +69,9 @@ const CanvasDecoration = () => {
   }, [annotations, confThreshold, canvasWidth]);
 
   // ---------- Render ----------
-  return <Content width={canvasWidth} height={contentHeight} ref={canvasRef} />;
+  return (
+    <Content width={contentWidth} height={contentHeight} ref={canvasRef} />
+  );
 };
 
 export default CanvasDecoration;

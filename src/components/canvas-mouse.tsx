@@ -7,7 +7,12 @@ import { useActionContext } from "../contexts/action";
 import { useDrawContext } from "../contexts/draw";
 import { useDataContext } from "../contexts/data";
 import { getCursorSecond } from "../functions.time";
-import { MAGNIFICATION, MAX_SCALE } from "../constants";
+import {
+  CANVAS_PADDING,
+  MAGNIFICATION,
+  MAX_SCALE,
+  VERTICAL_SCALE_HEIGHT,
+} from "../constants";
 
 const CanvasMouse = () => {
   const {
@@ -19,7 +24,16 @@ const CanvasMouse = () => {
     setAnnotations,
     selectable,
   } = useDataContext();
-  const { contentHeight, scale, setScale, canvasWidth } = useScaleContext();
+  const {
+    contentWidth,
+    contentHeight,
+    scale,
+    setScale,
+    canvasWidth,
+    scrollLeft,
+  } = useScaleContext();
+  const graphWidth = contentWidth - CANVAS_PADDING * 2;
+  const graphHeight = contentHeight - CANVAS_PADDING - VERTICAL_SCALE_HEIGHT;
   const { drawn } = useDrawContext();
   const {
     cursorPosition,
@@ -37,7 +51,20 @@ const CanvasMouse = () => {
   // ---------- Effects ----------
   useMouseCanvasSetup(canvasRef);
 
-  useCursorEffect(cursorPosition, audioBuffer, canvasRef, drawn, canvasWidth);
+  // カーソル位置の縦棒などを描画
+  useCursorEffect(
+    cursorPosition,
+    audioBuffer,
+    canvasRef,
+    drawn,
+    contentWidth,
+    contentHeight,
+    canvasWidth,
+    graphWidth,
+    graphHeight,
+    scale,
+    scrollLeft
+  );
 
   // ---------- Mouse event listener ----------
   const onMouseMove = (e: MouseEvent) => {
@@ -107,16 +134,33 @@ const CanvasMouse = () => {
     if (clickable) {
       const newClickedTime = getCursorSecond(
         canvasWidth,
+        graphWidth,
+        scale,
         duration,
-        cursorPosition.x
+        cursorPosition.x,
+        scrollLeft
       );
       setClickedTime(newClickedTime);
     }
 
     if (selectable) {
       const prevAnnotations = JSON.parse(JSON.stringify(annotations));
-      const x0 = getCursorSecond(canvasWidth, duration, selectedRange[0]);
-      const x1 = getCursorSecond(canvasWidth, duration, selectedRange[1]);
+      const x0 = getCursorSecond(
+        canvasWidth,
+        graphWidth,
+        scale,
+        duration,
+        selectedRange[0],
+        scrollLeft
+      );
+      const x1 = getCursorSecond(
+        canvasWidth,
+        graphWidth,
+        scale,
+        duration,
+        selectedRange[1],
+        scrollLeft
+      );
       const newAnnotation: Annotation = {
         startTime: x0,
         endTime: x1,
@@ -131,7 +175,7 @@ const CanvasMouse = () => {
   // ---------- Render ----------
   return (
     <Content
-      width={canvasWidth}
+      width={contentWidth}
       height={contentHeight}
       ref={canvasRef}
       onMouseDown={onMouseDown}

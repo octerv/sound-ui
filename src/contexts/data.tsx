@@ -21,6 +21,8 @@ interface DataContextType {
   // control audio
   currentTime: number;
   setCurrentTime: (currentTime: number) => void;
+  currentTimeX: number;
+  setCurrentTimeX: (currentTimeX: number) => void;
   clickable: boolean;
   setClickable: (clickable: boolean) => void;
   clickedTime: number;
@@ -55,6 +57,7 @@ export const DataProvider = ({ children }: DataProviderProps) => {
   const [mono, setMono] = useState<boolean>(false);
   const [normalize, setNormalize] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
+  const [currentTimeX, setCurrentTimeX] = useState<number>(0);
   const [clickable, setClickable] = useState<boolean>(false);
   const [clickedTime, setClickedTime] = useState<number>(0);
   const [annotations, setAnnotations] = useState<Annotation[]>([]);
@@ -78,6 +81,8 @@ export const DataProvider = ({ children }: DataProviderProps) => {
         setNormalize,
         currentTime,
         setCurrentTime,
+        currentTimeX,
+        setCurrentTimeX,
         clickable,
         setClickable,
         clickedTime,

@@ -30,6 +30,11 @@ declare module "sound-ui/types" {
     confidence: number;
   };
 
+  export type TimeScale = {
+    x: number;
+    t: number;
+  };
+
   export interface CanvasPropsInterface {
     canvasRef: React.RefObject<HTMLCanvasElement>;
     height: number;

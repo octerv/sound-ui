@@ -120,9 +120,11 @@ export const Default = () => {
       <button onClick={handleNormalize}>
         Normalize ({normalize ? "ON" : "OFF"})
       </button>
-      &nbsp;
+      <br />
       <button onClick={() => setScale(1.0)}>Zoom min</button>
       <button onClick={() => setScale(MAX_SCALE)}>Zoom max</button>
+      <button onClick={() => setScale(scale - 1)}>Zoom -</button>
+      <button onClick={() => setScale(scale + 1)}>Zoom +</button>
       ZoomLevel: {scale}
       <br />
       <Waves

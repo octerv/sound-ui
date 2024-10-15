@@ -1,4 +1,4 @@
-import { Position } from "sound-ui/types";
+import { Position, TimeScale } from "sound-ui/types";
 import { CANVAS_PADDING, GRAPH_PADDING } from "./constants";
 
 /**
@@ -18,7 +18,7 @@ function getTimeStr(second: number): string {
 }
 
 /**
- * 指定時刻の現在位置を取得する
+ * 指定時刻のキャンバス上の現在位置を取得する
  * @param canvasWidth
  * @param duration
  * @param currentTime ミリ秒
@@ -29,12 +29,8 @@ const getTimePosition = (
   duration: number,
   currentTime: number
 ): Position => {
-  const graphWidth = canvasWidth - CANVAS_PADDING * 2 - GRAPH_PADDING * 2;
-  const x =
-    CANVAS_PADDING +
-    GRAPH_PADDING +
-    Math.floor(graphWidth * (currentTime / duration));
-  const y = CANVAS_PADDING;
+  const x = (currentTime / duration) * canvasWidth;
+  const y = 0;
   return { x, y };
 };
 
@@ -43,15 +39,47 @@ const getTimePosition = (
  * @param canvasWidth
  * @param duration
  * @param x
+ * @param scrollLeft
  * @returns
  */
-const getCursorSecond = (canvasWidth: number, duration: number, x: number) => {
-  if (x === 0) return 0;
-  const adjustWidth = CANVAS_PADDING + GRAPH_PADDING;
-  return ((x - adjustWidth) * duration) / (canvasWidth - adjustWidth * 2);
+const getCursorSecond = (
+  canvasWidth: number,
+  graphWidth: number,
+  scale: number,
+  duration: number,
+  x: number,
+  scrollLeft: number
+) => {
+  // if (x === 0) return 0;
+  const graphX = x - CANVAS_PADDING;
+  // 計算基準にする幅（描画領域に貼り付ける
+  const canvasX =
+    scale === 1.0 ? (graphX / graphWidth) * canvasWidth : graphX + scrollLeft;
+
+  // 時刻に変換して返却
+  return (canvasX / canvasWidth) * duration;
+};
+
+// SPLIT SCALE
+// duration >= 1:00:00 ... each 10:00 = sampleRate * 600
+// duration >= 30:00 && duration < 1:00:00 ... each 5:00 = sampleRate * 300
+// duration >= 10:00 && duration < 30:00 ... each 3:00 = sampleRate * 180
+// duration >= 1:00 && duration < 10:00 ... each 1:00 = sampleRate * 60
+// duration < 1:00 ... each 0:05 = sampleRate * 5
+const getTimeScales = (audioBuffer: AudioBuffer, canvasWidth: number) => {
+  const duration = audioBuffer.duration;
+  const timeScales: TimeScale[] = [];
+  for (let t = 0; t <= duration; t = t + 60) {
+    const x = (t / duration) * canvasWidth;
+    timeScales.push({
+      x,
+      t,
+    });
+  }
+  return timeScales;
 };
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // Export
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-export { getTimeStr, getTimePosition, getCursorSecond };
+export { getTimeStr, getTimePosition, getCursorSecond, getTimeScales };

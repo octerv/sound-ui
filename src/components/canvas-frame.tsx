@@ -6,17 +6,19 @@ import { useRef } from "react";
 
 const CanvasFrame = () => {
   const { audioBuffer, numberOfChannels, mono } = useDataContext();
-  const { contentHeight, canvasWidth } = useScaleContext();
+  const { contentWidth, contentHeight } = useScaleContext();
   const n = mono ? 1 : numberOfChannels;
 
   // ---------- Refs ----------
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // ---------- Effects ----------
-  useFrameCanvasSetup(canvasRef, contentHeight, canvasWidth, audioBuffer, n);
+  useFrameCanvasSetup(canvasRef, contentWidth, contentHeight, audioBuffer, n);
 
   // ---------- Render ----------
-  return <Content width={canvasWidth} height={contentHeight} ref={canvasRef} />;
+  return (
+    <Content width={contentWidth} height={contentHeight} ref={canvasRef} />
+  );
 };
 
 export default CanvasFrame;

@@ -1,17 +1,20 @@
 import type { ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
-import { CANVAS_PADDING, GRAPH_PADDING } from "../constants";
+import { CANVAS_PADDING } from "../constants";
+import { TimeScale } from "sound-ui/types";
 
 interface ScaleContextType {
-  contentWidth: number;
-  contentHeight: number;
+  contentWidth: number; // 描画を行うキャンバスの幅（指定された固定サイズ）
+  contentHeight: number; // 描画を行うキャンバスの高さ（指定された固定サイズ）
+  canvasWidth: number; // 波形を描画するバックスクリーンキャンバスの幅
+  setCanvasWidth: (width: number) => void;
+  graphWidth: number; // 描画キャンバス内の波形を表示する幅
   scale: number;
   setScale: (scale: number) => void;
-  canvasWidth: number;
-  setCanvasWidth: (width: number) => void;
+  timeScales: TimeScale[];
+  setTimeScales: (timeScales: TimeScale[]) => void;
   scrollLeft: number;
   setScrollLeft: (left: number) => void;
-  graphWidth: number;
 }
 
 const ScaleContext = createContext<ScaleContextType | undefined>(undefined);
@@ -29,12 +32,11 @@ export const ScaleProvider = ({
   contentHeight,
   inputScale = 1.0,
 }: ScaleProviderProps) => {
-  const [scale, setScale] = useState<number>(1.0);
   const [canvasWidth, setCanvasWidth] = useState<number>(contentWidth);
+  const graphWidth = contentWidth - CANVAS_PADDING * 2;
+  const [scale, setScale] = useState<number>(1.0);
   const [scrollLeft, setScrollLeft] = useState<number>(0);
-  const [graphWidth, setGraphWidth] = useState<number>(
-    contentWidth - CANVAS_PADDING * 2 - GRAPH_PADDING * 2
-  );
+  const [timeScales, setTimeScales] = useState<TimeScale[]>([]);
   // Paddingは以下の設計
   // | Content | CANVAS_PADDING | Canvas | GRAPH_PADDING | Graph | GRAPH_PADDING | Canvas | CANVAS_PADDING | Content |
 
@@ -45,13 +47,15 @@ export const ScaleProvider = ({
       value={{
         contentWidth,
         contentHeight,
-        scale,
-        setScale,
         canvasWidth,
         setCanvasWidth,
+        graphWidth,
+        scale,
+        setScale,
+        timeScales,
+        setTimeScales,
         scrollLeft,
         setScrollLeft,
-        graphWidth,
       }}
     >
       {children}

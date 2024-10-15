@@ -22,7 +22,7 @@ const CanvasWavePeriod = ({
   period,
   frequency,
 }: Props) => {
-  const { canvasWidth } = useScaleContext();
+  const { contentWidth, canvasWidth } = useScaleContext();
 
   // ---------- Refs ----------
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -48,7 +48,7 @@ const CanvasWavePeriod = ({
   const wavesStyle = { top, left };
   return (
     <Content
-      width={canvasWidth}
+      width={contentWidth}
       height={height}
       style={wavesStyle}
       ref={canvasRef}
