@@ -610,7 +610,7 @@ const drawAnnotations = (
     drawFillRect(canvasCtx, x0, y0, w, canvasHeight, Color.DustyRose);
     if (annotation.label !== "" && w >= MIN_LABEL_WIDTH) {
       let labelY = y0 + canvasHeight / 2;
-      if (classes.length >= 0) {
+      if (classes.length > 0) {
         // classesが指定されている場合に高さを調整
         const labelInterval = canvasHeight / classes.length;
         const labelIdx = classes.indexOf(annotation.label);
