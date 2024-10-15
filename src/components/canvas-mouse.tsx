@@ -13,6 +13,7 @@ import {
   MAX_ZOOM_LEVEL,
   VERTICAL_SCALE_HEIGHT,
 } from "../constants";
+import { useDebounce } from "../effects.scale";
 
 const CanvasMouse = () => {
   const {
@@ -67,6 +68,30 @@ const CanvasMouse = () => {
   );
 
   // ---------- Mouse event listener ----------
+  const debouncedSetZoomLevel = useDebounce((newZoomLevel) => {
+    if (
+      newZoomLevel >= 1.0 &&
+      newZoomLevel <= MAX_ZOOM_LEVEL &&
+      zoomLevelRef.current !== newZoomLevel
+    ) {
+      setZoomLevel(newZoomLevel);
+    }
+  }, 100); // 100ミリ秒のディレイ
+
+  const onMouseWheel = (e: WheelEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    let newZoomLevel = zoomLevelRef.current || 1.0;
+    if (e.deltaY < 0) {
+      newZoomLevel = Math.min(newZoomLevel + MAGNIFICATION, MAX_ZOOM_LEVEL);
+    } else {
+      newZoomLevel = Math.max(newZoomLevel - MAGNIFICATION, 1.0);
+    }
+
+    debouncedSetZoomLevel(newZoomLevel);
+  };
+
   const onMouseMove = (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -78,29 +103,6 @@ const CanvasMouse = () => {
 
     // scale center
     setCursorPosition({ x: posX, y: posY });
-  };
-
-  const onMouseWheel = (e: WheelEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    // 縦スクロールで拡大縮小
-    if (e.deltaY !== 0) {
-      let newZoomLevel = zoomLevelRef.current || 1.0;
-      if (e.deltaY < -4) {
-        newZoomLevel = Math.floor((newZoomLevel + MAGNIFICATION) * 10) / 10;
-      } else if (e.deltaY > 4) {
-        newZoomLevel = Math.floor((newZoomLevel - MAGNIFICATION) * 10) / 10;
-      }
-
-      if (
-        newZoomLevel >= 1.0 &&
-        newZoomLevel <= MAX_ZOOM_LEVEL &&
-        zoomLevelRef.current !== newZoomLevel
-      ) {
-        setZoomLevel(newZoomLevel);
-      }
-    }
   };
 
   useEffect(() => {
