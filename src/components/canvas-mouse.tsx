@@ -10,7 +10,7 @@ import { getCursorSecond } from "../functions.time";
 import {
   CANVAS_PADDING,
   MAGNIFICATION,
-  MAX_SCALE,
+  MAX_ZOOM_LEVEL,
   VERTICAL_SCALE_HEIGHT,
 } from "../constants";
 
@@ -27,8 +27,8 @@ const CanvasMouse = () => {
   const {
     contentWidth,
     contentHeight,
-    scale,
-    setScale,
+    zoomLevel,
+    setZoomLevel,
     canvasWidth,
     scrollLeft,
   } = useScaleContext();
@@ -45,8 +45,8 @@ const CanvasMouse = () => {
 
   // ---------- Refs ----------
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const scaleRef = useRef<number>();
-  scaleRef.current = scale;
+  const zoomLevelRef = useRef<number>();
+  zoomLevelRef.current = zoomLevel;
 
   // ---------- Effects ----------
   useMouseCanvasSetup(canvasRef);
@@ -62,7 +62,7 @@ const CanvasMouse = () => {
     canvasWidth,
     graphWidth,
     graphHeight,
-    scale,
+    zoomLevel,
     scrollLeft
   );
 
@@ -86,19 +86,19 @@ const CanvasMouse = () => {
 
     // 縦スクロールで拡大縮小
     if (e.deltaY !== 0) {
-      let newScale = scaleRef.current || 1.0;
+      let newZoomLevel = zoomLevelRef.current || 1.0;
       if (e.deltaY < -4) {
-        newScale = Math.floor((newScale + MAGNIFICATION) * 10) / 10;
+        newZoomLevel = Math.floor((newZoomLevel + MAGNIFICATION) * 10) / 10;
       } else if (e.deltaY > 4) {
-        newScale = Math.floor((newScale - MAGNIFICATION) * 10) / 10;
+        newZoomLevel = Math.floor((newZoomLevel - MAGNIFICATION) * 10) / 10;
       }
 
       if (
-        newScale >= 1.0 &&
-        newScale <= MAX_SCALE &&
-        scaleRef.current !== newScale
+        newZoomLevel >= 1.0 &&
+        newZoomLevel <= MAX_ZOOM_LEVEL &&
+        zoomLevelRef.current !== newZoomLevel
       ) {
-        setScale(newScale);
+        setZoomLevel(newZoomLevel);
       }
     }
   };
@@ -135,7 +135,7 @@ const CanvasMouse = () => {
       const newClickedTime = getCursorSecond(
         canvasWidth,
         graphWidth,
-        scale,
+        zoomLevel,
         duration,
         cursorPosition.x,
         scrollLeft
@@ -148,7 +148,7 @@ const CanvasMouse = () => {
       const x0 = getCursorSecond(
         canvasWidth,
         graphWidth,
-        scale,
+        zoomLevel,
         duration,
         selectedRange[0],
         scrollLeft
@@ -156,7 +156,7 @@ const CanvasMouse = () => {
       const x1 = getCursorSecond(
         canvasWidth,
         graphWidth,
-        scale,
+        zoomLevel,
         duration,
         selectedRange[1],
         scrollLeft

@@ -15,7 +15,6 @@ import {
   getCanvasContext,
 } from "./functions.canvas";
 import { sliceByNumber } from "./functions.common";
-import { Position } from "sound-ui/types";
 
 /**
  * 指定されたキャンバスにグラフを設定するためのフックです。
@@ -229,7 +228,7 @@ const useCursorEffect = (
   canvasWidth: number,
   graphWidth: number,
   graphHeight: number,
-  scale: number,
+  zoomLevel: number,
   scrollLeft: number
 ) => {
   useEffect(() => {
@@ -266,7 +265,7 @@ const useCursorEffect = (
     const sec = getCursorSecond(
       canvasWidth,
       graphWidth,
-      scale,
+      zoomLevel,
       audioBuffer.duration,
       position.x,
       scrollLeft
@@ -287,7 +286,7 @@ const useCursorEffect = (
  * マウスで範囲選択された箇所を配列にする
  * @param selecting
  * @param position
- * @param scale
+ * @param zoomLevel
  * @param drewWaves
  * @param canvasRef
  * @returns
@@ -295,7 +294,7 @@ const useCursorEffect = (
 const useSelectRange = (
   selecting: boolean,
   position: { [key: string]: number },
-  scale: number,
+  zoomLevel: number,
   drewWaves: boolean,
   canvasRef: RefObject<HTMLCanvasElement> | null,
   selectedRange: number[],
@@ -307,8 +306,8 @@ const useSelectRange = (
     if (!selecting) return;
     // グラフの範囲外に出たら消したままにする
     const { canvasWidth, canvasHeight } = getCanvasContext(canvasRef);
-    const frameWidth = canvasWidth / scale;
-    const unscaledPosX = Math.round(position.x / scale);
+    const frameWidth = canvasWidth / zoomLevel;
+    const unscaledPosX = Math.round(position.x / zoomLevel);
 
     const outOfCanvas =
       position.x < CANVAS_PADDING + GRAPH_PADDING ||

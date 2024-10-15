@@ -1,5 +1,5 @@
 import { Position, TimeScale } from "sound-ui/types";
-import { CANVAS_PADDING, GRAPH_PADDING } from "./constants";
+import { CANVAS_PADDING } from "./constants";
 
 /**
  * 時刻を文字列として取得する
@@ -37,6 +37,8 @@ const getTimePosition = (
 /**
  * カーソル位置の時刻を取得する
  * @param canvasWidth
+ * @param graphWidth
+ * @param zoomLevel
  * @param duration
  * @param x
  * @param scrollLeft
@@ -45,7 +47,7 @@ const getTimePosition = (
 const getCursorSecond = (
   canvasWidth: number,
   graphWidth: number,
-  scale: number,
+  zoomLevel: number,
   duration: number,
   x: number,
   scrollLeft: number
@@ -54,7 +56,9 @@ const getCursorSecond = (
   const graphX = x - CANVAS_PADDING;
   // 計算基準にする幅（描画領域に貼り付ける
   const canvasX =
-    scale === 1.0 ? (graphX / graphWidth) * canvasWidth : graphX + scrollLeft;
+    zoomLevel === 1.0
+      ? (graphX / graphWidth) * canvasWidth
+      : graphX + scrollLeft;
 
   // 時刻に変換して返却
   return (canvasX / canvasWidth) * duration;

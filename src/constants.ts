@@ -9,7 +9,7 @@ export const DEFAULT_SAMPLING_LEVEL = 0.01;
 
 // scaling
 export const MAGNIFICATION = 0.5;
-export const MAX_SCALE = 100;
+export const MAX_ZOOM_LEVEL = 100;
 
 // colors
 export namespace Color {

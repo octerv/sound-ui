@@ -13,7 +13,8 @@ import { useDataContext } from "../contexts/data";
 const CanvasDecoration = () => {
   const { dataUrl, duration, annotations, classes, confThreshold } =
     useDataContext();
-  const { contentWidth, contentHeight, scale, canvasWidth } = useScaleContext();
+  const { contentWidth, contentHeight, zoomLevel, canvasWidth } =
+    useScaleContext();
   const { drawn } = useDrawContext();
   const { cursorPosition, selecting, selectedRange, setSelectedRange } =
     useActionContext();
@@ -27,7 +28,7 @@ const CanvasDecoration = () => {
   useSelectRange(
     selecting,
     cursorPosition,
-    scale,
+    zoomLevel,
     drawn,
     canvasRef,
     selectedRange,
@@ -43,7 +44,7 @@ const CanvasDecoration = () => {
       selectedRange,
       cursorPosition,
       selecting,
-      scale
+      zoomLevel
     );
   }, [cursorPosition, selecting]);
 

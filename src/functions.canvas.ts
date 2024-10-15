@@ -8,8 +8,8 @@ import {
   Font,
   MIN_LABEL_WIDTH,
 } from "./constants";
-import { getTimePosition, getTimeStr } from "./functions.time";
-import { scaling, sliceByNumber } from "./functions.common";
+import { getTimePosition } from "./functions.time";
+import { sliceByNumber } from "./functions.common";
 import { Annotation } from "sound-ui/types";
 
 /**
@@ -365,12 +365,8 @@ const drawWavesStereoToMono = (
   if (!audioBuffer) return null;
   console.info("[info] drawing: stereo to mono");
 
-  // canvasのサイズを変更してスケールを表現
-  const { buffer, scales } = scaling(audioBuffer);
-
   // どれくらいの詳細度で描画するか（以下は1/10秒）
-  const stepInterval = buffer.sampleRate * samplingLevel;
-  console.debug(`sampling level: ${samplingLevel}, interval: ${stepInterval}`);
+  const stepInterval = audioBuffer.sampleRate * samplingLevel;
 
   // canvasの取得
   const offscreenCanvas = document.createElement("canvas");
@@ -378,23 +374,20 @@ const drawWavesStereoToMono = (
   offscreenCanvas.height = canvasHeight;
   const canvasCtx = offscreenCanvas.getContext("2d");
   if (!canvasCtx) return null;
-  console.debug(`canvasWidth: ${canvasWidth}, canvasHeight: ${canvasHeight}`);
 
   // graph frame size
-  const graphWidth = canvasWidth - CANVAS_PADDING * 2;
-  const graphHeight = canvasHeight - CANVAS_PADDING * 2 - VERTICAL_SCALE_HEIGHT;
-  console.debug(`graphWidth: ${graphWidth}, graphHeight: ${graphHeight}`);
+  const graphWidth = canvasWidth;
+  const graphHeight = canvasHeight;
 
   // step size
   const stepWidth =
-    (graphWidth - GRAPH_PADDING * 2) /
-    (buffer.getChannelData(0).length / stepInterval);
-  const stepHeight = graphHeight - GRAPH_PADDING * 2;
+    graphWidth / (audioBuffer.getChannelData(0).length / stepInterval);
+  const stepHeight = graphHeight;
 
   // bufferからステレオそれぞれのデータを取り出す
-  const channelDataLeft = buffer.getChannelData(0);
-  const channelDataRight = buffer.getChannelData(1);
-  const numberOfSamples = buffer.length;
+  const channelDataLeft = audioBuffer.getChannelData(0);
+  const channelDataRight = audioBuffer.getChannelData(1);
+  const numberOfSamples = audioBuffer.length;
 
   // 左右のチャンネルのデータを加算し、平均を取ることでモノラル波形を作成する
   const waveformData = new Float32Array(numberOfSamples);
@@ -402,47 +395,23 @@ const drawWavesStereoToMono = (
     waveformData[i] = (channelDataLeft[i] + channelDataRight[i]) / 2;
   }
 
-  const centerHeight = CANVAS_PADDING + graphHeight / 2;
+  const centerHeight = graphHeight / 2;
 
-  let prePos = {
-    x: CANVAS_PADDING + GRAPH_PADDING,
+  let previousPosition = {
+    x: 0,
     y: centerHeight,
   };
-
   for (let j = 0; j < waveformData.length; j = j + stepInterval) {
     const amp = waveformData[j] * (stepHeight / 2);
 
-    const curPos = {
-      x: CANVAS_PADDING + GRAPH_PADDING + stepWidth * (j / stepInterval),
+    const currentPosition = {
+      x: stepWidth * (j / stepInterval),
       y: centerHeight - amp,
     };
 
-    // draw horizontal scale
-    if (j in scales) {
-      // console.debug(`draw scale [${j}:${scales[j]}]`);
-      const y = CANVAS_PADDING;
-      canvasCtx.strokeStyle = Color.DeepSlate;
-      canvasCtx.lineWidth = 0.2;
-      canvasCtx.beginPath();
-      canvasCtx.moveTo(curPos.x, y);
-      canvasCtx.lineTo(curPos.x, y + graphHeight);
-      canvasCtx.closePath();
-      canvasCtx.stroke();
-      // 目盛り文字を描画
-      const scaleY = canvasHeight - VERTICAL_SCALE_HEIGHT + 8;
-      drawText(
-        canvasCtx,
-        curPos.x,
-        scaleY,
-        getTimeStr(scales[j]),
-        Font.Small,
-        Color.DeepSlate
-      );
-    }
-
     if (j === 0) {
       // 先頭は値を入れておくのみにする（0位置の設定のため）
-      prePos = curPos;
+      previousPosition = currentPosition;
       continue;
     }
 
@@ -450,10 +419,10 @@ const drawWavesStereoToMono = (
     canvasCtx.strokeStyle = Color.SkyBlueCyan;
     canvasCtx.lineWidth = 0.5;
     canvasCtx.beginPath();
-    canvasCtx.moveTo(prePos.x, prePos.y);
-    canvasCtx.lineTo(curPos.x, curPos.y);
+    canvasCtx.moveTo(previousPosition.x, previousPosition.y);
+    canvasCtx.lineTo(currentPosition.x, currentPosition.y);
     canvasCtx.stroke();
-    prePos = curPos;
+    previousPosition = currentPosition;
   }
 
   return offscreenCanvas;
@@ -476,12 +445,8 @@ const drawWaves = (
   if (!audioBuffer) return null;
   console.info("[info] drawing: stereo waves");
 
-  // canvasのサイズを変更してスケールを表現
-  const { buffer, scales } = scaling(audioBuffer);
-
   // どれくらいの詳細度で描画するか（以下は1/10秒）
-  const stepInterval = buffer.sampleRate * samplingLevel;
-  console.debug(`sampling level: ${samplingLevel}, interval: ${stepInterval}`);
+  const stepInterval = audioBuffer.sampleRate * samplingLevel;
 
   // canvasの取得
   const offscreenCanvas = document.createElement("canvas");
@@ -489,63 +454,36 @@ const drawWaves = (
   offscreenCanvas.height = canvasHeight;
   const canvasCtx = offscreenCanvas.getContext("2d");
   if (!canvasCtx) return null;
-  console.debug(`canvasWidth: ${canvasWidth}, canvasHeight: ${canvasHeight}`);
 
   // graph frame size
-  const graphWidth = canvasWidth - CANVAS_PADDING * 2;
-  const graphHeight = canvasHeight - CANVAS_PADDING * 2 - VERTICAL_SCALE_HEIGHT;
-  console.debug(`graphWidth: ${graphWidth}, graphHeight: ${graphHeight}`);
+  const graphWidth = canvasWidth;
+  const graphHeight = canvasHeight / audioBuffer.numberOfChannels;
 
   // step size
   const stepWidth =
-    (graphWidth - GRAPH_PADDING * 2) /
-    (buffer.getChannelData(0).length / stepInterval);
-  const stepHeight = graphHeight - GRAPH_PADDING * 2;
+    graphWidth / (audioBuffer.getChannelData(0).length / stepInterval);
+  const stepHeight = graphHeight;
 
   // bufferからモノラルのデータを取り出す
-  const channelData = buffer.getChannelData(0);
+  const channelData = audioBuffer.getChannelData(0);
 
   const centerHeight = CANVAS_PADDING + graphHeight / 2;
 
-  let prePos = {
-    x: CANVAS_PADDING + GRAPH_PADDING,
+  let previousPosition = {
+    x: 0,
     y: centerHeight,
   };
-
   for (let j = 0; j < channelData.length; j = j + stepInterval) {
     const amp = channelData[j] * (stepHeight / 2);
 
-    const curPos = {
-      x: CANVAS_PADDING + GRAPH_PADDING + stepWidth * (j / stepInterval),
+    const currentPosition = {
+      x: stepWidth * (j / stepInterval),
       y: centerHeight - amp,
     };
 
-    // draw horizontal scale
-    if (j in scales) {
-      // console.debug(`draw scale [${j}:${scales[j]}]`);
-      const y = CANVAS_PADDING;
-      canvasCtx.strokeStyle = Color.DeepSlate;
-      canvasCtx.lineWidth = 0.2;
-      canvasCtx.beginPath();
-      canvasCtx.moveTo(curPos.x, y);
-      canvasCtx.lineTo(curPos.x, y + graphHeight);
-      canvasCtx.closePath();
-      canvasCtx.stroke();
-      // 目盛り文字を描画
-      const scaleY = canvasHeight - VERTICAL_SCALE_HEIGHT + 8;
-      drawText(
-        canvasCtx,
-        curPos.x,
-        scaleY,
-        getTimeStr(scales[j]),
-        Font.Small,
-        Color.DeepSlate
-      );
-    }
-
     if (j === 0) {
       // 先頭は値を入れておくのみにする（0位置の設定のため）
-      prePos = curPos;
+      previousPosition = currentPosition;
       continue;
     }
 
@@ -553,10 +491,10 @@ const drawWaves = (
     canvasCtx.strokeStyle = Color.SkyBlueCyan;
     canvasCtx.lineWidth = 0.5;
     canvasCtx.beginPath();
-    canvasCtx.moveTo(prePos.x, prePos.y);
-    canvasCtx.lineTo(curPos.x, curPos.y);
+    canvasCtx.moveTo(previousPosition.x, previousPosition.y);
+    canvasCtx.lineTo(currentPosition.x, currentPosition.y);
     canvasCtx.stroke();
-    prePos = curPos;
+    previousPosition = currentPosition;
   }
 
   return offscreenCanvas;
@@ -572,7 +510,7 @@ const drawWaves = (
  * @param ranges
  * @param position
  * @param selecting
- * @param scale
+ * @param zoomLevel
  * @returns
  */
 const drawSelectedRange = (
@@ -580,7 +518,7 @@ const drawSelectedRange = (
   ranges: number[],
   position: { [key: string]: number },
   selecting: boolean,
-  scale: number
+  zoomLevel: number
 ) => {
   if (!canvasRef || !canvasRef.current) return;
   const { canvasCtx, canvasHeight } = getCanvasContext(canvasRef);
@@ -590,7 +528,7 @@ const drawSelectedRange = (
 
   // 選択された範囲を描画する
   const scaledRanges = ranges.map((r: number) => {
-    return Math.round(r * scale);
+    return Math.round(r * zoomLevel);
   });
   const rescaleRanges = sliceByNumber(scaledRanges, 2);
   canvasCtx.fillStyle = Color.DustyRose;
@@ -705,11 +643,6 @@ const drawAnnotations = (
 
   return offscreenCanvas;
 };
-
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-// Draw scale
-//_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-const drawScale = (canvasRef: RefObject<HTMLCanvasElement> | null) => {};
 
 //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 // export

@@ -9,8 +9,8 @@ interface ScaleContextType {
   canvasWidth: number; // 波形を描画するバックスクリーンキャンバスの幅
   setCanvasWidth: (width: number) => void;
   graphWidth: number; // 描画キャンバス内の波形を表示する幅
-  scale: number;
-  setScale: (scale: number) => void;
+  zoomLevel: number;
+  setZoomLevel: (zoomLevel: number) => void;
   timeScales: TimeScale[];
   setTimeScales: (timeScales: TimeScale[]) => void;
   scrollLeft: number;
@@ -23,24 +23,24 @@ type ScaleProviderProps = {
   children: ReactNode;
   contentWidth: number;
   contentHeight: number;
-  inputScale?: number;
+  inputZoomLevel?: number;
 };
 
 export const ScaleProvider = ({
   children,
   contentWidth,
   contentHeight,
-  inputScale = 1.0,
+  inputZoomLevel = 1.0,
 }: ScaleProviderProps) => {
   const [canvasWidth, setCanvasWidth] = useState<number>(contentWidth);
   const graphWidth = contentWidth - CANVAS_PADDING * 2;
-  const [scale, setScale] = useState<number>(1.0);
+  const [zoomLevel, setZoomLevel] = useState<number>(1.0);
   const [scrollLeft, setScrollLeft] = useState<number>(0);
   const [timeScales, setTimeScales] = useState<TimeScale[]>([]);
   // Paddingは以下の設計
   // | Content | CANVAS_PADDING | Canvas | GRAPH_PADDING | Graph | GRAPH_PADDING | Canvas | CANVAS_PADDING | Content |
 
-  useEffect(() => setScale(inputScale), [inputScale]);
+  useEffect(() => setZoomLevel(inputZoomLevel), [inputZoomLevel]);
 
   return (
     <ScaleContext.Provider
@@ -50,8 +50,8 @@ export const ScaleProvider = ({
         canvasWidth,
         setCanvasWidth,
         graphWidth,
-        scale,
-        setScale,
+        zoomLevel,
+        setZoomLevel,
         timeScales,
         setTimeScales,
         scrollLeft,

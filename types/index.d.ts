@@ -16,7 +16,7 @@ declare module "sound-ui/types" {
     clickable?: boolean;
     selectable?: boolean;
     mono?: boolean;
-    scale?: number;
+    zoomLevel?: number;
     setZoomLevel?: (zoomLevel: number) => void;
     currentTime?: number; // ミリ秒数位置指定
     setPlayPosition?: (seconds: number) => void;

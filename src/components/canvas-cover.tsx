@@ -6,7 +6,7 @@ import { useRef } from "react";
 
 const CanvasCover = () => {
   const { numberOfChannels, mono } = useDataContext();
-  const { contentWidth, contentHeight, canvasWidth } = useScaleContext();
+  const { contentWidth, contentHeight } = useScaleContext();
   const n = mono ? 1 : numberOfChannels;
 
   // ---------- Refs ----------

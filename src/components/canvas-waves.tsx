@@ -1,9 +1,8 @@
-import { startTransition, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useEffect } from "react";
 import { Content } from "./styled";
 import { useWavesCanvasSetup } from "../effects.canvas";
 import {
-  drawLine,
   drawText,
   drawWaveStereo,
   drawWaves,
@@ -28,7 +27,7 @@ const CanvasWaves = () => {
     contentHeight,
     canvasWidth,
     graphWidth,
-    scale,
+    zoomLevel,
     timeScales,
     scrollLeft,
   } = useScaleContext();
@@ -44,7 +43,7 @@ const CanvasWaves = () => {
   const copyCanvas = () => {
     if (!offscreenCanvas) return;
     const mainCtx = canvasRef.current?.getContext("2d");
-    let sourceWidth = scale > 1.0 ? graphWidth : canvasWidth;
+    let sourceWidth = zoomLevel > 1.0 ? graphWidth : canvasWidth;
     if (mainCtx) {
       mainCtx.clearRect(0, 0, contentWidth, contentHeight);
       // メインキャンバスに描画
@@ -71,7 +70,7 @@ const CanvasWaves = () => {
 
     for (const timeScale of timeScales) {
       const adjustX =
-        scale === 1.0
+        zoomLevel === 1.0
           ? (timeScale.x / canvasWidth) * graphWidth // 等倍の場合はキャンバスの縮小を考慮
           : timeScale.x - scrollLeft; // 拡大されている場合はスクロール位置を考慮
       drawText(

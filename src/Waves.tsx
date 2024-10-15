@@ -32,7 +32,7 @@ const Waves = (props: WavesProps) => {
         <ScaleProvider
           contentWidth={props.width}
           contentHeight={props.height}
-          inputScale={props.scale}
+          inputZoomLevel={props.zoomLevel}
         >
           <DrawProvider>
             <ActionProvider>

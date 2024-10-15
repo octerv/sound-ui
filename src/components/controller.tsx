@@ -32,8 +32,8 @@ const Controller = (props: Props) => {
   } = useDataContext();
   const {
     contentWidth,
-    scale,
-    setScale,
+    zoomLevel,
+    setZoomLevel,
     canvasWidth,
     setCanvasWidth,
     graphWidth,
@@ -73,20 +73,20 @@ const Controller = (props: Props) => {
   // 拡大縮小された場合に拡大率、スクロール位置、現在再生位置、キャンバスの幅を再設定する
   useEffect(() => {
     if (!audioBuffer) return;
-    console.info(`[info] update scale: ${scale}`);
+    console.info(`[info] update zoomLevel: ${zoomLevel}`);
     // TODO: マウスホイールで連続拡大縮小操作が多重実行されることを要修正
     // 再生位置を取得しておく
     const { x } = getTimePosition(canvasWidth, duration, currentTime);
 
     // Canvasの幅を変更
-    const newCanvasWidth = contentWidth * scale;
+    const newCanvasWidth = contentWidth * zoomLevel;
     if (newCanvasWidth <= contentWidth) {
       // 時間軸のメモリを計算
       const newTimeScales = getTimeScales(audioBuffer, contentWidth);
 
       // 値の更新
       setCanvasWidth(contentWidth);
-      setScale(1.0);
+      setZoomLevel(1.0);
       setScrollLeft(0);
       setCurrentTimeX(x);
       setTimeScales(newTimeScales);
@@ -95,7 +95,7 @@ const Controller = (props: Props) => {
       const prevScale = Math.floor((canvasWidth / contentWidth) * 10) / 10;
       // 描画領域のカーソル位置をオフスクリーンの位置に変換して倍率をかける
       const offscreenCursorPositionX =
-        ((cursorPosition.x + scrollLeft) / prevScale) * scale;
+        ((cursorPosition.x + scrollLeft) / prevScale) * zoomLevel;
       const newScrollLeft = offscreenCursorPositionX - cursorPosition.x;
 
       // 時間軸のメモリを計算
@@ -110,9 +110,9 @@ const Controller = (props: Props) => {
 
     // 親コンポーネントに伝える
     if (props.setZoomLevel) {
-      props.setZoomLevel(scale);
+      props.setZoomLevel(zoomLevel);
     }
-  }, [scale]);
+  }, [zoomLevel]);
 
   // -----------------------------------------------------------------------------
   // Section: オーディオの再生に関する操作
@@ -126,7 +126,7 @@ const Controller = (props: Props) => {
     // キャンバス上の座標を取得
     const { x } = getTimePosition(canvasWidth, duration, props.currentTime);
     let newCurrentTimeX =
-      scale === 1.0 ? (x / canvasWidth) * graphWidth : x - scrollLeft;
+      zoomLevel === 1.0 ? (x / canvasWidth) * graphWidth : x - scrollLeft;
     // if (newCurrentTimeX < 0) newCurrentTimeX = 0;
     newCurrentTimeX += CANVAS_PADDING;
 
@@ -140,7 +140,7 @@ const Controller = (props: Props) => {
         setScrollLeft(x - contentWidth / 2);
         newCurrentTimeX = contentWidth / 2;
       }
-      if (scale > 1.0 && newCurrentTimeX >= contentWidth / 2) {
+      if (zoomLevel > 1.0 && newCurrentTimeX >= contentWidth / 2) {
         setScrollLeft(x - contentWidth / 2);
         newCurrentTimeX = contentWidth / 2;
       }

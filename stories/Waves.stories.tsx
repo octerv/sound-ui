@@ -2,7 +2,7 @@ import React, { ChangeEvent, useRef, useState } from "react";
 import Waves from "../src/Waves";
 import { openAudioFile, openJsonFile } from "../src/functions.file";
 import { useAudioTime } from "../src/effects.audio";
-import { MAX_SCALE } from "../src/constants";
+import { MAX_ZOOM_LEVEL } from "../src/constants";
 
 type Annotation = {
   startTime: number;
@@ -29,7 +29,7 @@ export const Default = () => {
   const [clickable, setClickable] = useState<boolean>(false);
   const [selectable, setSelectable] = useState<boolean>(false);
   const [normalize, setNormalize] = useState<boolean>(false);
-  const [scale, setScale] = useState<number>(1.0);
+  const [zoomLevel, setZoomLevel] = useState<number>(1.0);
   const currentTime = useAudioTime(audioRef);
 
   const selectFile = (e: ChangeEvent<HTMLInputElement>) => {
@@ -82,12 +82,6 @@ export const Default = () => {
     setNormalize(!normalize);
   };
 
-  // 拡大縮小を指定する関数
-  const setZoomLevel = (zoomLevel: number) => {
-    if (scale === zoomLevel) return;
-    setScale(zoomLevel);
-  };
-
   // 再生位置を秒数で指定する関数
   const setPlayPosition = (seconds: number) => {
     if (audioRef.current) {
@@ -121,11 +115,11 @@ export const Default = () => {
         Normalize ({normalize ? "ON" : "OFF"})
       </button>
       <br />
-      <button onClick={() => setScale(1.0)}>Zoom min</button>
-      <button onClick={() => setScale(MAX_SCALE)}>Zoom max</button>
-      <button onClick={() => setScale(scale - 1)}>Zoom -</button>
-      <button onClick={() => setScale(scale + 1)}>Zoom +</button>
-      ZoomLevel: {scale}
+      <button onClick={() => setZoomLevel(1.0)}>Zoom min</button>
+      <button onClick={() => setZoomLevel(MAX_ZOOM_LEVEL)}>Zoom max</button>
+      <button onClick={() => setZoomLevel(zoomLevel - 1)}>Zoom -</button>
+      <button onClick={() => setZoomLevel(zoomLevel + 1)}>Zoom +</button>
+      ZoomLevel: {zoomLevel}
       <br />
       <Waves
         dataUrl={dataUrl}
@@ -136,7 +130,7 @@ export const Default = () => {
         height={400}
         samplingLevel={0.01}
         normalize={normalize}
-        scale={scale}
+        zoomLevel={zoomLevel}
         setZoomLevel={setZoomLevel}
         currentTime={currentTime}
         {...(clickable && { clickable })}
