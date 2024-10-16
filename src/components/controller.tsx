@@ -93,6 +93,9 @@ const Controller = (props: Props) => {
       newScrollLeft = offscreenCursorPositionX - cursorPosition.x;
     }
 
+    // 値の調整
+    if (newScrollLeft < 0) newScrollLeft = 0;
+
     // 時間軸のメモリを計算
     const newTimeScales = getTimeScales(audioBuffer, newCanvasWidth);
 
@@ -115,7 +118,8 @@ const Controller = (props: Props) => {
   // オーディオ再生の時刻変化によって画面上の再生位置とスクロール量を更新する
   useEffect(() => {
     if (!props.currentTime) return;
-    setCurrentTime(props.currentTime);
+
+    let newScrollLeft = 0;
 
     // キャンバス上の座標を取得
     const { x } = getTimePosition(canvasWidth, duration, props.currentTime);
@@ -131,15 +135,22 @@ const Controller = (props: Props) => {
       // TODO: スクロール開始部分でカクツクので微調整が必要かと思われる
       // TODO: 拡大済みで残りがスクロール不要な場合の対応が必要
       if (newCurrentTimeX < 0) {
-        setScrollLeft(x - contentWidth / 2);
+        newScrollLeft = x - contentWidth / 2;
         newCurrentTimeX = contentWidth / 2;
       }
       if (zoomLevel > 1.0 && newCurrentTimeX >= contentWidth / 2) {
-        setScrollLeft(x - contentWidth / 2);
+        newScrollLeft = x - contentWidth / 2;
         newCurrentTimeX = contentWidth / 2;
       }
     }
+
+    // 値の調整
+    if (newScrollLeft < 0) newScrollLeft = 0;
+
+    // 値の更新
+    setCurrentTime(props.currentTime);
     setCurrentTimeX(newCurrentTimeX);
+    setScrollLeft(newScrollLeft);
   }, [props.currentTime]);
 
   // 再生位置をマウスクリックで有効にするか無効にするか切り替える

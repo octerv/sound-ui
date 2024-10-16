@@ -70,9 +70,9 @@ const CanvasWaves = () => {
 
     for (const timeScale of timeScales) {
       const adjustX =
-        zoomLevel === 1.0
-          ? (timeScale.x / canvasWidth) * graphWidth // 等倍の場合はキャンバスの縮小を考慮
-          : timeScale.x - scrollLeft; // 拡大されている場合はスクロール位置を考慮
+        zoomLevel > 1.0
+          ? timeScale.x - scrollLeft // 拡大されている場合はスクロール位置を考慮
+          : (timeScale.x / canvasWidth) * graphWidth; // 等倍の場合はキャンバスの縮小を考慮
       drawText(
         mainCtx,
         adjustX + CANVAS_PADDING,
